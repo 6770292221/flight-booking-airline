@@ -1,0 +1,16 @@
+version: "3"
+services:
+  my-redis-docker-service:
+    image: redis:latest
+    container_name: my-redis
+    restart: always
+    ports:
+      - "15313:6379"  # Map Redis container's port 6379 to host port 15313
+    environment:
+      - REDIS_PASSWORD=nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz
+    command: ["redis-server", "--requirepass", "nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

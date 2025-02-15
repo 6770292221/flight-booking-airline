@@ -1,0 +1,21 @@
+import redisClient from '../utils/redis_utils.js';
+import logger from '../utils/logger_utils.js';
+
+export const addToBlacklist = async (token) => {
+    try {
+        const expiryTime = 86400;
+        await redisClient.setEx(token, expiryTime, 'blacklisted');
+        logger.info(`Token added to blacklist: ${token}`);
+    } catch (error) {
+        logger.error('Error adding token to blacklist:', error);
+    }
+};
+export const isTokenBlacklisted = async (token) => {
+    try {
+        const reply = await redisClient.get(token);
+        return reply === 'blacklisted';
+    } catch (error) {
+        logger.error('Error checking token blacklist:', error);
+        return false;
+    }
+};
