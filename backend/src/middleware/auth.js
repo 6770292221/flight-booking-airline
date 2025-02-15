@@ -17,7 +17,7 @@ const verifyToken = async (req, res, next) => {
     try {
         const isBlacklisted = await isTokenBlacklisted(token);
         if (isBlacklisted) {
-             return res.status(StatusCodes.UNAUTHORIZED).json({
+            return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
                 code: Codes.TKN_6002,
                 message: Messages.TKN_6002,
@@ -28,12 +28,14 @@ const verifyToken = async (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-         return res.status(StatusCodes.UNAUTHORIZED).json({
+        return res.status(StatusCodes.UNAUTHORIZED).json({
             status: StatusMessages.FAILED,
             code: Codes.TKN_6002,
             message: Messages.TKN_6002,
         });
     }
 };
+
+
 
 export { verifyToken };

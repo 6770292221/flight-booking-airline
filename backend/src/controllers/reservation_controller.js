@@ -2,21 +2,24 @@ import { ReservationServiceModel, ReservationMongooseModel } from "../models/res
 import { FlightMongooseModel } from "../models/flights_modeles.js";
 import { SeatMongooseModel } from "../models/seats_modeles.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
+import { Types } from 'mongoose';
 
 
-export async function createReservation(req, res) {
+export const createReservation = async (req, res, next) => {
     try {
-        const { flightId, seatId, userId } = req.body;
+        const userId = req.user.userId;
 
-        if (!flightId || !seatId || !userId) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
+        const { flightId, passenger } = req.body;
+
+        if (!passenger || !userId || !flightId) {
+            return res.status(400).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3001,
                 message: Messages.RSV_3001
             });
         }
 
-        if (!Array.isArray(seatId)) {
+        if (!Types.ObjectId.isValid(flightId)) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3002,
@@ -24,52 +27,123 @@ export async function createReservation(req, res) {
             });
         }
 
-        if (new Set(seatId).size !== seatId.length) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
+        const flight = await FlightMongooseModel.findById(flightId);
+
+        if (!flight) {
+            return res.status(400).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3003,
                 message: Messages.RSV_3003
             });
         }
 
-        const flight = await FlightMongooseModel.findById(flightId);
-        if (!flight) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
+        const seatIds = passenger.map(p => p.seatId);
+        const uniqueSeatIds = new Set(seatIds);
+
+        if (seatIds.length !== uniqueSeatIds.size) {
+            return res.status(400).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3004,
                 message: Messages.RSV_3004
             });
         }
 
-        const seats = await SeatMongooseModel.find({ _id: { $in: seatId } }).lean();
+        const passports = passenger.map(p => p.passport);
+        const uniquePassports = new Set(passports);
+
+        if (passports.length !== uniquePassports.size) {
+            return res.status(400).json({
+                status: StatusMessages.FAILED,
+                code: Codes.RSV_3005,
+                message: Messages.RSV_3005
+            });
+        }
+
+        for (let i = 0; i < passenger.length; i++) {
+            const { seatId, first, family, passport, price } = passenger[i];
 
 
-        const foundSeatIds = seats.map(seat => seat._id.toString());
+            if (!Types.ObjectId.isValid(seatId)) {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3006,
+                    message: Messages.RSV_3006.replace("{index}", i + 1)
+                });
+            }
+
+            const seat = await SeatMongooseModel.findById(seatId);
+            if (!seat) {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3007,
+                    message: Messages.RSV_3007.replace("{index}", i + 1)
+                });
+
+            }
+            if (typeof price !== "number" || price <= 0) {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3010,
+                    message: Messages.RSV_3010.replace("{index}", i + 1)
+                });
+            }
+
+            if (price <= 0 || isNaN(price)) {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3011,
+                    message: Messages.RSV_3011.replace("{index}", i + 1)
+                });
+            }
+
+            if (!seatId || !first || !family || !passport || !price) {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3008,
+                    message: Messages.RSV_3008.replace("{index}", i + 1)
+                });
+            }
+
+        }
 
         const destination = flight.destination;
         const randomDigits = Math.floor(100000 + Math.random() * 900000);
-        const bookingReference = `${destination}-${randomDigits}`;
+        const generatedBookingId = `${destination}-${randomDigits}`;
 
-        const newReservation = new ReservationMongooseModel({
-            flightId,
-            seatId,
-            userId,
-            bookingReference,
-        });
+        const reservationService = new ReservationServiceModel();
+        const reservation = await reservationService.createReservation(flightId, passenger, userId, generatedBookingId);
 
-        const savedReservation = await newReservation.save();
+        let totalPrice = 0;
+        const selectedPassengers = await Promise.all(
+            reservation.passenger.map(async (p) => {
+                const seat = await SeatMongooseModel.findById(p.seatId);
+
+                if (seat) {
+                    totalPrice += parseFloat(p.price);
+                }
+
+                return {
+                    seatId: p.seatId,
+                    seatNumber: seat.seatNumber,
+                    fullName: `${p.first} ${p.family}`,
+                    passport: p.passport,
+                    price: p.price
+                };
+            })
+        );
+
         res.status(StatusCodes.CREATE).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.RSV_3007,
-            message: Messages.RSV_3007,
-            data: {
-                transactionId: savedReservation._id,
-                bookingReference: savedReservation.bookingReference,
-                userId: savedReservation.userId,
-                paymentStatus: savedReservation.paymentStatus,
-                createdAt: savedReservation.createdAt,
+            code: Codes.RSV_3009,
+            message: Messages.RSV_3009,
+            date: {
+                flightId: reservation.flightId,
                 flightNumber: flight.flightNumber,
-                seatNumbers: seats.map(seat => seat.seatNumber)
+                bookingId: reservation.bookingId,
+                status: reservation.status,
+                paymentReference: reservation.paymentReference,
+                passenger: selectedPassengers,
+                totalPrice: totalPrice,
             }
         });
 
@@ -80,6 +154,7 @@ export async function createReservation(req, res) {
         });
     }
 }
+
 
 export async function getAllReservations(req, res) {
     try {
@@ -103,7 +178,7 @@ export async function getAllReservations(req, res) {
                 arrivalTime: reservation.arrivalTime || reservation.flight?.arrivalTime,
                 reservationId: reservation._id || reservation.reservationId,
                 paymentStatus: reservation.paymentStatus,
-                bookingReference: reservation.bookingReference,
+                bookingId: reservation.bookingId,
                 createdAt: reservation.createdAt,
                 name: reservation.account?.name,
                 email: reservation.account?.email,
@@ -125,3 +200,4 @@ export async function getAllReservations(req, res) {
         console.error(error);
     }
 }
+

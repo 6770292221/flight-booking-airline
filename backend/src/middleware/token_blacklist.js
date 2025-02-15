@@ -19,3 +19,13 @@ export const isTokenBlacklisted = async (token) => {
         return false;
     }
 };
+
+export const decodeToken = (token) => {
+    try {
+        const decoded = jwt.decode(token);
+        return decoded;
+    } catch (error) {
+        logger.error('Error decoding token:', error);
+        return null;
+    }
+};
