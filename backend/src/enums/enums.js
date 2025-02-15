@@ -112,6 +112,7 @@ export const Messages = Object.freeze({
   RSV_3009: "Reservation successful.",
   RSV_3010: "Price must be a positive number at Passenger {index}.",
   RSV_3011: "Price must be greater than 0 at Passenger {index}.",
+  RSV_3012: "Passenger {index}: The selected seat is not available for booking",
 
   // Seat
   SAT_1001: "Missing required information: flightId, seatId, and userId are mandatory.",

@@ -104,6 +104,15 @@ export const createReservation = async (req, res, next) => {
                 });
             }
 
+            if (seat.status !== "available") {
+                return res.status(400).json({
+                    status: StatusMessages.FAILED,
+                    code: Codes.RSV_3012,
+                    message: Messages.RSV_3012.replace("{index}", i + 1)
+                });
+            }
+
+
         }
 
         const destination = flight.destination;
