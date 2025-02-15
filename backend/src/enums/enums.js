@@ -101,16 +101,17 @@ export const Messages = Object.freeze({
   LGN_2003: "The email you entered is incorrect. Please try again.",
 
   // Reservation Messages
-  RSV_3001: "Missing required information: flightId, seatId, and userId are mandatory.",
-  RSV_3002: "seatId must be an array.",
-  RSV_3003: "seatId must not contain duplicates.",
-  RSV_3004: "Flight with the specified flightId not found.",
-  RSV_3005: "Get reservation successfully",
-  RSV_3006: "Get reservation failed",
-  RSV_3007: "reservation successfully",
-  RSV_3008: "Delete reservation successfully",
-  RSV_3009: "reservation transaction found successfully.",
-  RSV_3010: "Update reservation successfully",
+  RSV_3001: "Missing required information: flightId and passenger are mandatory.",
+  RSV_3002: "Invalid flight number.",
+  RSV_3003: "Flight information not found",
+  RSV_3004: "Duplicate seat booking is not allowed.",
+  RSV_3005: "Duplicate passport usage is not allowed.",
+  RSV_3006: "Seat for passenger {index} is invalid.",
+  RSV_3007: "Seat for passenger {index} does not exist in the system.",
+  RSV_3008: "Passenger {index} information is incomplete.",
+  RSV_3009: "Reservation successful.",
+  RSV_3010: "Price must be a positive number at Passenger {index}.",
+  RSV_3011: "Price must be greater than 0 at Passenger {index}.",
 
   // Seat
   SAT_1001: "Missing required information: flightId, seatId, and userId are mandatory.",
