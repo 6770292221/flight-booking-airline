@@ -3,10 +3,21 @@ import jwt from "jsonwebtoken";
 import { AccountMongooseModel } from "../models/account_models.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
 import { addToBlacklist } from '../middleware/token_blacklist.js';
+import speakeasy from 'speakeasy';
+
 
 export async function loginUser(req, res) {
-    const { email, password } = req.body;
+    const { email, password, otp } = req.body;
     try {
+
+        if (!email || !password || !otp) {
+            return res.status(400).json({
+                status: StatusMessages.FAILED,
+                code: Codes.LGN_2002,
+                message: Messages.LGN_2002
+            });
+        }
+
         const user = await AccountMongooseModel.findOne({ email });
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -20,10 +31,37 @@ export async function loginUser(req, res) {
         if (!isMatch) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                code: Codes.LGN_2002,
-                message: Messages.LGN_2002
+                code: Codes.LGN_2006,
+                message: Messages.LGN_2006
             });
         }
+
+        const twoFactorSecret = user.twoFactorSecret;
+        if (!twoFactorSecret) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.LGN_2004,
+                message: Messages.LGN_2004
+            });
+        }
+
+        const isValidOTP = speakeasy.totp.verify({
+            secret: twoFactorSecret,
+            encoding: 'base32',
+            token: otp,
+            window: 1
+        });
+
+        if (!isValidOTP) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.LGN_2005,
+                message: Messages.LGN_2005
+            });
+        }
+
+
+
 
         const token = jwt.sign(
             {

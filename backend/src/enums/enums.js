@@ -32,6 +32,11 @@ export const Codes = Object.freeze({
   // Auth Codes
   LGN_2001: "LGN_2001",
   LGN_2002: "LGN_2002",
+  LGN_2003: "LGN_2003",
+  LGN_2004: "LGN_2004",
+  LGN_2005: "LGN_2005",
+  LGN_2006: "LGN_2006",
+  LGN_2007: "LGN_2007",
 
   // Reservation Codes
   RSV_3001: "RSV_3001",
@@ -97,8 +102,12 @@ export const Messages = Object.freeze({
 
   // Auth Messages
   LGN_2001: "Login successful",
-  LGN_2002: "The password you entered is incorrect. Please try again.",
+  LGN_2002: "Missing required information: flightId, email, password and otp are mandatory.",
   LGN_2003: "The email you entered is incorrect. Please try again.",
+  LGN_2004: "Two-factor authentication is not set up for this account.",
+  LGN_2005: "Invalid or expired OTP. Please try again.",
+  LGN_2006: "The password you entered is incorrect. Please try again.",
+  LGN_2007: "",
 
   // Reservation Messages
   RSV_3001: "Missing required information: flightId and passenger are mandatory.",
@@ -112,6 +121,7 @@ export const Messages = Object.freeze({
   RSV_3009: "Reservation successful.",
   RSV_3010: "Price must be a positive number at Passenger {index}.",
   RSV_3011: "Price must be greater than 0 at Passenger {index}.",
+  RSV_3012: "Passenger {index}: The selected seat is not available for booking",
 
   // Seat
   SAT_1001: "Missing required information: flightId, seatId, and userId are mandatory.",
@@ -141,6 +151,7 @@ export const Messages = Object.freeze({
   VAL_4002: "Invalid phone number format",
   VAL_4003: "Invalid shopId format",
   VAL_4004: `Invalid data format`,
+
 
   // Logout Messages
   LOT_5001: "Logout successful",

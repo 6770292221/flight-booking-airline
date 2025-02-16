@@ -2,6 +2,9 @@ import { AccountServiceModel, AccountMongooseModel } from "../models/account_mod
 import { ResponseModel } from "../models/response_models.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
 import bcrypt from 'bcrypt';
+import speakeasy from 'speakeasy';
+import qrcode from 'qrcode';
+
 
 const hideEmail = (email) => {
   const [localPart, domainPart] = email.split('@');
@@ -72,8 +75,25 @@ export async function createAccount(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const hiddenEmail = hideEmail(email);
 
-    const newAccount = new AccountServiceModel(firstName, lastName, hashedPassword, email, phoneNumber);
-    await AccountMongooseModel.create(newAccount);
+    const twoFASecret = speakeasy.generateSecret({
+      name: `Ariline-booking (${email})`
+    });
+
+    const qrCodeDataURL = await qrcode.toDataURL(twoFASecret.otpauth_url);
+
+    const newAccount = new AccountMongooseModel({
+      firstName,
+      lastName,
+      password: hashedPassword,
+      email,
+      phoneNumber,
+      isAdmin,
+      twoFactorSecret: twoFASecret.base32,
+      qrCode: qrCodeDataURL
+
+    });
+
+    await newAccount.save();
 
     res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
@@ -85,7 +105,10 @@ export async function createAccount(req, res) {
         email: hiddenEmail,
         phoneNumber: newAccount.phoneNumber,
         password: hashedPassword,
-        isAdmin: isAdmin
+        isAdmin: isAdmin,
+        twoFactorSecret: twoFASecret.base32,
+        qrCode: qrCodeDataURL
+
       }
     });
 

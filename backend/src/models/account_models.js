@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
 
 class AccountServiceModel {
-  constructor(firstName, lastName, password, email, telephone, isAdmin) {
+  constructor(firstName, lastName, password, email, telephone, isAdmin, twoFactorSecret, qrCode) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.password = password;
     this.email = email;
     this.phoneNumber = telephone;
     this.isAdmin = isAdmin;
+    this.twoFactorSecret = twoFactorSecret;
+    this.qrCode = qrCode;
+
   }
 
   static getSchema() {
@@ -19,6 +22,9 @@ class AccountServiceModel {
         email: { type: String, required: true, unique: true },
         phoneNumber: { type: String, required: true },
         isAdmin: { type: Boolean, default: false },
+        twoFactorSecret: { type: String, required: true },
+        qrCode: { type: String, required: true }
+
       },
       { timestamps: true }
     );
