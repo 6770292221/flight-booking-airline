@@ -86,7 +86,7 @@ export async function createSeat(req, res) {
 export async function updateSeat(req, res) {
     try {
         const { _id } = req.params;
-        const { seatClass, price } = req.body;
+        const { seatClass, price, status } = req.body;
 
         if (!req.user || req.user.isAdmin !== true) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -96,11 +96,11 @@ export async function updateSeat(req, res) {
             });
         }
 
-        if (!seatClass || price === undefined) {
+        if (seatClass === undefined && price === undefined && status === undefined) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                code: Codes.SAT_1001,
-                message: Messages.SAT_1001
+                code: Codes.SAT_1006,
+                message: Messages.SAT_1006
             });
         }
 
@@ -121,8 +121,18 @@ export async function updateSeat(req, res) {
             });
         }
 
-        seat.seatClass = seatClass;
-        seat.price = price;
+        if (status && !["available", "reserve", "confirmed"].includes(status)) {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                status: StatusMessages.FAILED,
+                code: Codes.SAT_1010,
+                message: Messages.SAT_1010
+            });
+        }
+
+        if (seatClass !== undefined) seat.seatClass = seatClass;
+        if (price !== undefined) seat.price = price;
+        if (status !== undefined) seat.status = status;
+
         await seat.save();
 
         res.status(StatusCodes.OK).json({

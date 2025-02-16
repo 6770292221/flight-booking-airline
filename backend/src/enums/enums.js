@@ -74,6 +74,7 @@ export const Codes = Object.freeze({
   SAT_1007: "SAT_1007",
   SAT_1008: "SAT_1008",
   SAT_1009: "SAT_1009",
+  SAT_1010: "SAT_1010:",
 
   //Flight
   FGT_1001: "SAT_1001",
@@ -133,6 +134,7 @@ export const Messages = Object.freeze({
   SAT_1007: "Seat updated successfully.",
   SAT_1008: "Seat delete successfully.",
   SAT_1009: "Seat found successfully.",
+  SAT_1010: "Invalid status value. Allowed values are 'available', 'reserve', 'confirmed",
 
   // Flight
   FGT_1001: "Flight not found.",
