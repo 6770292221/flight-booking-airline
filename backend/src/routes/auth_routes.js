@@ -9,4 +9,5 @@ routerAuth.get('/auth/verifyToken', verifyToken, verifyTokenUser);
 
 
 
+
 export default routerAuth;
