@@ -6,7 +6,7 @@ import { verifyToken } from "../middleware/auth.js";
 const routerFlight = Router();
 
 routerFlight.post("/seat", verifyToken, createSeat);
-routerFlight.put("/seat/:_id", verifyToken, updateSeat);
+routerFlight.patch("/seat/:_id", verifyToken, updateSeat);
 routerFlight.delete("/seat/:_id", verifyToken, deleteSeat);
 routerFlight.get("/seat/:_id", verifyToken, getSeatById);
 routerFlight.get("/seat", verifyToken, getAllSeats);
