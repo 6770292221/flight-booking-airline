@@ -36,7 +36,6 @@ export const Codes = Object.freeze({
   LGN_2002: "LGN_2002",
   LGN_2003: "LGN_2003",
   LGN_2004: "LGN_2004",
-  LGN_2005: "LGN_2005",
   LGN_2006: "LGN_2006",
 
   // Reservation Codes
@@ -111,7 +110,7 @@ export const Messages = Object.freeze({
   REG_1004: "Name Already Exists: The name already exists in the system.",
   REG_1005: "Email Already Exists: The email already exists in the system.",
   REG_1006: "Password must meet the following requirements: 1. Length between 8 and 20 characters, 2. At least one uppercase letter (A-Z), 3. At least one lowercase letter (a-z), 4. At least one number (0-9), 5. At least one special character (e.g., !@#$%^&*(),.?\":{}|<>).",
-  REG_1007: "Account is not verifi.",
+  REG_1007: "Account already verified.",
   REG_1008: "Account successfully verified",
 
   // Auth Messages
@@ -119,7 +118,6 @@ export const Messages = Object.freeze({
   LGN_2002: "Missing required information: flightId, email, password and otp are mandatory.",
   LGN_2003: "The email you entered is incorrect. Please try again.",
   LGN_2004: "Two-factor authentication is not set up for this account.",
-  LGN_2005: "Invalid or expired OTP. Please try again.",
   LGN_2006: "The password you entered is incorrect. Please try again.",
 
   // Reservation Messages
@@ -170,9 +168,9 @@ export const Messages = Object.freeze({
 
   // 2fa
   ATH_4001: "user not found",
-  ATH_4002: "Invalid phone number format",
-  ATH_4003: "Invalid shopId format",
-  ATH_4004: `Invalid data format`,
+  ATH_4002: "Invalid or expired OTP. Please try again",
+  ATH_4003: "Missing required information: VrificationCode are mandatory",
+  ATH_4004: "2FA verified successfully.",
 
 
   // Logout Messages

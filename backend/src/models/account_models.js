@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 class AccountServiceModel {
-  constructor(firstName, lastName, password, email, telephone, isAdmin, twoFactorSecret, qrCode) {
+  constructor(firstName, lastName, password, email, telephone, isAdmin, twoFactorSecret, qrCode, verified) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.password = password;
