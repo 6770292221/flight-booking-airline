@@ -4,6 +4,7 @@ import { AccountMongooseModel } from "../models/account_models.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
 import { addToBlacklist } from '../middleware/token_blacklist.js';
 import speakeasy from 'speakeasy';
+import { verify } from "crypto";
 
 
 export async function loginUser(req, res) {
@@ -154,100 +155,66 @@ export const logoutUser = async (req, res) => {
     }
 };
 
-// export async function verify2fa(req, res) {
-//     try {
-//         const userId = req.user.userId;
+export const verify2fa = async (req, res) => {
+    try {
+        const userId = req.user.userId;
 
-//         const { verificationCode } = req.body;
-//         if (!verificationCode) {
-//             return res.status(StatusCodes.OK).json({
-//                 status: StatusMessages.SUCCESS,
-//                 code: Codes.LGN_2002,
-//                 message: Messages.LGN_2002,
-//                 data: {
-//                     verify: false
+        const { verificationCode } = req.body;
+        if (!verificationCode) {
+            return res.status(StatusCodes.OK).json({
+                status: StatusMessages.SUCCESS,
+                code: Codes.ATH_4003,
+                message: Messages.ATH_4003,
+            });
+        }
 
-//                 }
-//             });
-//         }
+        const user = await AccountMongooseModel.findById(userId);
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                status: StatusMessages.FAILED,
+                code: Codes.REG_1002,
+                message: Messages.REG_1002,
+            });
+        }
 
-//         const user = await AccountMongooseModel.findById(userId);
-//         if (!user) {
-//             return res.status(StatusCodes.NOT_FOUND).json({
-//                 status: StatusMessages.FAILED,
-//                 code: Codes.ATH_4001,
-//                 message: Messages.ATH_4001,
-//             });
-//         }
+        const twoFactorSecret = user.twoFactorSecret;
+        if (!twoFactorSecret) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.LGN_2004,
+                message: Messages.LGN_2004,
+            });
+        }
 
-//         if (user.verified) {
-//             return res.status(400).json({
-//                 verified: false,
-//                 message: "User is already verified."
-//             });
-//         }
+        const isValidOTP = speakeasy.totp.verify({
+            secret: twoFactorSecret,
+            encoding: 'base32',
+            token: verificationCode,
+            window: 1
+        });
 
-//         const twoFactorSecret = user.twoFactorSecret;
-//         if (!twoFactorSecret) {
-//             return res.status(401).json({
-//                 verified: false,
-//                 message: "2FA is not enabled for this user."
-//             });
-//         }
+        if (!isValidOTP) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.ATH_4002,
+                message: Messages.ATH_4002,
+                verifie: false
+            });
+        }
 
-//         const isValidOTP = speakeasy.totp.verify({
-//             secret: twoFactorSecret,
-//             encoding: 'base32',
-//             token: verificationCode,
-//             window: 1
-//         });
+        return res.status(200).json({
+            verified: true,
+            code: Codes.ATH_4004,
+            message: Messages.ATH_4004,
+            verifie: true
 
-//         console.log("2fa:", isValidOTP);
-//         if (!isValidOTP) {
-//             return res.status(401).json({
-//                 verified: false,
-//                 message: "Invalid verification code."
-//             });
-//         }
+        });
 
-//         user.verified = true;
-//         await user.save();
-
-//         return res.status(200).json({
-//             verified: true,
-//             message: "Account successfully verified."
-//         });
-
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({
-//             verified: false,
-//             message: "Internal server error."
-//         });
-//     }
-// }
-
-
-// const twoFactorSecret = user.twoFactorSecret;
-//         if (!twoFactorSecret) {
-//             return res.status(StatusCodes.UNAUTHORIZED).json({
-//                 status: StatusMessages.FAILED,
-//                 code: Codes.LGN_2004,
-//                 message: Messages.LGN_2004
-//             });
-//         }
-
-//         const isValidOTP = speakeasy.totp.verify({
-//             secret: twoFactorSecret,
-//             encoding: 'base32',
-//             token: otp,
-//             window: 1
-//         });
-
-//         if (!isValidOTP) {
-//             return res.status(StatusCodes.UNAUTHORIZED).json({
-//                 status: StatusMessages.FAILED,
-//                 code: Codes.LGN_2005,
-//                 message: Messages.LGN_2005
-//             });
-//         }
+    } catch (error) {
+        console.error("Error during verify2fa:", error);
+        return res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
+    }
+};

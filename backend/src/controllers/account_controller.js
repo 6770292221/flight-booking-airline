@@ -114,6 +114,7 @@ export async function createAccount(req, res) {
         lastName: user.lastName,
         phoneName: user.phoneName,
         isAdmin: user.isAdmin,
+        verified: user.verified
       },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
@@ -203,16 +204,27 @@ export async function verifyUser(req, res) {
       });
     }
 
-    user.verified = true;
-    res.status(StatusCodes.OK).json({
+    const updateResult = await AccountMongooseModel.updateOne(
+      { _id: userId },
+      { $set: { verified: true } }
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        message: "Unable to update verification status."
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
       message: Messages.REG_1008,
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(StatusCodes.SERVER_ERROR).json({
+    console.error("Error during verifyUser:", error);
+    return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       message: StatusMessages.SERVER_ERROR,
     });
