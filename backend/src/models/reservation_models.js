@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const statusEnum = ["pending", "completed", "failed", "cancel"];
+const statusEnum = ["pending", "completed", "failed", "cancelled"];
 
 const passengerSchema = new mongoose.Schema({
     seatId: { type: String, required: true },

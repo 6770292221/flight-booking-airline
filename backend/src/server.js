@@ -9,7 +9,7 @@ import routerAuth from './routes/auth_routes.js';
 import routerFlight from "./routes/flights_routes.js";
 import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
-import { sendPromotion } from './schedules/promotion_scheduler.js';
+import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 
 
 
@@ -33,7 +33,9 @@ app.listen(port, () => {
   logger.info(`server started on port ${port}`);
 });
 
-// cron.schedule('*/1 * * * *', sendPromotion);
-
+cron.schedule("*/1 * * * *", async () => {
+  console.log(`[Scheduler] Calling cancelReservation API...`);
+  await cancelReservation();
+});
 
 export default app;

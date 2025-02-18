@@ -12,7 +12,7 @@ export const createReservation = async (req, res, next) => {
         const { flightId, passenger } = req.body;
 
         if (!passenger || !userId || !flightId) {
-            return res.status(400).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3001,
                 message: Messages.RSV_3001
@@ -30,7 +30,7 @@ export const createReservation = async (req, res, next) => {
         const flight = await FlightMongooseModel.findById(flightId);
 
         if (!flight) {
-            return res.status(400).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3003,
                 message: Messages.RSV_3003
@@ -41,7 +41,7 @@ export const createReservation = async (req, res, next) => {
         const uniqueSeatIds = new Set(seatIds);
 
         if (seatIds.length !== uniqueSeatIds.size) {
-            return res.status(400).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3004,
                 message: Messages.RSV_3004
@@ -52,7 +52,7 @@ export const createReservation = async (req, res, next) => {
         const uniquePassports = new Set(passports);
 
         if (passports.length !== uniquePassports.size) {
-            return res.status(400).json({
+            return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3005,
                 message: Messages.RSV_3005
@@ -64,7 +64,7 @@ export const createReservation = async (req, res, next) => {
 
 
             if (!Types.ObjectId.isValid(seatId)) {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3006,
                     message: Messages.RSV_3006.replace("{index}", i + 1)
@@ -73,7 +73,7 @@ export const createReservation = async (req, res, next) => {
 
             const seat = await SeatMongooseModel.findById(seatId);
             if (!seat) {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3007,
                     message: Messages.RSV_3007.replace("{index}", i + 1)
@@ -81,7 +81,7 @@ export const createReservation = async (req, res, next) => {
 
             }
             if (typeof price !== "number" || price <= 0) {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3010,
                     message: Messages.RSV_3010.replace("{index}", i + 1)
@@ -89,7 +89,7 @@ export const createReservation = async (req, res, next) => {
             }
 
             if (price <= 0 || isNaN(price)) {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3011,
                     message: Messages.RSV_3011.replace("{index}", i + 1)
@@ -97,7 +97,7 @@ export const createReservation = async (req, res, next) => {
             }
 
             if (!seatId || !first || !family || !passport || !price) {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3008,
                     message: Messages.RSV_3008.replace("{index}", i + 1)
@@ -105,7 +105,7 @@ export const createReservation = async (req, res, next) => {
             }
 
             if (seat.status !== "available") {
-                return res.status(400).json({
+                return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3012,
                     message: Messages.RSV_3012.replace("{index}", i + 1)
@@ -205,8 +205,50 @@ export async function getAllReservations(req, res) {
 
         console.log(data);
     } catch (error) {
-        console.error('Error fetching reservations:', error.message);
-        console.error(error);
+        res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
     }
 }
 
+export const updateExpiredReservations = async (req, res) => {
+    try {
+        const THIRTY_MINUTES = 30 * 60 * 1000;
+        const currentTime = new Date();
+
+        const expiredReservations = await ReservationMongooseModel.find({
+            status: "pending",
+            createdAt: { $lte: new Date(currentTime - THIRTY_MINUTES) }
+        });
+
+        if (expiredReservations.length === 0) {
+            return res.status(StatusCodes.OK).json({
+                status: StatusMessages.SUCCESS,
+                code: Codes.RSV_3013,
+                message: Messages.RSV_3013,
+            });
+        }
+
+        const updatedReservations = await ReservationMongooseModel.updateMany(
+            {
+                status: "pending",
+                createdAt: { $lte: new Date(currentTime - THIRTY_MINUTES) }
+            },
+            { $set: { status: "cancelled" } }
+        );
+
+        res.status(StatusCodes.OK).json({
+            status: StatusMessages.SUCCESS,
+            code: Codes.RSV_3014,
+            message: Messages.RSV_3014,
+            updatedCount: updatedReservations.modifiedCount
+        });
+
+    } catch (error) {
+        res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
+    }
+};
