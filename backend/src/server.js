@@ -12,9 +12,6 @@ import routerReservation from "./routes/reservation_routes.js";
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 
 
-
-
-
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
 const port = process.env.PORT || 3000;
@@ -33,9 +30,8 @@ app.listen(port, () => {
   logger.info(`server started on port ${port}`);
 });
 
-cron.schedule("*/1 * * * *", async () => {
-  console.log(`[Scheduler] Calling cancelReservation API...`);
-  await cancelReservation();
-});
+// cron.schedule("*/1 * * * *", async () => {
+//   await cancelReservation();
+// });
 
 export default app;

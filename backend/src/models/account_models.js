@@ -10,6 +10,8 @@ class AccountServiceModel {
     this.isAdmin = isAdmin;
     this.twoFactorSecret = twoFactorSecret;
     this.qrCode = qrCode;
+    this.verified = verified;
+
 
   }
 
@@ -23,7 +25,11 @@ class AccountServiceModel {
         phoneNumber: { type: String, required: true },
         isAdmin: { type: Boolean, default: false },
         twoFactorSecret: { type: String, required: true },
-        qrCode: { type: String, required: true }
+        qrCode: { type: String, required: true },
+        verified: {
+          type: Boolean,
+          default: false,
+        },
 
       },
       { timestamps: true }

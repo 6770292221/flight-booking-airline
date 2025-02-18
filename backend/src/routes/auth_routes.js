@@ -6,6 +6,7 @@ const routerAuth = Router();
 routerAuth.post("/auth/login", loginUser);
 routerAuth.post("/auth/logout", verifyToken, logoutUser);
 routerAuth.get('/auth/verifyToken', verifyToken, verifyTokenUser);
+// routerAuth.get('/auth/verify2fa', verifyToken, verify2fa);
 
 
 
