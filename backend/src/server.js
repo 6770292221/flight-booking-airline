@@ -31,6 +31,7 @@ app.listen(port, () => {
 });
 
 // cron.schedule("*/1 * * * *", async () => {
+//   console.log(`[Scheduler] Calling cancelReservation API...`);
 //   await cancelReservation();
 // });
 
