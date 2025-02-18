@@ -10,11 +10,13 @@ import routerFlight from "./routes/flights_routes.js";
 import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
-
+import cors from "cors";
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors({ origin: "*" }));
 
 app.use(express.json());
 app.use("/api/v1/flight-core-api", routerFlight, routerSeats);

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Create new Account</h1>
+        <p class="subtext">Already Registered? <a href="index.html">Log in here.</a></p>
+        <form id="signup-form">
+            <label for="first-name">FIRST NAME</label>
+            <input type="text" id="first-name" name="firstName" required>
+
+            <label for="last-name">LAST NAME</label>
+            <input type="text" id="last-name" name="lastName" required>
+
+            <label for="email">EMAIL</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">PASSWORD</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="phone">PHONE NUMBER</label>
+            <input type="tel" id="phone" name="phoneNumber" required>
+<!-- 
+            <label for="isAdmin">
+                <input type="checkbox" id="isAdmin" name="isAdmin"> Is Admin
+            </label> -->
+
+            <button type="submit">SIGN UP</button>
+        </form>
+        <p id="message" class="hidden"></p>
+    </div>
+
+<!-- QR Code Popup -->
+<div id="qrModal" class="modal hidden">
+    <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h2>Configure Two-Factor Authentication</h2>
+
+        <!-- Secret Token Wrapper -->
+        <div class="token-wrapper">
+            <input type="text" id="authSecret" readonly>
+            <button id="copyToken" class="copy-btn">📋</button>
+        </div>
+
+        <!-- QR Code -->
+        <img id="qrImage" src="" alt="QR Code">
+        <p>Scan this QR code with your authentication app.</p>
+
+        <!-- 6-digit Verification Code Input -->
+        <label for="otp">Enter 6-digit code</label>
+        <input type="text" id="otp" maxlength="6" pattern="\d{6}" placeholder="123456">
+
+        <button id="confirm2FA">CONFIRM</button>
+    </div>
+</div>
+
+
+    <script src="../js/signup.js"></script>
+</body>
+</html>
+
