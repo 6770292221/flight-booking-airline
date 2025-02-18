@@ -4,6 +4,8 @@ import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js"
 import bcrypt from 'bcrypt';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
+import jwt from "jsonwebtoken";
+
 
 
 const hideEmail = (email) => {
@@ -80,7 +82,6 @@ export async function createAccount(req, res) {
     });
 
     const qrCodeDataURL = await qrcode.toDataURL(twoFASecret.otpauth_url);
-
     const newAccount = new AccountMongooseModel({
       firstName,
       lastName,
@@ -89,11 +90,34 @@ export async function createAccount(req, res) {
       phoneNumber,
       isAdmin,
       twoFactorSecret: twoFASecret.base32,
-      qrCode: qrCodeDataURL
+      qrCode: qrCodeDataURL,
+      verified: false
 
     });
 
     await newAccount.save();
+
+    const user = await AccountMongooseModel.findOne({ email });
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusMessages.FAILED,
+        code: Codes.LGN_2003,
+        message: Messages.LGN_2003
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneName: user.phoneName,
+        isAdmin: user.isAdmin,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
+    );
 
     res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
@@ -107,7 +131,9 @@ export async function createAccount(req, res) {
         password: hashedPassword,
         isAdmin: isAdmin,
         twoFactorSecret: twoFASecret.base32,
-        qrCode: qrCodeDataURL
+        qrCode: qrCodeDataURL,
+        verified: newAccount.verified,
+        token: token
 
       }
     });
@@ -120,5 +146,75 @@ export async function createAccount(req, res) {
         message: StatusMessages.SERVER_ERROR,
       })
     );
+  }
+}
+
+export async function verifyUser(req, res) {
+  try {
+    const userId = req.user.userId;
+
+    const { verificationCode } = req.body;
+    if (!verificationCode) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.VAL_4001,
+        message: Messages.VAL_4001,
+      });
+    }
+
+    const user = await AccountMongooseModel.findById(userId);
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.REG_1002,
+        message: Messages.REG_1002,
+      });
+    }
+
+    if (user.verified) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.REG_1007,
+        message: Messages.REG_1007,
+      });
+    }
+
+    const twoFactorSecret = user.twoFactorSecret;
+    if (!twoFactorSecret) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusMessages.FAILED,
+        code: Codes.LGN_2004,
+        message: Messages.LGN_2004,
+      });
+    }
+
+    const isValidOTP = speakeasy.totp.verify({
+      secret: twoFactorSecret,
+      encoding: 'base32',
+      token: verificationCode,
+      window: 1
+    });
+
+    if (!isValidOTP) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusMessages.FAILED,
+        code: Codes.LGN_2005,
+        message: Messages.LGN_2005,
+      });
+    }
+
+    user.verified = true;
+    res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.REG_1008,
+      message: Messages.REG_1008,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      message: StatusMessages.SERVER_ERROR,
+    });
   }
 }

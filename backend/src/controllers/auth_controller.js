@@ -7,10 +7,10 @@ import speakeasy from 'speakeasy';
 
 
 export async function loginUser(req, res) {
-    const { email, password, otp } = req.body;
+    const { email, password } = req.body;
     try {
 
-        if (!email || !password || !otp) {
+        if (!email || !password) {
             return res.status(400).json({
                 status: StatusMessages.FAILED,
                 code: Codes.LGN_2002,
@@ -36,33 +36,6 @@ export async function loginUser(req, res) {
             });
         }
 
-        const twoFactorSecret = user.twoFactorSecret;
-        if (!twoFactorSecret) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                status: StatusMessages.FAILED,
-                code: Codes.LGN_2004,
-                message: Messages.LGN_2004
-            });
-        }
-
-        const isValidOTP = speakeasy.totp.verify({
-            secret: twoFactorSecret,
-            encoding: 'base32',
-            token: otp,
-            window: 1
-        });
-
-        if (!isValidOTP) {
-            return res.status(StatusCodes.UNAUTHORIZED).json({
-                status: StatusMessages.FAILED,
-                code: Codes.LGN_2005,
-                message: Messages.LGN_2005
-            });
-        }
-
-
-
-
         const token = jwt.sign(
             {
                 userId: user._id,
@@ -70,7 +43,9 @@ export async function loginUser(req, res) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 phoneName: user.phoneName,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                verified: user.verified
+
             },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
@@ -178,3 +153,101 @@ export const logoutUser = async (req, res) => {
         });
     }
 };
+
+// export async function verify2fa(req, res) {
+//     try {
+//         const userId = req.user.userId;
+
+//         const { verificationCode } = req.body;
+//         if (!verificationCode) {
+//             return res.status(StatusCodes.OK).json({
+//                 status: StatusMessages.SUCCESS,
+//                 code: Codes.LGN_2002,
+//                 message: Messages.LGN_2002,
+//                 data: {
+//                     verify: false
+
+//                 }
+//             });
+//         }
+
+//         const user = await AccountMongooseModel.findById(userId);
+//         if (!user) {
+//             return res.status(StatusCodes.NOT_FOUND).json({
+//                 status: StatusMessages.FAILED,
+//                 code: Codes.ATH_4001,
+//                 message: Messages.ATH_4001,
+//             });
+//         }
+
+//         if (user.verified) {
+//             return res.status(400).json({
+//                 verified: false,
+//                 message: "User is already verified."
+//             });
+//         }
+
+//         const twoFactorSecret = user.twoFactorSecret;
+//         if (!twoFactorSecret) {
+//             return res.status(401).json({
+//                 verified: false,
+//                 message: "2FA is not enabled for this user."
+//             });
+//         }
+
+//         const isValidOTP = speakeasy.totp.verify({
+//             secret: twoFactorSecret,
+//             encoding: 'base32',
+//             token: verificationCode,
+//             window: 1
+//         });
+
+//         console.log("2fa:", isValidOTP);
+//         if (!isValidOTP) {
+//             return res.status(401).json({
+//                 verified: false,
+//                 message: "Invalid verification code."
+//             });
+//         }
+
+//         user.verified = true;
+//         await user.save();
+
+//         return res.status(200).json({
+//             verified: true,
+//             message: "Account successfully verified."
+//         });
+
+//     } catch (error) {
+//         console.error(error);
+//         return res.status(500).json({
+//             verified: false,
+//             message: "Internal server error."
+//         });
+//     }
+// }
+
+
+// const twoFactorSecret = user.twoFactorSecret;
+//         if (!twoFactorSecret) {
+//             return res.status(StatusCodes.UNAUTHORIZED).json({
+//                 status: StatusMessages.FAILED,
+//                 code: Codes.LGN_2004,
+//                 message: Messages.LGN_2004
+//             });
+//         }
+
+//         const isValidOTP = speakeasy.totp.verify({
+//             secret: twoFactorSecret,
+//             encoding: 'base32',
+//             token: otp,
+//             window: 1
+//         });
+
+//         if (!isValidOTP) {
+//             return res.status(StatusCodes.UNAUTHORIZED).json({
+//                 status: StatusMessages.FAILED,
+//                 code: Codes.LGN_2005,
+//                 message: Messages.LGN_2005
+//             });
+//         }
