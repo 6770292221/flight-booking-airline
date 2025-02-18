@@ -1,0 +1,224 @@
+/* Reset and Global Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    width: 320px;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.subtext {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 0.8rem;
+}
+
+input {
+    background: black;
+    border: 1px solid white;
+    padding: 10px;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+button {
+    background-color: #2d7ef9;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #1b5fd7;
+}
+
+.switch {
+    margin-top: 15px;
+    font-size: 0.9rem;
+}
+
+.switch a {
+    color: #2d7ef9;
+    text-decoration: none;
+}
+
+/* Center modal on screen */
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Modal content */
+.modal-content {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    color: white;
+}
+
+/* Hide modal by default */
+.hidden {
+    display: none;
+}
+
+/* Close button */
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* QR Code Image */
+#qrImage {
+    width: 200px;
+    height: 200px;
+    margin: 10px 0;
+}
+
+/* Confirm Button */
+#confirm2FA {
+    background-color: #2d7ef9;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#confirm2FA:hover {
+    background-color: #1b5fd7;
+}
+
+
+/* Center modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Show modal when not hidden */
+.modal:not(.hidden) {
+    display: flex;
+}
+
+/* Modal content */
+.modal-content {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    color: white;
+}
+
+/* Secret Token Box */
+.token-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #333;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Secret Token Input */
+#authSecret {
+    width: 100%;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Copy Button */
+.copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 20px;
+}
+
+/* QR Code Image */
+#qrImage {
+    width: 200px;
+    height: 200px;
+    margin: 10px 0;
+}
+
+/* OTP Input */
+#otp {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+    text-align: center;
+    border: 1px solid white;
+    background: #333;
+    color: white;
+}
+
+/* Confirm Button */
+#confirm2FA {
+    background-color: #2d7ef9;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#confirm2FA:hover {
+    background-color: #1b5fd7;
+}
