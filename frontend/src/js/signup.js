@@ -25,9 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
             const messageEl = document.getElementById("message");
 
             if (response.ok) {
-                messageEl.textContent = "Registration successful!";
-                messageEl.style.color = "green";
-                messageEl.classList.remove("hidden");
+                localStorage.setItem("authToken", result.data.token);
+           // ✅ Display Secret Key Instead of Input Field
+           if (result.data && result.data.qrCode) {
+            document.getElementById("qrImage").src = result.data.qrCode;
+            document.getElementById("authSecret").textContent = result.data.twoFactorSecret; // Display Secret Key
+            document.getElementById("qrModal").classList.remove("hidden");
+        }
 
                 // ✅ Check if QR Code is available, then show modal
                 if (result.data && result.data.qrCode) {
@@ -47,60 +51,87 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    const otpInputs = document.querySelectorAll(".otp-input");
+
+    otpInputs.forEach((input, index) => {
+        input.addEventListener("input", (event) => {
+            if (event.target.value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus(); // Move to next box
+            }
+        });
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Backspace" && !event.target.value && index > 0) {
+                otpInputs[index - 1].focus(); // Move to previous box on backspace
+            }
+        });
+    });
+
+
         // ✅ Close Modal
         document.getElementById("closeModal").addEventListener("click", () => {
             document.getElementById("qrModal").classList.add("hidden");
         });
+        
     
-        // ✅ Copy Token to Clipboard
-        document.getElementById("copyToken").addEventListener("click", () => {
-            const authSecret = document.getElementById("authSecret");
-        
-            // Select the text field content
-            authSecret.select();
-            authSecret.setSelectionRange(0, 99999); // For mobile devices
-        
-            // ✅ Use a fallback for clipboard API
-            try {
-                navigator.clipboard.writeText(authSecret.value).then(() => {
-                    alert("Secret copied to clipboard!");
-                }).catch(err => {
-                    console.error("Clipboard copy failed, using fallback method.", err);
-                    document.execCommand("copy"); // Fallback for older browsers
-                    alert("Secret copied to clipboard!");
-                });
-            } catch (err) {
-                console.error("Copy failed:", err);
-            }
+    // ✅ Copy Token to Clipboard
+    document.getElementById("copyToken").addEventListener("click", () => {
+        const authSecret = document.getElementById("authSecret");
+        navigator.clipboard.writeText(authSecret.value).then(() => {
+            alert("Secret copied to clipboard!");
+        }).catch(err => {
+            console.error("Clipboard copy failed.", err);
         });
+    });
         
     
-        // ✅ Handle 6-digit OTP Confirmation
-        document.getElementById("confirm2FA").addEventListener("click", async () => {
-            const otp = document.getElementById("otp").value;
-            if (otp.length !== 6 || isNaN(otp)) {
-                alert("Please enter a valid 6-digit code.");
-                return;
-            }
+    document.getElementById("confirm2FA").addEventListener("click", async () => {
+        let otp = "";
+        otpInputs.forEach(input => otp += input.value);
     
-            try {
-                const response = await fetch("http://localhost:3001/api/v1/user-core-api/verify-2fa", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: document.getElementById("email").value, otp })
-                });
+        if (otp.length !== 6 || isNaN(otp)) {
+            alert("Please enter a valid 6-digit code.");
+            return;
+        }
     
-                const result = await response.json();
-                if (response.ok) {
-                    alert("Two-Factor Authentication Verified Successfully!");
-                    document.getElementById("qrModal").classList.add("hidden");
-                } else {
-                    alert("Invalid OTP. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error verifying OTP:", error);
-                alert("Failed to verify OTP. Please try again.");
+        // Retrieve token from the stored response after registration
+        const token = localStorage.getItem("authToken"); // Retrieve from localStorage
+    
+        if (!token) {
+            alert("No token found. Please log in again.");
+            return;
+        }
+    
+        try {
+            const response = await fetch("http://localhost:3001/api/v1/user-core-api/verifyUser", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // ✅ Include Bearer Token
+                },
+                body: JSON.stringify({
+                    verificationCode: otp
+                })
+            });
+    
+            const result = await response.json();
+            console.log(response.data);
+            if (response.ok) {
+        // ✅ Show Success Popup Instead of Alert
+        document.getElementById("successModal").classList.remove("hidden");
+            } else {
+                alert("Invalid OTP. Please try again.");
             }
-        });
+        } catch (error) {
+            console.error("Error verifying OTP:", error);
+            alert("Failed to verify OTP. Please try again.");
+        }
+    });
+
+    // ✅ Redirect to Login Page When Clicking OK
+document.getElementById("successOkBtn").addEventListener("click", () => {
+    window.location.href = "index.html"; // Redirect to login page
+});
+
     
 });
