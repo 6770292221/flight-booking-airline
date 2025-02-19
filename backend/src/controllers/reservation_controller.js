@@ -164,7 +164,6 @@ export const createReservation = async (req, res, next) => {
     }
 }
 
-
 export async function getAllReservations(req, res) {
     try {
         const email = req.query.email;
@@ -224,11 +223,15 @@ export const updateExpiredReservations = async (req, res) => {
 
         if (expiredReservations.length === 0) {
             return res.status(StatusCodes.OK).json({
-                status: StatusMessages.SUCCESS,
+                status: StatusMessages.FAILED,
                 code: Codes.RSV_3013,
                 message: Messages.RSV_3013,
             });
         }
+
+        const seatIds = expiredReservations.flatMap(reservation =>
+            reservation.passenger.map(passenger => passenger.seatId)
+        );
 
         const updatedReservations = await ReservationMongooseModel.updateMany(
             {
@@ -239,14 +242,28 @@ export const updateExpiredReservations = async (req, res) => {
         );
 
         res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
+        let updatedSeats = 0;
+        if (seatIds.length > 0) {
+            const result = await SeatMongooseModel.updateMany(
+                {
+                    _id: { $in: seatIds },
+                    status: { $ne: "available" }
+                },
+                { $set: { status: "available" } }
+            );
+            updatedSeats = result.modifiedCount;
+        }
+
+        return res.status(StatusCodes.OK).json({
+            status: StatusMessages.FAILED,
             code: Codes.RSV_3014,
             message: Messages.RSV_3014,
-            updatedCount: updatedReservations.modifiedCount
+            updatedReservations: updatedReservations.modifiedCount,
+            updatedSeats: updatedSeats
         });
 
     } catch (error) {
-        res.status(StatusCodes.SERVER_ERROR).json({
+        return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
         });
