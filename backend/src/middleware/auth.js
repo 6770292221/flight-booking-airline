@@ -57,7 +57,16 @@ const verifyToken = async (req, res, next) => {
         }
 
         next();
+
     } catch (error) {
+        if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6002,
+                message: Messages.TKN_6002,
+            });
+        }
+
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
