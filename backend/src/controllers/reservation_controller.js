@@ -241,7 +241,6 @@ export const updateExpiredReservations = async (req, res) => {
             { $set: { status: "cancelled" } }
         );
 
-        res.status(StatusCodes.OK).json({
         let updatedSeats = 0;
         if (seatIds.length > 0) {
             const result = await SeatMongooseModel.updateMany(
