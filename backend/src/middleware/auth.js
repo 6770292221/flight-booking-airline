@@ -65,7 +65,7 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
-const verify2faToken = async (req, res, next) => {
+const getTokenData = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -107,7 +107,7 @@ const verify2faToken = async (req, res, next) => {
     }
 };
 
-export { verifyToken, verify2faToken };
+export { verifyToken, getTokenData };
 
 
 
