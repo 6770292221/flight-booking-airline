@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { flightDb } from "../config/connections.js";
+
 
 const seatStatusEnum = ["available", "reserve", "confirmed"];
 
@@ -29,6 +31,6 @@ class SeatServiceModel {
     }
 }
 
-const SeatMongooseModel = mongoose.model("Seat", SeatServiceModel.getSchema());
+const SeatMongooseModel = flightDb.model("Seat", SeatServiceModel.getSchema());
 
 export { SeatServiceModel, SeatMongooseModel };

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { AccountMongooseModel } from "../models/account_models.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
 import { addToBlacklist } from '../middleware/token_blacklist.js';
+import redisClient from '../utils/redis_utils.js';
 import speakeasy from 'speakeasy';
 import { verify } from "crypto";
 
@@ -37,6 +38,14 @@ export async function loginUser(req, res) {
             });
         }
 
+        if (user.verified === false) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.LGN_2005,
+                message: Messages.LGN_2005
+            });
+        }
+
         const token = jwt.sign(
             {
                 userId: user._id,
@@ -45,12 +54,14 @@ export async function loginUser(req, res) {
                 lastName: user.lastName,
                 phoneName: user.phoneName,
                 isAdmin: user.isAdmin,
-                verified: user.verified
-
             },
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
         );
+
+
+        await redisClient.set(token, JSON.stringify({ verified: false }));
+
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
@@ -62,6 +73,7 @@ export async function loginUser(req, res) {
                 email: user.email,
                 name: user.name,
                 isAdmin: user.isAdmin,
+                verified: false
             },
         });
     } catch (error) {
@@ -72,56 +84,6 @@ export async function loginUser(req, res) {
         });
     }
 }
-
-export const verifyTokenUser = (req, res) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-
-        if (!token) {
-            return res.status(StatusCodes.FORBIDDEN).json({
-                status: StatusMessages.FAILED,
-                code: Codes.TKN_6001,
-                message: Messages.TKN_6001,
-            });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-            if (err) {
-                return res.status(StatusCodes.FORBIDDEN).json({
-                    status: StatusMessages.FAILED,
-                    code: Codes.TKN_6002,
-                    message: Messages.TKN_6002,
-                });
-            }
-
-            const issuedAt = new Date(decoded.iat * 1000).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-            const expiresAt = new Date(decoded.exp * 1000).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
-
-            res.status(StatusCodes.OK).json({
-                status: StatusMessages.SUCCESS,
-                code: Codes.TKN_2000,
-                message: Messages.TKN_2000,
-                data: {
-                    userId: decoded.userId,
-                    email: decoded.email,
-                    isAdmin: decoded.isAdmin,
-                    issuedAt,
-                    expiresAt,
-
-                }
-
-            });
-        });
-
-    } catch (error) {
-        console.error("Error during token verification:", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            status: StatusMessages.FAILED,
-            code: Codes.SRV_5001,
-            message: Messages.SRV_5001,
-        });
-    }
-};
 
 export const logoutUser = async (req, res) => {
 
@@ -138,16 +100,12 @@ export const logoutUser = async (req, res) => {
         }
 
         await addToBlacklist(token);
-
-        res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "Strict" });
-
         res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
             code: Codes.LOT_5001,
             message: Messages.LOT_5001,
         });
     } catch (error) {
-        console.error("Error during logout:", error);
         res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
@@ -157,6 +115,25 @@ export const logoutUser = async (req, res) => {
 
 export const verify2fa = async (req, res) => {
     try {
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
+            });
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
+            });
+        }
+
         const userId = req.user.userId;
 
         const { verificationCode } = req.body;
@@ -202,16 +179,24 @@ export const verify2fa = async (req, res) => {
             });
         }
 
-        return res.status(200).json({
-            verified: true,
-            code: Codes.ATH_4004,
-            message: Messages.ATH_4004,
-            verifie: true
+        await redisClient.set(token, JSON.stringify({ verified: true }));
 
+
+        return res.status(200).json({
+            status: StatusMessages.SUCCESS,
+            code: Codes.LGN_2001,
+            message: Messages.LGN_2001,
+            data: {
+                token,
+                userId: user._id,
+                email: user.email,
+                name: user.name,
+                isAdmin: user.isAdmin,
+                verified: true
+            },
         });
 
     } catch (error) {
-        console.error("Error during verify2fa:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { userDb } from "../config/connections.js";
 
 class AccountServiceModel {
   constructor(firstName, lastName, password, email, telephone, isAdmin, twoFactorSecret, qrCode, verified) {
@@ -11,8 +12,6 @@ class AccountServiceModel {
     this.twoFactorSecret = twoFactorSecret;
     this.qrCode = qrCode;
     this.verified = verified;
-
-
   }
 
   static getSchema() {
@@ -37,6 +36,6 @@ class AccountServiceModel {
   }
 }
 
-const AccountMongooseModel = mongoose.model("Account", AccountServiceModel.getSchema());
+const AccountMongooseModel = userDb.model("users", AccountServiceModel.getSchema());
 
 export { AccountServiceModel, AccountMongooseModel };

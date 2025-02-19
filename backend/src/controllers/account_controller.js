@@ -6,8 +6,6 @@ import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 import jwt from "jsonwebtoken";
 
-
-
 const hideEmail = (email) => {
   const [localPart, domainPart] = email.split('@');
   const hiddenLocalPart = localPart.slice(0, 2) + '*'.repeat(localPart.length - 2);
@@ -199,8 +197,8 @@ export async function verifyUser(req, res) {
     if (!isValidOTP) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusMessages.FAILED,
-        code: Codes.LGN_2005,
-        message: Messages.LGN_2005,
+        code: Codes.ATH_4002,
+        message: Messages.ATH_4002,
       });
     }
 
@@ -208,13 +206,6 @@ export async function verifyUser(req, res) {
       { _id: userId },
       { $set: { verified: true } }
     );
-
-    if (updateResult.modifiedCount === 0) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        message: "Unable to update verification status."
-      });
-    }
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
