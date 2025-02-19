@@ -36,9 +36,12 @@ class FlightServiceModel {
       { timestamps: true }
     );
   }
-  static async getAllFlights() {
+
+  static async getAllFlights(filterQuery = {}, skip = 0, limit = 10) {
     try {
+      const total = await FlightMongooseModel.countDocuments(filterQuery);
       const flights = await FlightMongooseModel.aggregate([
+        { $match: filterQuery },
         {
           $lookup: {
             from: "seats",
@@ -66,20 +69,6 @@ class FlightServiceModel {
                 timezone: "Asia/Bangkok"
               }
             },
-            createdAt: {
-              $dateToString: {
-                format: "%Y-%m-%d %H:%M:%S",
-                date: "$createdAt",
-                timezone: "Asia/Bangkok"
-              }
-            },
-            updatedAt: {
-              $dateToString: {
-                format: "%Y-%m-%d %H:%M:%S",
-                date: "$updatedAt",
-                timezone: "Asia/Bangkok"
-              }
-            },
             seats: 1,
             availableSeats: {
               $size: {
@@ -91,15 +80,20 @@ class FlightServiceModel {
               }
             }
           }
-        }
+        },
+        { $skip: skip },
+        { $limit: limit }
       ]);
 
-      return flights;
+      if (!flights || flights.length === 0) {
+      }
 
+      return { flights, total };
     } catch (error) {
-      throw new Error("Error fetching flights: " + error.message);
+      throw new Error(error.message);
     }
   }
+
 }
 
 const FlightMongooseModel = flightDb.model("Flight", FlightServiceModel.getSchema());

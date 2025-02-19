@@ -113,7 +113,31 @@ export async function updateFlight(req, res) {
 
 export async function getAllFlights(req, res) {
     try {
-        const flights = await FlightServiceModel.getAllFlights();
+        const { flightNumber, origin, destination, departureTime, arrivalTime, page = 1, limit = 10 } = req.query;
+
+        const filterQuery = {};
+        if (flightNumber) filterQuery.flightNumber = flightNumber;
+        if (origin) filterQuery.origin = origin;
+        if (destination) filterQuery.destination = destination;
+        if (departureTime) filterQuery.departureTime = new Date(departureTime);
+        if (arrivalTime) filterQuery.arrivalTime = new Date(arrivalTime);
+
+        const pageNumber = parseInt(page, 10) || 1;
+        const limitNumber = parseInt(limit, 10) || 10;
+        const skip = (pageNumber - 1) * limitNumber;
+
+
+        const result = await FlightServiceModel.getAllFlights(filterQuery, skip, limitNumber);
+
+        if (!result || !result.flights) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status: StatusMessages.FAILED,
+                message: "server_error",
+                error: "No flights data found"
+            });
+        }
+
+        const { flights, total } = result;
 
         const data = flights.map(flight => ({
             flightId: flight._id,
@@ -130,24 +154,31 @@ export async function getAllFlights(req, res) {
                 status: seat.status,
                 flightNumber: flight.flightNumber
             }))
-
         }));
 
         res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
             code: Codes.FGT_1003,
             message: Messages.FGT_1003,
-            data
+            data,
+            count: total,
+            pagination: {
+                currentPage: pageNumber,
+                totalPages: Math.ceil(total / limitNumber),
+                totalItems: total,
+                limit: limitNumber
+            }
         });
+
     } catch (error) {
-        res.status(StatusCodes.SERVER_ERROR).json({
+        console.error("🔥 Error fetching flights:", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: StatusMessages.SERVER_ERROR,
+            message: "server_error",
+            error: error.message
         });
     }
 }
-
-
 
 export async function deleteFlight(req, res) {
     try {
