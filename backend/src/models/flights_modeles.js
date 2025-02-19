@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { flightDb } from "../config/connections.js";
+
 
 class FlightServiceModel {
   constructor(flightNumber, origin, destination, departureTime, arrivalTime) {
@@ -100,6 +102,6 @@ class FlightServiceModel {
   }
 }
 
-const FlightMongooseModel = mongoose.model("Flight", FlightServiceModel.getSchema());
+const FlightMongooseModel = flightDb.model("Flight", FlightServiceModel.getSchema());
 
 export { FlightServiceModel, FlightMongooseModel };

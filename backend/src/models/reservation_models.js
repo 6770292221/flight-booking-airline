@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { reservationsDb } from "../config/connections.js";
+
 
 const statusEnum = ["pending", "completed", "failed", "cancelled"];
 
@@ -37,7 +39,7 @@ const reservationSchema = new mongoose.Schema(
 
 class ReservationServiceModel {
     constructor() {
-        this.ReservationModel = mongoose.model("Reservation", reservationSchema);
+        this.ReservationModel = reservationsDb.model("Reservation", reservationSchema);
     }
 
     async createReservation(flightId, passenger, userId, bookingId, paymentReference) {
@@ -162,5 +164,5 @@ class ReservationServiceModel {
     //     }
 }
 
-const ReservationMongooseModel = mongoose.model("Reservation", reservationSchema);
+const ReservationMongooseModel = reservationsDb.model("Reservation", reservationSchema);
 export { ReservationServiceModel, ReservationMongooseModel };

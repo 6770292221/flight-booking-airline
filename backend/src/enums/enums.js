@@ -36,6 +36,7 @@ export const Codes = Object.freeze({
   LGN_2002: "LGN_2002",
   LGN_2003: "LGN_2003",
   LGN_2004: "LGN_2004",
+  LGN_2005: "LGN_2005",
   LGN_2006: "LGN_2006",
 
   // Reservation Codes
@@ -66,6 +67,7 @@ export const Codes = Object.freeze({
   ATH_4002: "ATH_4002",
   ATH_4003: "ATH_4003",
   ATH_4004: `ATH_4004`,
+  ATH_6005: "ATH_6005",
 
   // Logout Codes
   LOT_5001: "LOT_5001",
@@ -118,6 +120,7 @@ export const Messages = Object.freeze({
   LGN_2002: "Missing required information: flightId, email, password and otp are mandatory.",
   LGN_2003: "The email you entered is incorrect. Please try again.",
   LGN_2004: "Two-factor authentication is not set up for this account.",
+  LGN_2005: "Account not verified. Please contact admin.",
   LGN_2006: "The password you entered is incorrect. Please try again.",
 
   // Reservation Messages
@@ -171,6 +174,8 @@ export const Messages = Object.freeze({
   ATH_4002: "Invalid or expired OTP. Please try again",
   ATH_4003: "Missing required information: VrificationCode are mandatory",
   ATH_4004: "2FA verified successfully.",
+  ATH_6005: "Please verify your identity with the 2FA code",
+
 
 
   // Logout Messages
