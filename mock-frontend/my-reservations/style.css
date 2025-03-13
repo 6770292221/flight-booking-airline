@@ -1,0 +1,679 @@
+/* === RESET === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9e9f2;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* === CONTAINER === */
+.container {
+  padding: 30px;
+  max-width: 1700px;
+  margin: 30px auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 28px;
+  color: #7c1c4b;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* === TABLE === */
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.reservation-table th,
+.reservation-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.reservation-table th {
+  background-color: #f8d4e3;
+  color: #7c1c4b;
+  font-weight: 600;
+}
+
+.reservation-table tbody tr:nth-child(even) {
+  background-color: #fdf6f9;
+}
+
+.reservation-table tbody tr:hover {
+  background-color: #fbe7f1;
+}
+
+.reservation-table td {
+  color: #333;
+}
+
+/* === STATUS BADGES === */
+.status {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.status.completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.cancel {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* === BUTTONS === */
+.view-details-btn,
+.edit-btn,
+.delete-btn,
+.pay-btn,
+.add-passenger-btn,
+.save-btn,
+.confirm-btn,
+.cancel-btn {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.view-details-btn {
+  padding: 6px 12px;
+  background-color: #e91e63;
+  color: white;
+  border-radius: 6px;
+}
+
+.view-details-btn:hover {
+  background-color: #c2185b;
+}
+
+/* Action buttons in table */
+.action-buttons button {
+  background-color: transparent;
+  border: none;
+  margin: 0 5px;
+  font-size: 16px;
+}
+
+.edit-btn i {
+  color: #7c1c4b;
+}
+
+.delete-btn i {
+  color: #e91e63;
+}
+
+.pay-btn i {
+  color: #4caf50;
+}
+
+.edit-btn:hover i {
+  color: #a71d5d;
+}
+
+.delete-btn:hover i {
+  color: #c2185b;
+}
+
+.pay-btn:hover i {
+  color: #388e3c;
+}
+
+/* === DETAILS CONTAINER === */
+.details-container {
+  margin-top: 10px;
+  text-align: left;
+  background-color: #f9e9f2;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.details-container h4 {
+  margin-bottom: 5px;
+  color: #7c1c4b;
+}
+
+.details-container p {
+  font-size: 13px;
+  margin: 3px 0;
+}
+
+/* === MODAL === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+/* === MODAL CONTENT === */
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  width: 490px; /* Increase the width of the modal */
+  max-width: 100%; /* Remove the max-width constraint */
+  text-align: left;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #7c1c4b;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #7c1c4b;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.modal h2 {
+  color: #7c1c4b;
+  margin-bottom: 20px;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* === PASSENGER SECTION === */
+.passenger-section {
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7c1c4b;
+  margin-top: 20px;
+  /* margin-bottom: 10px;
+  margin-top: 10px; */
+}
+
+#passengerFields {
+  margin-top: 15px;
+}
+
+.passenger-fields {
+  border: 1px solid #c179a1;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 10px; /* เพิ่มระยะห่างระหว่างผู้โดยสารแต่ละคน */
+  background-color: #fdf6fa;
+  position: relative;
+}
+
+input[type="text"] {
+  margin-bottom: 1px; /* เพิ่มระยะห่างระหว่างฟิลด์ต่างๆ ภายในฟอร์ม */
+}
+
+.passenger-label {
+  font-weight: 500;
+  color: #7c1c4b;
+  margin-bottom: 1px;
+  display: block;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #e91e63;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+.save-btn {
+  background-color: #7c1c4b;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.save-btn:hover {
+  background-color: #5a1338;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .reservation-table th,
+  .reservation-table td {
+    padding: 10px 8px;
+  }
+}
+/* === ACTION BUTTONS === */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.action-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.edit-btn {
+  border-color: #e91e63;
+  color: #e91e63;
+}
+
+.delete-btn {
+  border-color: #d32f2f;
+  color: #d32f2f;
+}
+
+.pay-btn {
+  border-color: #4caf50;
+  color: #4caf50;
+}
+
+.edit-btn:hover {
+  background-color: #e91e63;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.pay-btn:hover {
+  background-color: #4caf50;
+  color: white;
+}
+
+/* === EDIT BUTTON === */
+.edit-btn {
+  border-color: #e91e63;
+}
+
+.edit-btn i {
+  color: #e91e63;
+}
+
+.edit-btn:hover {
+  background-color: #e91e63;
+}
+
+.edit-btn:hover i {
+  color: #fff;
+}
+
+/* === DELETE BUTTON === */
+.delete-btn {
+  border-color: #d32f2f;
+}
+
+.delete-btn i {
+  color: #d32f2f;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+.delete-btn:hover i {
+  color: #fff;
+}
+
+/* === PAY BUTTON === */
+.pay-btn {
+  border-color: #4caf50;
+}
+
+.pay-btn i {
+  color: #4caf50;
+}
+
+.pay-btn:hover {
+  background-color: #4caf50;
+}
+
+.pay-btn:hover i {
+  color: #fff;
+}
+/* === VIEW DETAILS ICON BUTTON === */
+.view-details-btn {
+  background: none;
+  border: none;
+  color: #e91e63; /* หรือสีอื่นตามธีม */
+  font-size: 17px;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.view-details-btn:hover {
+  color: #efd5e0; /* สีเข้มขึ้นตอน hover */
+  transform: scale(1.2);
+}
+
+.view-details-btn i {
+  pointer-events: none; /* ไม่ให้คลิกบนไอคอนเอง */
+}
+.passenger p {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.passenger p strong {
+  min-width: 120px; /* กำหนดความกว้างของ label */
+  display: inline-block;
+  color: #333;
+}
+
+.passenger p {
+  color: #333;
+}
+
+.swal-popup-z {
+  z-index: 99999 !important;
+}
+
+.edit-booking-container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+}
+
+.page-title {
+  text-align: left;
+  font-size: 32px;
+  color: #7c1c4b;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #7c1c4b;
+  margin-bottom: 8px;
+}
+
+.form-group select,
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #a85a8b;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.passenger-box {
+  border: 1px solid #d9a8c7;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.passenger-header {
+  font-weight: 600;
+  color: #7c1c4b;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-passenger-btn {
+  background: none;
+  border: none;
+  color: #e91e63;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.add-passenger-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #e91e63;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.add-passenger-btn {
+  width: 100%;
+  padding: 12px; /* เพิ่ม padding เพื่อให้ไอคอนอยู่ในปุ่ม */
+  background-color: #e91e63;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 20px; /* ขยายขนาดไอคอน */
+  display: flex;
+  justify-content: center; /* จัดให้อยู่กลาง */
+  align-items: center; /* จัดให้ไอคอนอยู่ตรงกลาง */
+}
+
+.confirm-edit-btn {
+  width: 100%;
+  padding: 18px; /* เพิ่มพื้นที่ภายในปุ่ม */
+  margin-top: 20px;
+  background-color: #7c1c4b;
+  color: #fff;
+  font-size: 18px; /* ปรับขนาดตัวอักษร */
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.confirm-edit-btn:hover {
+  background-color: #5a1235;
+}
+
+/* === FORM INSIDE MODAL === */
+#editBookingForm select {
+  width: 100%; /* Make them span the full width of their container */
+  padding: 500px 50px; /* Adjust padding to control the height */
+  border-radius: 8px; /* Rounded corners */
+  border: 1px solid #c179a1; /* Border color */
+  background-color: #fafafa; /* Background color */
+  font-size: 14px; /* Font size for text inside input/select */
+  transition: 0.3s;
+  margin-bottom: 40px; /* Add space between the inputs/selects */
+}
+#editBookingForm label[for="passengers"] {
+  font-weight: bold;
+  color: #7c1c4b;
+  margin-top: 20px; /* Add space before the Passengers label */
+}
+#editBookingForm label {
+  font-size: 14px;
+  font-weight: 300;
+  color: #7c1c4b;
+  margin-bottom: 20px;
+}
+#editBookingForm input[type="text"] {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #c179a1;
+  background-color: #fafafa;
+  font-size: 14px;
+  transition: 0.3s;
+  margin-top: -1px; /* Small top margin */
+  margin-bottom: 20px; /* Reduced bottom margin */
+  text-align: left; /* Align text to the left */
+}
+
+#editBookingForm select {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #c179a1;
+  background-color: #fafafa;
+  font-size: 14px;
+  transition: 0.3s;
+  margin-top: 5px; /* Small space above */
+  margin-bottom: 5px; /* Reduced bottom margin */
+}
+
+/* === PASSENGER FIELDS IN MODAL === */
+#passengerFields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 5px; /* Reduced bottom margin */
+}
+
+.passenger {
+  border: 1px solid #c179a1;
+  background-color: #fdf6fa;
+  padding: 15px;
+  border-radius: 8px;
+  position: relative;
+}
+
+/* === REMOVE PASSENGER BUTTON === */
+.remove-passenger-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #e91e63;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.remove-passenger-btn i {
+  pointer-events: none;
+}
+
+/* === ADD PASSENGER BUTTON === */
+.add-passenger-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #e91e63;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-bottom: 15px;
+}
+
+.add-passenger-btn:hover {
+  background-color: #c2185b;
+}
+
+/* === CONFIRM CHANGES BUTTON === */
+.save-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #7c1c4b;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: -1px;
+}
+
+.save-btn:hover {
+  background-color: #5a1338;
+}
+
+.swal2-popup {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+}
+
+.swal2-title {
+  color: #c2185b !important; /* ใช้สีเดียวกับในหน้า Login */
+}

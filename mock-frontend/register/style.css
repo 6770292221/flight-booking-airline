@@ -1,0 +1,252 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9e9f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.register-container {
+  background-color: #ffffff;
+  width: 500px; /* ขยายความกว้างของฟอร์ม */
+  max-width: 90%;
+  padding: 50px 40px; /* ขยายพื้นที่ด้านในฟอร์ม */
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.register-container h2 {
+  color: #7c1c4b;
+  font-size: 26px; /* ขยายขนาดฟอนต์ให้เหมือนในหน้า login */
+  margin-bottom: 20px; /* เพิ่มระยะห่างด้านล่าง */
+}
+
+.register-container p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.register-container p a {
+  color: #7c1c4b;
+  text-decoration: none;
+}
+
+.register-container p a:hover {
+  text-decoration: underline;
+}
+
+.register-container input {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0 20px 0;
+  border: 1px solid #d179a1;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.register-container input:focus {
+  border-color: #7c1c4b;
+  outline: none;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #7c1c4b;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s ease;
+}
+
+.register-btn:hover {
+  background-color: #5a1338;
+  transform: translateY(-2px);
+}
+
+.swal2-popup.twofa-popup {
+  width: 500px !important;
+  max-width: 90%;
+  padding: 30px 20px !important;
+  border-radius: 15px;
+}
+
+.swal2-title {
+  font-size: 22px !important;
+  color: #4e2a37 !important;
+}
+
+.swal2-html-container {
+  font-size: 14px;
+  color: #7c1c4b;
+}
+
+.otp-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+  margin-bottom: -2px;
+}
+
+.otp-input {
+  width: 60px; /* ขยายช่องกรอก OTP */
+  height: 60px; /* ขยายช่องกรอก OTP */
+  text-align: center;
+  font-size: 24px; /* ขยายขนาดตัวอักษร */
+  border: 1.5px solid #7c1c4b;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #4e2a37;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.otp-input:focus {
+  border-color: #7c1c4b;
+  outline: none;
+  box-shadow: 0 0 5px rgba(124, 28, 75, 0.5);
+}
+
+.swal2-confirm.verify-btn {
+  background-color: #7c1c4b !important;
+  color: #fff !important;
+  padding: 15px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px !important;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.swal2-confirm.verify-btn:hover {
+  background-color: #5a1338 !important;
+}
+
+.secret-container {
+  width: 200px; /* ปรับความกว้างตามต้องการ */
+  margin: 0 auto;
+  display: flex; /* ใช้ flex เพื่อจัดแนวในแถวเดียว */
+  justify-content: center; /* จัดให้อยู่ตรงกลาง container */
+  align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  gap: 8px; /* เพิ่มช่องว่างระหว่างข้อความและปุ่ม */
+}
+
+.secret-key {
+  font-size: 14px; /* ปรับ font เล็กลง */
+  color: #7c1c4b; /* ให้เหมือน font สีในตัวอย่าง */
+  font-weight: 500;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex; /* เพื่อจัดให้ icon อยู่ตรงกลาง */
+  align-items: center; /* จัดให้อยู่ตรงกลางแนวตั้ง */
+  justify-content: center;
+  color: #d32f6f;
+  font-size: 18px; /* ปรับขนาด icon ถ้าต้องการเล็กลงเพิ่มค่าเล็กลง */
+  padding: 0;
+}
+
+.copy-btn:hover {
+  color: #c2185b;
+}
+
+/* SweetAlert2 Custom Popup */
+.swal2-popup.twofa-popup {
+  width: 500px !important;
+  max-width: 90%;
+  padding: 30px 20px !important;
+  border-radius: 15px;
+}
+
+.swal2-title {
+  font-size: 22px !important;
+  color: #c2185b !important; /* ใช้สีเดียวกับ Login */
+}
+
+.swal2-html-container {
+  font-size: 14px;
+  color: #585355;
+}
+
+.swal2-popup img {
+  margin: 20px auto;
+  display: block;
+  width: 150px;
+  height: 150px;
+}
+
+.swal2-confirm {
+  background-color: #c2185b !important;
+  color: #fff !important;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px !important;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.swal2-confirm:hover {
+  background-color: #c2185b !important;
+}
+
+.swal2-cancel {
+  background-color: #c2185b !important;
+  border-radius: 8px !important;
+  padding: 10px 25px !important;
+  font-size: 16px !important;
+}
+
+/* Success message */
+.swal2-popup {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+}
+
+.swal2-title {
+  color: #c2185b !important; /* ใช้สีเดียวกับในหน้า Login */
+}
+
+#signupForm label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+  text-align: left; /* ทำให้ label ชิดซ้าย */
+}
+
+#signupForm input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-top: -1px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  border: 1px solid #c179a1; /* สีกรอบ */
+  background-color: #fafafa;
+  font-size: 14px;
+  text-align: left; /* ชิดซ้ายที่ตัวอักษรใน input */
+}
+
+#signupForm input::placeholder {
+  text-align: left; /* ชิดซ้ายข้อความ placeholder */
+}

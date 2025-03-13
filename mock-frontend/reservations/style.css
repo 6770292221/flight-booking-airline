@@ -1,0 +1,266 @@
+/* === RESET === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f9e9f2;
+  color: #333;
+  height: 100vh;
+}
+
+/* === CONTAINER === */
+.container {
+  background-color: #fff;
+  margin: 90px auto;
+  padding: 30px;
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  text-align: center;
+  color: #7c1c4b;
+  margin-bottom: 25px;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+/* === FORM === */
+.reservation-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #7c1c4b;
+  display: block;
+}
+
+select,
+input[type="text"] {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #c179a1;
+  background-color: #fafafa;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+select:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #7c1c4b;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(124, 28, 75, 0.1);
+}
+
+/* === PASSENGER SECTION === */
+.passenger-section {
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #7c1c4b;
+  margin-bottom: 10px;
+}
+
+.passenger-fields {
+  border: 1px solid #c179a1;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px; /* เพิ่มระยะห่างระหว่างผู้โดยสารแต่ละคน */
+  background-color: #fdf6fa;
+  position: relative;
+}
+
+input[type="text"] {
+  margin-bottom: 10px; /* เพิ่มระยะห่างระหว่างฟิลด์ต่างๆ ภายในฟอร์ม */
+}
+
+.passenger-label {
+  font-weight: 500;
+  color: #7c1c4b;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #e91e63;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.add-passenger-btn {
+  width: 100%;
+  padding: 12px; /* เพิ่ม padding เพื่อให้ไอคอนอยู่ในปุ่ม */
+  background-color: #e91e63;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 20px; /* ขยายขนาดไอคอน */
+  display: flex;
+  justify-content: center; /* จัดให้อยู่กลาง */
+  align-items: center; /* จัดให้ไอคอนอยู่ตรงกลาง */
+}
+
+.add-passenger-btn:hover {
+  background-color: #c2185b;
+}
+
+.add-passenger-btn i {
+  font-size: 24px; /* ปรับขนาดของไอคอน */
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 18px; /* เพิ่มพื้นที่ภายในปุ่ม */
+  margin-top: 20px;
+  background-color: #7c1c4b;
+  color: #fff;
+  font-size: 18px; /* ปรับขนาดตัวอักษร */
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.confirm-btn:hover {
+  background-color: #5a1338;
+}
+
+.add-passenger-btn:hover {
+  background-color: #c2185b;
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 18px; /* เพิ่มพื้นที่ภายในปุ่ม */
+  margin-top: 20px;
+  background-color: #7c1c4b;
+  color: #fff;
+  font-size: 18px; /* ปรับขนาดตัวอักษร */
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.confirm-btn:hover {
+  background-color: #5a1338;
+}
+
+/* === MODAL STYLES (IF NEEDED) === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(3px);
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #7c1c4b;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.ok-btn,
+.cancel-btn {
+  padding: 12px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.ok-btn {
+  background-color: #e91e63;
+  color: #fff;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+}
+
+.ok-btn:hover {
+  background-color: #c2185b;
+}
+
+.cancel-btn:hover {
+  background-color: #bbb;
+}
+.swal2-popup {
+  border-radius: 16px !important;
+  padding: 30px 20px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm {
+  background-color: #c73665 !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.swal2-cancel {
+  background-color: #a3a3a3 !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  padding: 12px 25px !important;
+  font-size: 16px !important;
+}
+
+.swal2-popup {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 16px !important;
+}
+
+.swal2-title {
+  color: #c2185b !important; /* ใช้สีเดียวกับในหน้า Login */
+}
