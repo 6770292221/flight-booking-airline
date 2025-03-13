@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reservation</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Navbar CSS -->
+    <link rel="stylesheet" href="../components/navbar.css">
+
+    <!-- FontAwesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        <h1 class="page-title">My Reservation</h1>
+
+        <table class="reservation-table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Flight Number</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+                    <th>Passengers</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- Booking 1 -->
+                <tr>
+                    <td>SGT-278149</td>
+                    <td>FD123</td>
+                    <td>BKK</td>
+                    <td>HKD</td>
+                    <td>2025-03-15 14:00:00</td>
+                    <td>2025-03-15 16:00:00</td>
+                    <td>
+                        <button class="view-details-btn" onclick="toggleDetails(this)">
+                            <i class="fas fa-user-friends"></i>
+                        </button>
+                        <div class="details-container" style="display: none;">
+                            <div class="passenger">
+                                <h4>Passenger 1</h4>
+                                <p><strong>Name:</strong> Jane Doe</p>
+                                <p><strong>Passport:</strong> B87654gs3ss21</p>
+                                <p><strong>Seat Number:</strong> 13B, Business</p>
+                            </div>
+                            <div class="passenger">
+                                <h4>Passenger 2</h4>
+                                <p><strong>Name:</strong> John Smith</p>
+                                <p><strong>Passport:</strong> X1234567</p>
+                                <p><strong>Seat Number:</strong> 14A, Economy</p>
+                            </div>
+                            <div class="passenger">
+                                <h4>Passenger 4</h4>
+                                <p><strong>Name:</strong> John Smith</p>
+                                <p><strong>Passport:</strong> X1234567</p>
+                                <p><strong>Seat Number:</strong> 14A, Economy</p>
+                            </div>
+                            <div class="passenger">
+                                <h4>Passenger 2</h4>
+                                <p><strong>Name:</strong> John Smith</p>
+                                <p><strong>Passport:</strong> X1234567</p>
+                                <p><strong>Seat Number:</strong> 14A, Economy</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>10,000 Baht</td>
+                    <td><span class="status pending">Pending</span></td>
+                    <td class="action-buttons">
+                        <button class="edit-btn" onclick="editBooking()"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" onclick="deleteBooking(event)"><i class="fas fa-trash"></i></button>
+                        <button onclick="window.location.href='../payment/index.html'" class="pay-btn"><i
+                                class="fas fa-credit-card"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Booking 2 -->
+                <tr>
+                    <td>SGT-278149</td>
+                    <td>FD123</td>
+                    <td>BKK</td>
+                    <td>HKD</td>
+                    <td>2025-03-15 14:00:00</td>
+                    <td>2025-03-15 16:00:00</td>
+                    <td>
+                        <button class="view-details-btn" onclick="toggleDetails(this)">
+                            <i class="fas fa-user-friends"></i>
+                        </button>
+                        <div class="details-container" style="display: none;">
+                            <div class="passenger">
+                                <h4>Passenger 1</h4>
+                                <p><strong>Name:</strong> Jane Doe</p>
+                                <p><strong>Passport:</strong> B87654gs3ss21</p>
+                                <p><strong>Seat Number:</strong> 13B, Business</p>
+                            </div>
+                            <div class="passenger">
+                                <h4>Passenger 2</h4>
+                                <p><strong>Name:</strong> John Smith</p>
+                                <p><strong>Passport:</strong> X1234567</p>
+                                <p><strong>Seat Number:</strong> 14A, Economy</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>10,000 Baht</td>
+                    <td><span class="status pending">Pending</span></td>
+                    <td class="action-buttons">
+                        <button class="edit-btn" onclick="editBooking()"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" onclick="deleteBooking(event)"><i class="fas fa-trash"></i></button>
+                        <button onclick="window.location.href='../payment/index.html'" class="pay-btn"><i
+                                class="fas fa-credit-card"></i></button>
+                    </td>
+                </tr>
+
+                <!-- Booking 3 -->
+                <tr>
+                    <td>SGT-278149</td>
+                    <td>FD123</td>
+                    <td>BKK</td>
+                    <td>HKD</td>
+                    <td>2025-03-15 14:00:00</td>
+                    <td>2025-03-15 16:00:00</td>
+                    <td>
+                        <button class="view-details-btn" onclick="toggleDetails(this)">
+                            <i class="fas fa-user-friends"></i>
+                        </button>
+                        <div class="details-container" style="display: none;">
+                            <div class="passenger">
+                                <h4>Passenger 1</h4>
+                                <p><strong>Name:</strong> Jane Doe</p>
+                                <p><strong>Passport:</strong> B87654gs3ss21</p>
+                                <p><strong>Seat Number:</strong> 13B, Business</p>
+                            </div>
+                            <div class="passenger">
+                                <h4>Passenger 2</h4>
+                                <p><strong>Name:</strong> John Smith</p>
+                                <p><strong>Passport:</strong> X1234567</p>
+                                <p><strong>Seat Number:</strong> 14A, Economy</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>10,000 Baht</td>
+                    <td><span class="status pending">Pending</span></td>
+                    <td class="action-buttons">
+                        <button class="edit-btn" onclick="editBooking()"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" onclick="deleteBooking(event)"><i class="fas fa-trash"></i></button>
+                        <button onclick="window.location.href='../payment/index.html'" class="pay-btn"><i
+                                class="fas fa-credit-card"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit Booking Modal -->
+    <div id="editBookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">X</span>
+
+            <h2>Edit Booking</h2>
+            <form id="editBookingForm">
+                <label for="flight">Flight:</label>
+                <input type="text" id="flight" name="flight" value="FD123" disabled><br>
+                <label for="seat">Seat:</label>
+                <select id="seat" name="seat">
+                    <option value="13B, FIRST, 1500$">13B, FIRST, 1500$</option>
+                    <option value="14A, ECONOMY, 800$">14A, ECONOMY, 800$</option>
+                    <option value="15C, ECONOMY, 700$">15C, ECONOMY, 700$</option>
+                </select><br>
+                <!-- Passengers Section -->
+                <label for="passengers">Passengers:</label>
+                <div id="passengerFields">
+                    <div class="passenger" id="passenger1">
+                        <label for="firstName1">Passenger 1:</label>
+                        <input type="text" name="firstName" id="firstName1" placeholder="First Name" required>
+                        <input type="text" name="lastName" id="lastName1" placeholder="Family Name" required>
+                        <input type="text" name="passport" id="passport1" placeholder="Passport" required>
+                        <button type="button" onclick="removePassenger(this)" class="remove-passenger-btn"><i
+                                class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <button type="button" class="add-passenger-btn" onclick="addPassenger()">
+                    <i class="fas fa-user-plus"></i> <!-- FontAwesome Icon สำหรับเพิ่มผู้โดยสาร -->
+                </button>
+                <button type="button" onclick="confirmEditBooking()" class="save-btn">
+                    Confirm Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load Navbar -->
+    <script>
+        fetch('../components/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('navbar-placeholder').innerHTML = data;
+            });
+    </script>
+
+    <!-- External JS file -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
