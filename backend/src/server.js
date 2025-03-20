@@ -11,6 +11,7 @@ import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 import cors from "cors";
+import mailService from './utils/mail_utils.js'
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
@@ -29,6 +30,12 @@ connectDB(logger);
 redisClient.connect();
 
 app.listen(port, () => {
+  mailService.sendEmail(
+    'mindwua@gmail.com',
+    'Test Email',
+    'Hello! This is a test email from the singleton MailService.'
+  );
+  console.log('Notification email sent successfully.');
   logger.info(`server started on port ${port}`);
 });
 
