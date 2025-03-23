@@ -51,8 +51,8 @@ const verifyToken = async (req, res, next) => {
         if (!tokenData.verified) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                code: Codes.ATH_6005,
-                message: Messages.ATH_6005,
+                code: Codes.OTP_6005,
+                message: Messages.OTP_6005,
             });
         }
 
