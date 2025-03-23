@@ -11,6 +11,7 @@ import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
 import routerBooking from './routes/booking_routes.js';
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
+import routerPayment from "./routes/payment_routes.js";
 import cors from "cors";
 import mailService from './utils/mail_utils.js'
 
@@ -24,7 +25,9 @@ app.use(express.json());
 app.use("/api/v1/flight-core-api", routerFlight, routerSeats);
 app.use("/api/v1/user-core-api", routerAccount, routerAuth);
 app.use("/api/v1/reservation-core-api", routerReservation);
+app.use("/api/v1/payment-core-api", routerPayment);
 app.use("/api/v1/booking-core-api", routerBooking);
+
 
 
 connectDB(logger);

@@ -100,6 +100,19 @@ export const Codes = Object.freeze({
   FGT_1008: "FGT_1008",
   FGT_1009: "FGT_1009",
 
+  //Payment
+  PMT_1001: "PMT_1001",
+  PMT_1002: "PMT_1002",
+  PMT_1003: "PMT_1003",
+  PMT_1004: "PMT_1004",
+  PMT_1005: "PMT_1005",
+  PMT_1006: "PMT_1006",
+  PMT_1007: "PMT_1007",
+  PMT_1008: "PMT_1008",
+  PMT_1009: "PMT_1009",
+  PMT_1010: "PMT_1010",
+  PMT_1011: "PMT_1011",
+
   //General
   GNR_1001: "GNR_1001",
 
@@ -178,6 +191,18 @@ export const Messages = Object.freeze({
   OTP_6005: "Please verify the SMS OTP",
 
 
+  // Payment Messages
+  PMT_1001: "Payment successful",
+  PMT_1002: "Payment failed",
+  PMT_1003: "Missing required information: BookingId",
+  PMT_1004: "Booking not found",
+  PMT_1005: "The user id does not match the user id associated with the booking",
+  PMT_1006: "Booking status is not pending",
+  PMT_1007: "Payment token and amount are required",
+  PMT_1008: "Error creating PaymentIntent",
+  PMT_1009: "Failed to update booking status",
+  PMT_1010: "Bank payment is not success",
+  PMT_1011: "Bank name, Account number, Transaction reference and Transfer datetime are required",
 
   // Logout Messages
   LOT_5001: "Logout successful",
