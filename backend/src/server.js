@@ -9,6 +9,7 @@ import routerAuth from './routes/auth_routes.js';
 import routerFlight from "./routes/flights_routes.js";
 import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
+import routerBooking from './routes/booking_routes.js';
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 import cors from "cors";
 import mailService from './utils/mail_utils.js'
@@ -23,7 +24,7 @@ app.use(express.json());
 app.use("/api/v1/flight-core-api", routerFlight, routerSeats);
 app.use("/api/v1/user-core-api", routerAccount, routerAuth);
 app.use("/api/v1/reservation-core-api", routerReservation);
-
+app.use("/api/v1/booking-core-api", routerBooking);
 
 
 connectDB(logger);
