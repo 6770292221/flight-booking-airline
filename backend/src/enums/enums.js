@@ -31,6 +31,7 @@ export const Codes = Object.freeze({
   REG_1007: "REG_1007",
   REG_1008: "REG_1008",
 
+
   // Auth Codes
   LGN_2001: "LGN_2001",
   LGN_2002: "LGN_2002",
@@ -169,12 +170,12 @@ export const Messages = Object.freeze({
   VAL_4003: "Invalid shopId format",
   VAL_4004: `Invalid data format`,
 
-  // 2fa
+  // OTP
   ATH_4001: "user not found",
   ATH_4002: "Invalid or expired OTP. Please try again",
   ATH_4003: "Missing required information: VrificationCode are mandatory",
   ATH_4004: "2FA verified successfully.",
-  ATH_6005: "Please verify your identity with the 2FA code",
+  OTP_6005: "Please verify the SMS OTP",
 
 
 
