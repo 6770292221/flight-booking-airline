@@ -35,13 +35,13 @@ class HeaderInterceptor {
     return HeaderInterceptor.headerToken;
   }
 
-  static setConfigOffer(reqBody, domestic) {
+  static setConfigOffer(reqBody, domestic, direction) {
     const queryParams = qs.stringify(
       {
         adults: reqBody.adults,
-        originLocationCode: reqBody.originLocationCode,
-        destinationLocationCode: reqBody.destinationLocationCode,
-        departureDate: reqBody.departureDate,
+        originLocationCode: direction ? reqBody.originLocationCode : reqBody.destinationLocationCode,
+        destinationLocationCode: direction ? reqBody.destinationLocationCode : reqBody.originLocationCode,
+        departureDate: direction ? reqBody.departureDate : reqBody.arrivalDate,
         nonStop: reqBody.nonStop || undefined,
         max: reqBody.max || undefined,
         currencyCode: reqBody.currencyCode || undefined,

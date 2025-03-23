@@ -1,17 +1,15 @@
+import { response } from "express";
+
 export class MapUtils {
   static createMappedFlightDetails(
     obj,
-    dircetion,
+    flag,
     airlines = [],
     airports = [],
     aircrafts = [],
     cabins = []
   ) {
-    console.log(obj);
-    let response = {
-      dircetion: dircetion,
-      data: [],
-    };
+    let response = []
     for (let i = 0; i < obj.length; i++) {
       let value = obj[i];
       const mappedData = new Map();
@@ -74,8 +72,11 @@ export class MapUtils {
         rate: value.price?.total,
         currency: value.price?.currency,
       });
-      //   console.log(mappedData)
-      response.data.push(Object.fromEntries(mappedData));
+      if(flag == "OUTBOUND") {
+        response.push(Object.fromEntries(mappedData));
+      } else if(flag == "INBOUND") {
+        response.push(Object.fromEntries(mappedData));
+      }
     }
     return response;
   }
