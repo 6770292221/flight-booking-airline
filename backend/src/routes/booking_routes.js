@@ -16,5 +16,4 @@ routerBooking.get("/admin/booking", verifyToken, getAllBookingsByAdmin);
 
 
 
-
 export default routerBooking;
