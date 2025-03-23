@@ -188,7 +188,7 @@ export const Messages = Object.freeze({
   ATH_4002: "Invalid or expired OTP. Please try again",
   ATH_4003: "Missing required information: VrificationCode are mandatory",
   ATH_4004: "2FA verified successfully.",
-  OTP_6005: "Please verify the SMS OTP",
+  ATH_6005: "Please verify the SMS OTP",
 
 
   // Payment Messages
