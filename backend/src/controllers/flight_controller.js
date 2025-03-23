@@ -8,6 +8,7 @@ import axios from "axios";
 
 export const postFlightsOffer = async (req, res) => {
   try {
+    await HeaderInterceptor.fetchToken();
     const airlines = await AirlineMongooseModel.find();
     const airports = await AirportMongooseModel.find();
     const domestic = airlines.map((value) => value.carrierCode).join(',')
@@ -18,12 +19,13 @@ export const postFlightsOffer = async (req, res) => {
       outbound: [],
       inbound: []
     };
+
     let { direction } = req.body;
       if( direction == "ONEWAY" ) {
         resp.dircetion = "ONEWAY"
-        await HeaderInterceptor.fetchToken();
-        HeaderInterceptor.setConfigOffer(req.body, domestic, true);
-        const respOutbound = await axios.request(HeaderInterceptor.getConfig());
+
+        const config = HeaderInterceptor.setConfigOffer(req.body, domestic, true);
+        const respOutbound = await axios.request(config);
         resp.outbound = MapUtils.createMappedFlightDetails(
           respOutbound.data.data,
           "OUTBOUND",
@@ -34,10 +36,9 @@ export const postFlightsOffer = async (req, res) => {
         );
       } else if (direction == "ROUNDTRIP") {
         resp.dircetion = "ROUNDTRIP"
-        await HeaderInterceptor.fetchToken();
-        HeaderInterceptor.setConfigOffer(req.body, domestic, true);
-        const config = HeaderInterceptor.getConfig();
-        const respOutbound = await axios.request(HeaderInterceptor.getConfig());
+        let config =  HeaderInterceptor.setConfigOffer(req.body, domestic, true);
+
+        const respOutbound = await axios.request(config);
         resp.outbound = MapUtils.createMappedFlightDetails(
           respOutbound.data.data,
           "OUTBOUND",
@@ -46,8 +47,8 @@ export const postFlightsOffer = async (req, res) => {
           aircrafts,
           cabins
         );
-        HeaderInterceptor.setConfigOffer(req.body, domestic, false);
-        const respInbound = await axios.request(HeaderInterceptor.getConfig());
+        config =  HeaderInterceptor.setConfigOffer(req.body, domestic, false);
+        const respInbound = await axios.request(config);
         resp.inbound = MapUtils.createMappedFlightDetails(
           respInbound.data.data,
           "INBOUND",

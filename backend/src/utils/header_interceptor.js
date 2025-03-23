@@ -2,8 +2,8 @@ import axios from "axios";
 import qs from "qs";
 
 class HeaderInterceptor {
+  constructor() {}
   static headerToken = "";
-  static config = {};
   static async fetchToken() {
     const data = qs.stringify({
       grant_type: "client_credentials",
@@ -35,12 +35,29 @@ class HeaderInterceptor {
     return HeaderInterceptor.headerToken;
   }
 
+  static setConfigGet() {
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: ``,
+      headers: {
+        Authorization: "Bearer " + HeaderInterceptor.getToken(),
+      },
+    };
+    return config;
+  }
+
   static setConfigOffer(reqBody, domestic, direction) {
+    let config = HeaderInterceptor.setConfigGet();
     const queryParams = qs.stringify(
       {
         adults: reqBody.adults,
-        originLocationCode: direction ? reqBody.originLocationCode : reqBody.destinationLocationCode,
-        destinationLocationCode: direction ? reqBody.destinationLocationCode : reqBody.originLocationCode,
+        originLocationCode: direction
+          ? reqBody.originLocationCode
+          : reqBody.destinationLocationCode,
+        destinationLocationCode: direction
+          ? reqBody.destinationLocationCode
+          : reqBody.originLocationCode,
         departureDate: direction ? reqBody.departureDate : reqBody.arrivalDate,
         nonStop: reqBody.nonStop || undefined,
         max: reqBody.max || undefined,
@@ -50,23 +67,13 @@ class HeaderInterceptor {
       },
       { skipNulls: true }
     ); // This prevents adding empty params
-    const includedAirlineCodesParam = domestic 
-    ? `includedAirlineCodes=${domestic}`
-    : '';
+    const includedAirlineCodesParam = domestic
+      ? `includedAirlineCodes=${domestic}`
+      : "";
 
-
-    HeaderInterceptor.config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url: `https://test.api.amadeus.com/v2/shopping/flight-offers?${includedAirlineCodesParam}&${queryParams}`,
-      headers: {
-        Authorization: "Bearer " + HeaderInterceptor.getToken(),
-      },
-    };
-  }
-
-  static getConfig() {
-    return HeaderInterceptor.config;
+    console.log(config)
+    config.url = `https://test.api.amadeus.com/v2/shopping/flight-offers?${includedAirlineCodesParam}&${queryParams}`  
+    return config;
   }
 }
 
