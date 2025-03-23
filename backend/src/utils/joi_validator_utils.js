@@ -36,3 +36,17 @@ export const bookingRunningSchema = Joi.object({
     .regex(/^BKD-[0-9]{8}$/)
     .required(),
 });
+
+
+export const flightQuerySchema = Joi.object({
+  originLocationCode: Joi.string().required(),
+  destinationLocationCode: Joi.string().required(),
+  departureDate: Joi.date().iso().required(),
+  // includedAirlineCodes: Joi.string().required(), 
+  nonStop: Joi.boolean().optional(),
+  max: Joi.number().integer().optional(),
+  currencyCode: Joi.string().length(3).required(),
+  adults: Joi.number().integer().min(1).required(),
+  children: Joi.number().integer().min(0).required(),
+  infants: Joi.number().integer().min(0).optional()
+});
