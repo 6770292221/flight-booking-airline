@@ -35,8 +35,7 @@ class HeaderInterceptor {
     return HeaderInterceptor.headerToken;
   }
 
-  static setConfigOffer(reqBody) {
-    const { includedAirlineCodes } = reqBody;
+  static setConfigOffer(reqBody, domestic) {
     const queryParams = qs.stringify(
       {
         adults: reqBody.adults,
@@ -51,8 +50,8 @@ class HeaderInterceptor {
       },
       { skipNulls: true }
     ); // This prevents adding empty params
-    const includedAirlineCodesParam = includedAirlineCodes 
-    ? `includedAirlineCodes=${includedAirlineCodes}`
+    const includedAirlineCodesParam = domestic 
+    ? `includedAirlineCodes=${domestic}`
     : '';
 
 

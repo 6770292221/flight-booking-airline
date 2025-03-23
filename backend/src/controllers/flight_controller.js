@@ -10,12 +10,13 @@ export const postFlightsOffer = async (req, res) => {
   try {
     const airlines = await AirlineMongooseModel.find();
     const airports = await AirportMongooseModel.find();
+    const domestic = airlines.map((value) => value.carrierCode).join(',')
     const aircrafts = await AircraftMongooseModel.find();
     const cabins = await CabinClassMongooseModel.find();
     let { direction } = req.body;
     if (direction === "oneWay") {
       await HeaderInterceptor.fetchToken();
-      HeaderInterceptor.setConfigOffer(req.body);
+      HeaderInterceptor.setConfigOffer(req.body, domestic);
       const config = HeaderInterceptor.getConfig();
       const response = await axios.request(config);
 
@@ -27,7 +28,7 @@ export const postFlightsOffer = async (req, res) => {
         aircrafts,
         cabins
       );
-      res.status(200).json(mappedData);
+      res.status(200).json(mappedData)
     } else if (direction === "roundTrip") {
       await HeaderInterceptor.fetchToken();
       HeaderInterceptor.setConfigOffer(req.body);
