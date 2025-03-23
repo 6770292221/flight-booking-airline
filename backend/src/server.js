@@ -9,9 +9,11 @@ import routerAuth from './routes/auth_routes.js';
 import routerFlight from "./routes/flights_routes.js";
 import routerSeats from "./routes/seats_routes.js";
 import routerReservation from "./routes/reservation_routes.js";
+import routerBooking from './routes/booking_routes.js';
 import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 import routerPayment from "./routes/payment_routes.js";
 import cors from "cors";
+import mailService from './utils/mail_utils.js'
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
@@ -24,6 +26,7 @@ app.use("/api/v1/flight-core-api", routerFlight, routerSeats);
 app.use("/api/v1/user-core-api", routerAccount, routerAuth);
 app.use("/api/v1/reservation-core-api", routerReservation);
 app.use("/api/v1/payment-core-api", routerPayment);
+app.use("/api/v1/booking-core-api", routerBooking);
 
 
 
@@ -31,6 +34,12 @@ connectDB(logger);
 redisClient.connect();
 
 app.listen(port, () => {
+  mailService.sendEmail(
+    'mindwua@gmail.com',
+    'Test Email',
+    'Hello! This is a test email from the singleton MailService.'
+  );
+  console.log('Notification email sent successfully.');
   logger.info(`server started on port ${port}`);
 });
 

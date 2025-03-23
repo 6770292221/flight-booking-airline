@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { createAccount, verifyUser } from "../controllers/account_controller.js";
+import { createAccount, verifyUserByEmail } from "../controllers/account_controller.js";
 import { getTokenData } from "../middleware/auth.js";
 
 
 const routerAccount = Router();
 
 routerAccount.post("/register", createAccount);
-routerAccount.post("/verifyUser", getTokenData, verifyUser);
+routerAccount.post("/verifyUser", verifyUserByEmail);
 
 
 export default routerAccount;

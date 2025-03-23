@@ -148,76 +148,55 @@ export async function createAccount(req, res) {
   }
 }
 
-export async function verifyUser(req, res) {
-  try {
-    const userId = req.user.userId;
 
-    const { verificationCode } = req.body;
-    if (!verificationCode) {
+export async function verifyUserByEmail(req, res) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.VAL_4001,
-        message: Messages.VAL_4001,
+        message: Messages.VAL_4001
       });
     }
 
-    const user = await AccountMongooseModel.findById(userId);
+    const user = await AccountMongooseModel.findOne({ email: email.toLowerCase() });
+
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
         code: Codes.REG_1002,
-        message: Messages.REG_1002,
+        message: Messages.REG_1002
       });
     }
 
-    if (user.verified) {
+    if (user.verified === true) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.REG_1007,
-        message: Messages.REG_1007,
+        message: Messages.REG_1007
       });
     }
 
-    const twoFactorSecret = user.twoFactorSecret;
-    if (!twoFactorSecret) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.LGN_2004,
-        message: Messages.LGN_2004,
-      });
-    }
-
-    const isValidOTP = speakeasy.totp.verify({
-      secret: twoFactorSecret,
-      encoding: 'base32',
-      token: verificationCode,
-      window: 1
-    });
-
-    if (!isValidOTP) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.ATH_4002,
-        message: Messages.ATH_4002,
-      });
-    }
-
-    const updateResult = await AccountMongooseModel.updateOne(
-      { _id: userId },
-      { $set: { verified: true } }
-    );
+    user.verified = true;
+    await user.save();
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
       message: Messages.REG_1008,
+      data: {
+        email: user.email,
+        verified: user.verified
+      }
     });
 
   } catch (error) {
-    console.error("Error during verifyUser:", error);
+    console.error(error);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
-      message: StatusMessages.SERVER_ERROR,
+      message: StatusMessages.SERVER_ERROR
     });
   }
 }
