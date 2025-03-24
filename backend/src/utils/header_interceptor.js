@@ -61,7 +61,7 @@ class HeaderInterceptor {
         departureDate: direction ? reqBody.departureDate : reqBody.arrivalDate,
         nonStop: reqBody.nonStop || undefined,
         max: reqBody.max || undefined,
-        currencyCode: reqBody.currencyCode || undefined,
+        currencyCode: reqBody.currencyCode || "THB",
         children: reqBody.children || undefined,
         infants: reqBody.infants || undefined,
       },

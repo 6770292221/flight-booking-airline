@@ -17,17 +17,18 @@ export class MapUtils {
       const travelerPricing = value.travelerPricings?.[0];
       const fareDetails = travelerPricing?.fareDetailsBySegment?.[0];
 
-      mappedData.set("airLineCode", segment?.carrierCode); // Rename carrierCode -> airLineCode
+      mappedData.set("direction", flag)
+      mappedData.set("airline", segment?.carrierCode); // Rename carrierCode -> airLineCode
       mappedData.set("flightNumber", segment?.carrierCode + segment?.number);
       mappedData.set(
-        "airLineName",
+        "airlineName",
         airlines.find(
           (airline) =>
             airline.carrierCode == value.itineraries[0].segments[0].carrierCode
         )?.airlineName
       );
       mappedData.set("departure", {
-        code: segment?.departure?.iataCode,
+        iataCode: segment?.departure?.iataCode,
         cityName: airports.find(
           (airport) => airport.iataCode == segment?.departure?.iataCode
         )?.cityName,
@@ -35,7 +36,7 @@ export class MapUtils {
       });
 
       mappedData.set("arrival", {
-        code: segment?.arrival?.iataCode,
+        iataCode: segment?.arrival?.iataCode,
         cityName: airports.find(
           (airport) => airport.iataCode == segment?.arrival?.iataCode
         )?.cityName,
@@ -69,7 +70,7 @@ export class MapUtils {
         )?.carryOn,
       });
       mappedData.set("price", {
-        rate: value.price?.total,
+        amount: value.price?.total,
         currency: value.price?.currency,
       });
       if(flag == "OUTBOUND") {
