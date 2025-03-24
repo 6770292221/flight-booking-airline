@@ -1,7 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
-import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail } from '../email/emailService.js'
+import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
 
 
 export async function createBooking(req, res) {
@@ -362,11 +362,35 @@ export async function updatePayments(req, res) {
 
         booking.payments = payments;
 
+
         if (status) {
             booking.status = status;
         }
 
         booking.updatedAt = new Date();
+
+        const user = await AccountMongooseModel.findById(booking.userId).lean();
+
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                status: StatusMessages.FAILED,
+                message: "User not found for this booking."
+            });
+        }
+
+        if (status === 'CONFIRM') {
+            await sendPaymentSuccessEmail({
+                bookingResponse: booking.toObject(),
+                reqUser: user
+            });
+        }
+
+        if (status === 'REJECTED') {
+            await sendPaymentFailedEmail({
+                bookingResponse: booking.toObject(),
+                reqUser: user
+            });
+        }
 
         const validationError = booking.validateSync();
         if (validationError) {
