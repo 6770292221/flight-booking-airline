@@ -116,7 +116,56 @@ const getTokenData = async (req, res, next) => {
     }
 };
 
-export { verifyToken, getTokenData };
+const verifyAdmin = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            status: StatusMessages.FAILED,
+            code: Codes.TKN_6001,
+            message: Messages.TKN_6001,
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            status: StatusMessages.FAILED,
+            code: Codes.TKN_6001,
+            message: Messages.TKN_6001,
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+
+        if (req.user.isAdmin === false) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6003,
+                message: Messages.TKN_6003,
+            });
+        }
+
+        next();
+
+    } catch (error) {
+        if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6002,
+                message: Messages.TKN_6002,
+            });
+        }
+
+        return res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
+    }
+};
+
+export { verifyToken, getTokenData, verifyAdmin };
 
 
 

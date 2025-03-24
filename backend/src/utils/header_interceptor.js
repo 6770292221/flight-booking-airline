@@ -71,10 +71,11 @@ class HeaderInterceptor {
       ? `includedAirlineCodes=${domestic}`
       : "";
 
-    console.log(config)
     config.url = `https://test.api.amadeus.com/v2/shopping/flight-offers?${includedAirlineCodesParam}&${queryParams}`  
     return config;
   }
 }
+
+
 
 export { HeaderInterceptor };
