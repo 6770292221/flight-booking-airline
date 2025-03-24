@@ -11,9 +11,12 @@ import speakeasy from "speakeasy";
 import qrcode from "qrcode";
 import jwt from "jsonwebtoken";
 import { sendVerifyRegisterEmail } from "../email/emailService.js";
-import { Logger } from "../state/logger_state.js";
+import logger from "../utils/logger_utils.js";
+import { EmailContext } from "../state/mailing_context.js";
+import { VerifyRegisterState} from "../state/mailing_concrete.js";
+import { validateBody } from "../middleware/validate.js";
 
-const logger = new Logger();
+const emailContext = new EmailContext();
 
 const hideEmail = (email) => {
   const [localPart, domainPart] = email.split("@");
@@ -64,7 +67,7 @@ export async function createAccount(req, res) {
     } = req.body;
 
     if (!firstName || !lastName || !password || !email || !phoneNumber) {
-      logger.log(`Validation failed: Missing fields`, "error");
+      logger.info(`Validation failed: Missing fields`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.VAL_4001,
@@ -73,7 +76,7 @@ export async function createAccount(req, res) {
     }
 
     try {
-      logger.log(`Validating account fields for email: ${email}`, "info");
+      logger.info(`Validating account fields for email: ${email}`, "info");
       validateField(
         firstName,
         nameRegex,
@@ -100,7 +103,7 @@ export async function createAccount(req, res) {
         `${Messages.REG_1003}: ${email}`
       );
     } catch (validationError) {
-      logger.log(`Validation error: ${validationError.message}`, "error");
+      logger.info(`Validation error: ${validationError.message}`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: validationError.code,
@@ -117,7 +120,7 @@ export async function createAccount(req, res) {
         Messages.REG_1005
       );
     } catch (accountError) {
-      logger.log(`Account already exists: ${email}`, "warn");
+      logger.info(`Account already exists: ${email}`, "warn");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: accountError.code,
@@ -148,12 +151,12 @@ export async function createAccount(req, res) {
 
     await newAccount.save();
 
-    logger.log(`Account created successfully: ${email}`, "info");
+    logger.info(`Account created successfully: ${email}`, "info");
 
     const user = await AccountMongooseModel.findOne({ email });
 
     if (!user) {
-      logger.log(`Account creation failed: ${email}`, "error");
+      logger.info(`Account creation failed: ${email}`, "error");
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2003,
@@ -175,8 +178,10 @@ export async function createAccount(req, res) {
       { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
     );
 
-    sendVerifyRegisterEmail(req.body);
-    res.status(StatusCodes.CREATE).json({
+    emailContext.setState(new VerifyRegisterState());
+    await emailContext.sendEmail({data: '', reqUser: req.body})
+  
+    return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1001,
       message: Messages.REG_1001,
@@ -194,7 +199,7 @@ export async function createAccount(req, res) {
       },
     });
   } catch (error) {
-    logger.log(`Unexpected error: ${error.message}`, "error");
+    logger.info(`Unexpected error: ${error.message}`, "error");
     res.status(StatusCodes.SERVER_ERROR).json(
       ResponseModel.create({
         status: StatusMessages.FAILED,
@@ -209,7 +214,7 @@ export async function verifyUserByEmail(req, res) {
     const { email } = req.params;
 
     if (!email) {
-      logger.log(`Email is missing from request`, "error");
+      logger.info(`Email is missing from request`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.VAL_4001,
@@ -222,7 +227,7 @@ export async function verifyUserByEmail(req, res) {
     });
 
     if (!user) {
-      logger.log(`Account not found for email: ${email}`, "warn");
+      logger.info(`Account not found for email: ${email}`, "warn");
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
         code: Codes.REG_1002,
@@ -231,7 +236,7 @@ export async function verifyUserByEmail(req, res) {
     }
 
     if (user.verified === true) {
-      logger.log(`Account already verified: ${email}`, "warn");
+      logger.info(`Account already verified: ${email}`, "warn");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.REG_1007,
@@ -242,9 +247,8 @@ export async function verifyUserByEmail(req, res) {
     user.verified = true;
     await user.save();
 
-    logger.log(`Account verified successfully: ${email}`, "info");
-
-    res.redirect(`http://127.0.0.1:5500/frontend/src/pages/index.html`);
+    logger.info(`Account verified successfully: ${email}`, "info");
+    return res.redirect(`http://127.0.0.1:5500/frontend/src/pages/index.html`);
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
@@ -255,7 +259,7 @@ export async function verifyUserByEmail(req, res) {
       },
     });
   } catch (error) {
-    logger.log(`Unexpected error: ${error.message}`, "error");
+    logger.info(`Unexpected error: ${error.message}`, "error");
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       message: StatusMessages.SERVER_ERROR,
