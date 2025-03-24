@@ -11,6 +11,8 @@ import routerPayment from "./routes/payment_routes.js";
 import cors from "cors";
 import routerFlight from "./routes/flights_routes.js";
 import routerAirports from "./routes/airports_routes.js";
+import routerAirlines from "./routes/airlines_routes.js";
+
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
@@ -23,7 +25,9 @@ app.use(express.json());
 app.use("/api/v1/user-core-api", routerAccount, routerAuth);
 app.use("/api/v1/payment-core-api", routerPayment);
 app.use("/api/v1/booking-core-api", routerBooking);
-app.use("/api/v1/flight-core-api", routerFlight, routerAirports);
+app.use("/api/v1/flight-core-api", routerFlight);
+app.use('/api/v1/airline-core-api', routerAirlines);
+app.use('/api/v1/airport-core-api', routerAirports);
 
 
 connectDB(logger);
