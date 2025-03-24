@@ -1,7 +1,7 @@
 
 import { Codes, Messages, StatusCodes, StatusMessages } from "../enums/enums.js";
-import logger from "../utils/logger_utils.js";
-
+import { Logger } from "../state/logger_state.js";
+const logger = new Logger();
 const validateBody = (schema) => (req, res, next) => {
     try {
         logger.info('Start validateBody')
