@@ -17,7 +17,7 @@ const flightSchema = new mongoose.Schema({
         time: Date
     },
     price: {
-        rate: String,
+        amount: String,
         currency: String
     }
 }, { _id: false });
@@ -36,10 +36,11 @@ const passengerSchema = new mongoose.Schema({
         ticketNumber: String
     }],
     addons: [{
+        flightNumber: String,
         seat: String,
         meal: String,
         price: {
-            rate: String,
+            amount: String,
             currency: String
         }
     }]
@@ -63,8 +64,6 @@ const bookingSchema = new mongoose.Schema({
     passengers: [passengerSchema],
     payments: [paymentSchema],
     status: { type: String, default: "PENDING" },
-    amount: Number,
-    currency: String,
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
     expiresAt: { type: Date }

@@ -40,7 +40,7 @@ export const Codes = Object.freeze({
   LGN_2005: "LGN_2005",
   LGN_2006: "LGN_2006",
 
-  // Reservation Codes
+  // Booking Codes
   RSV_3001: "RSV_3001",
   RSV_3002: "RSV_3002",
   RSV_3003: "RSV_3003",
@@ -137,21 +137,21 @@ export const Messages = Object.freeze({
   LGN_2005: "Account not verified. Please contact admin.",
   LGN_2006: "The password you entered is incorrect. Please try again.",
 
-  // Reservation Messages
+  // Booking Messages
   RSV_3001: "Missing required information: flightId and passenger are mandatory.",
   RSV_3002: "Invalid flight number.",
   RSV_3003: "Flight information not found",
   RSV_3004: "Duplicate seat booking is not allowed.",
-  RSV_3005: "Duplicate passport usage is not allowed.",
-  RSV_3006: "Seat for passenger {index} is invalid.",
-  RSV_3007: "Seat for passenger {index} does not exist in the system.",
-  RSV_3008: "Passenger {index} information is incomplete.",
-  RSV_3009: "Reservation successful.",
-  RSV_3010: "Price must be a positive number at Passenger {index}.",
-  RSV_3011: "Price must be greater than 0 at Passenger {index}.",
-  RSV_3012: "Passenger {index}: The selected seat is not available for booking",
-  RSV_3013: "No expired reservations found.",
-  RSV_3014: "Expired reservations cancelled and seats updated.",
+  RSV_3005: "Payments updated successfully.",
+  RSV_3006: "Payments array is required.",
+  RSV_3007: "Tickets updated successfully.",
+  RSV_3008: "Passenger at index ${i} with passportNumber '${updatedPassenger.passportNumber}' not found in booking.",
+  RSV_3009: "Create Booking successful",
+  RSV_3010: "Bookings fetched successfully.",
+  RSV_3011: "Booking Not found.",
+  RSV_3012: "Booking deleted successfully.",
+  RSV_3013: "Booking updated successfully.",
+  RSV_3014: "Passengers array is required.",
 
   // Seat
   SAT_1001: "Missing required information: flightId, seatId, and userId are mandatory.",
@@ -181,7 +181,7 @@ export const Messages = Object.freeze({
   VAL_4001: "Required fields are missing. Please fill in all the necessary fields.",
   VAL_4002: "Invalid phone number format",
   VAL_4003: "Invalid shopId format",
-  VAL_4004: `Invalid data format`,
+  VAL_4004: `Validation error. Please check your data information.`,
 
   // OTP
   ATH_4001: "user not found",

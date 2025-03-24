@@ -1,6 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
+import MailService from '../utils/mail_utils.js';
 
 export async function createBooking(req, res) {
     try {
@@ -8,7 +9,6 @@ export async function createBooking(req, res) {
         const userId = req.user.userId;
 
         if (!req.user || !req.user.userId) {
-            console.log("Unauthorized access. req.user is missing");
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
                 code: Codes.TKN_6001,
@@ -17,7 +17,6 @@ export async function createBooking(req, res) {
         }
 
         const bookingData = req.body;
-        console.log("Raw bookingData:", bookingData);
 
         if (!bookingData.bookingId) {
             const timestamp = Date.now();
@@ -28,40 +27,35 @@ export async function createBooking(req, res) {
         bookingData.createdAt = new Date();
         bookingData.updatedAt = new Date();
 
-        console.log("Processed bookingData:", bookingData);
 
         const newBooking = new BookingMongooseModel(bookingData);
-        console.log("newBooking (before validate):", newBooking);
 
         const validationError = newBooking.validateSync();
         if (validationError) {
-            console.error("Validation error:", validationError.message);
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: validationError.message
+                code: Codes.VAL_4004,
+                message: Messages.VAL_4004,
             });
         }
 
         try {
             await newBooking.save();
-            console.log("Booking saved successfully");
         } catch (saveError) {
-            console.error("Error during save:", saveError);
             return res.status(StatusCodes.SERVER_ERROR).json({
                 status: StatusMessages.FAILED,
-                message: saveError.message
+                message: StatusMessages.SERVER_ERROR,
             });
         }
 
         return res.status(StatusCodes.CREATE).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1001,
-            message: Messages.BKG_1001,
+            code: Codes.RSV_3009,
+            message: Messages.RSV_3009,
             data: newBooking
         });
 
     } catch (error) {
-        console.error("createBooking error (outer):", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
@@ -77,16 +71,45 @@ export async function getBookingById(req, res) {
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: Messages.BKG_1002
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
             });
         }
 
+        // Calculate total from flights
+        let flightTotal = 0;
+        if (booking.flights && booking.flights.length > 0) {
+            flightTotal = booking.flights.reduce((acc, flight) => {
+                const rate = parseFloat(flight.price?.amount || 0);
+                return acc + rate;
+            }, 0);
+        }
+
+        // Calculate total from passengers' addons
+        let addonsTotal = 0;
+        if (booking.passengers && booking.passengers.length > 0) {
+            addonsTotal = booking.passengers.reduce((passengerAcc, passenger) => {
+                const passengerAddonsTotal = passenger.addons?.reduce((addonAcc, addon) => {
+                    const rate = parseFloat(addon.price?.amount || 0);
+                    return addonAcc + rate;
+                }, 0);
+                return passengerAcc + passengerAddonsTotal;
+            }, 0);
+        }
+
+        const totalPrice = flightTotal + addonsTotal;
+
+        // console.log("Flight Total:", flightTotal);
+        // console.log("Addons Total:", addonsTotal);
+        // console.log("Sum Total:", total);
+
         res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1003,
-            message: Messages.BKG_1003,
-            data: booking
+            code: Codes.RSV_3010,
+            message: Messages.RSV_3010,
+            data: booking,
+            totalPrice: totalPrice,
+            currency: "THB"
         });
     } catch (error) {
         res.status(StatusCodes.SERVER_ERROR).json({
@@ -118,8 +141,8 @@ export async function deleteBooking(req, res) {
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: Messages.BKG_1002
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
             });
         }
 
@@ -127,30 +150,28 @@ export async function deleteBooking(req, res) {
         const isAdmin = req.user.isAdmin === true;
 
         if (!isOwner && !isAdmin) {
-            return res.status(StatusCodes.FORBIDDEN).json({
+            return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                message: "You do not have permission to delete this booking."
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001
             });
         }
 
         await booking.deleteOne();
 
-        console.log("Booking deleted successfully!");
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1008,
-            message: "Booking deleted successfully.",
+            code: Codes.RSV_3012,
+            message: Messages.RSV_3012,
             data: {
                 deletedId: bookingId
             }
         });
 
     } catch (error) {
-        console.error("deleteBooking error:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
-            error: error.message
         });
     }
 }
@@ -174,8 +195,8 @@ export async function updateBooking(req, res) {
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: Messages.BKG_1002
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
             });
         }
 
@@ -183,9 +204,11 @@ export async function updateBooking(req, res) {
         const isAdmin = req.user.isAdmin === true;
 
         if (!isOwner && !isAdmin) {
-            return res.status(StatusCodes.FORBIDDEN).json({
+            return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                message: "You do not have permission to update this booking."
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001
+
             });
         }
 
@@ -210,7 +233,8 @@ export async function updateBooking(req, res) {
         if (validationError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: validationError.message
+                code: Codes.VAL_4004,
+                message: Messages.VAL_4004,
             });
         }
 
@@ -218,16 +242,15 @@ export async function updateBooking(req, res) {
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1007,
-            message: "Booking updated successfully.",
+            code: Codes.RSV_3013,
+            message: Messages.RSV_3013,
             data: booking
         });
 
     } catch (error) {
-        console.error("updateBookingAll error:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: error.message || StatusMessages.SERVER_ERROR
+            message: StatusMessages.SERVER_ERROR,
         });
     }
 }
@@ -240,7 +263,8 @@ export async function updateTickets(req, res) {
         if (!passengers || !Array.isArray(passengers)) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: "Passengers array is required.",
+                code: Codes.RSV_3014,
+                message: Messages.RSV_3014,
             });
         }
 
@@ -249,8 +273,8 @@ export async function updateTickets(req, res) {
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: "Booking not found.",
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011,
             });
         }
 
@@ -264,7 +288,7 @@ export async function updateTickets(req, res) {
             if (!existingPassenger) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
-                    code: Codes.BKG_1010,
+                    code: Codes.RSV_3008,
                     message: `Passenger at index ${i} with passportNumber '${updatedPassenger.passportNumber}' not found in booking.`,
                 });
             }
@@ -290,7 +314,8 @@ export async function updateTickets(req, res) {
         if (validationError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: validationError.message,
+                code: Codes.VAL_4004,
+                message: Messages.VAL_4004,
             });
         }
 
@@ -298,16 +323,15 @@ export async function updateTickets(req, res) {
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1007,
-            message: "Tickets updated successfully.",
+            code: Codes.RSV_3007,
+            message: Messages.RSV_3007,
             data: booking,
         });
 
     } catch (error) {
-        console.error("updateTickets error:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: error.message || StatusMessages.SERVER_ERROR,
+            message: StatusMessages.SERVER_ERROR,
         });
     }
 }
@@ -321,7 +345,8 @@ export async function updatePayments(req, res) {
         if (!payments || !Array.isArray(payments)) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: "Payments array is required."
+                code: Codes.RSV_3006,
+                message: Messages.RSV_3006,
             });
         }
 
@@ -330,8 +355,8 @@ export async function updatePayments(req, res) {
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: Messages.BKG_1002
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
             });
         }
 
@@ -347,7 +372,8 @@ export async function updatePayments(req, res) {
         if (validationError) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: validationError.message
+                code: Codes.VAL_4004,
+                message: Messages.VAL_4004,
             });
         }
 
@@ -355,16 +381,15 @@ export async function updatePayments(req, res) {
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1007,
-            message: "Payments updated successfully.",
+            code: Codes.RSV_3005,
+            message: Messages.RSV_3005,
             data: booking
         });
 
     } catch (error) {
-        console.error("updatePayments error:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: error.message || StatusMessages.SERVER_ERROR
+            message: StatusMessages.SERVER_ERROR,
         });
     }
 }
@@ -377,7 +402,8 @@ export async function getMyBookings(req, res) {
         if (!userId) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                message: "Unauthorized. No userId found in token."
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
             });
         }
 
@@ -386,7 +412,8 @@ export async function getMyBookings(req, res) {
         if (!isValidObjectId) {
             return res.status(StatusCodes.BAD_REQUEST).json({
                 status: StatusMessages.FAILED,
-                message: "Invalid userId format."
+                code: Codes.VAL_4004,
+                message: Messages.VAL_4004,
             });
         }
 
@@ -401,23 +428,22 @@ export async function getMyBookings(req, res) {
         } catch (queryError) {
             return res.status(StatusCodes.SERVER_ERROR).json({
                 status: StatusMessages.FAILED,
-                message: queryError.message
+                message: StatusMessages.SERVER_ERROR,
             });
         }
 
         if (!bookings || bookings.length === 0) {
-            console.warn("⚠️ No bookings found for userId:", userId);
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: "No bookings found"
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011,
             });
         }
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1003,
-            message: "Bookings fetched successfully.",
+            code: Codes.RSV_3010,
+            message: Messages.RSV_3010,
             count: bookings.length,
             data: bookings
         });
@@ -425,7 +451,7 @@ export async function getMyBookings(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: error.message || "server_error"
+            message: StatusMessages.SERVER_ERROR,
         });
     }
 }
@@ -434,12 +460,11 @@ export async function getAllBookingsByAdmin(req, res) {
     try {
         const isAdmin = req.user.isAdmin === true;
 
-        console.log("isAdmin:", isAdmin);
-
         if (!isAdmin) {
             return res.status(StatusCodes.FORBIDDEN).json({
                 status: StatusMessages.FAILED,
-                message: "You do not have permission to access all bookings."
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001
             });
         }
 
@@ -452,23 +477,22 @@ export async function getAllBookingsByAdmin(req, res) {
         } catch (queryError) {
             return res.status(StatusCodes.SERVER_ERROR).json({
                 status: StatusMessages.FAILED,
-                message: queryError.message
+                message: StatusMessages.SERVER_ERROR,
             });
         }
 
         if (!bookings || bookings.length === 0) {
-            console.warn("⚠️ No bookings found (admin)");
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
-                code: Codes.BKG_1002,
-                message: "No bookings found"
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
             });
         }
 
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
-            code: Codes.BKG_1003,
-            message: "All bookings fetched successfully (admin).",
+            code: Codes.RSV_3010,
+            message: Messages.RSV_3010,
             count: bookings.length,
             data: bookings
         });
@@ -476,7 +500,7 @@ export async function getAllBookingsByAdmin(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
-            message: error.message || "server_error"
+            message: StatusMessages.SERVER_ERROR,
         });
     }
 }
