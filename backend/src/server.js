@@ -11,7 +11,7 @@ import cors from "cors";
 import routerFlight from "./routes/flights_routes.js";
 import routerAirports from "./routes/airports_routes.js";
 import routerAirlines from "./routes/airlines_routes.js";
-import {Logger} from "./state/logger_state.js";
+import logger from "./utils/logger_utils.js";
 import routerCabin from "./routes/cabin_routes.js";
 
 
@@ -19,7 +19,6 @@ import routerCabin from "./routes/cabin_routes.js";
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
 const port = process.env.PORT || 3000;
-const logger = new Logger();
 
 app.use(cors({ origin: "*" }));
 
@@ -36,8 +35,8 @@ connectDB(logger);
 redisClient.connect();
 
 app.listen(port, () => {
-  logger.log('Notification email sent successfully.');
-  logger.log(`server started on port ${port}`);
+  logger.info('Notification email sent successfully.');
+  logger.info(`server started on port ${port}`);
 });
 
 // cron.schedule("*/1 * * * *", async () => {
