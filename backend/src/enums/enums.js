@@ -76,6 +76,7 @@ export const Codes = Object.freeze({
   // Permission Messages
   TKN_6001: "TKN_6001",
   TKN_6002: "TKN_6002",
+  TKN_6003: "TKN_6003",
 
   //Seat
   SAT_1001: "SAT_1001",
@@ -134,6 +135,14 @@ export const Codes = Object.freeze({
   CABIN_1005: "CABIN_1005",
   CABIN_1006: "CABIN_1006",
   CABIN_1007: "CABIN_1007",
+
+  AIR_1004: "AIR_1004",
+  AIR_1005: "AIR_1005",
+  AIR_1006: "AIR_1006",
+  AIR_1007: "AIR_1007",
+  AIR_1008: "AIR_1008",
+  AIR_1009: "AIR_1009",
+  AIR_1010: "AIR_1010"
 });
 
 export const Messages = Object.freeze({
@@ -228,6 +237,7 @@ export const Messages = Object.freeze({
   // Permission Messages
   TKN_6001: "You do not have permission to access.",
   TKN_6002: "Invaild or session expired",
+  TKN_6003: "Admin access required. You do not have permission to perform this action",
 
   //General Messages
   GNR_1001: "Internal Server Error",
@@ -249,7 +259,16 @@ export const Messages = Object.freeze({
   CABIN_1004: "Cabin Class retrieved successfully.",
   CABIN_1005: "Cabin Class not found.",
   CABIN_1006: "Cabin Class updated successfully.",
-  CABIN_1007: "Cabin Class deleted successfully."
+  CABIN_1007: "Cabin Class deleted successfully.",
+
+  AIR_1004: "Airports retrieved successfully.",
+  AIR_1005: "No airports found.",
+  AIR_1006: "Failed to retrieve airports.",
+  AIR_1007: "Airport created successfully",
+  AIR_1008: "Airports with this code already exists.",
+  AIR_1009: "Airport updated successfully",
+  AIR_1010: "Airport deleted successfully",
+
 
 });
 
