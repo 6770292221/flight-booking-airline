@@ -14,16 +14,16 @@ class AirlineServiceModel {
   static getSchema() {
     return new mongoose.Schema(
       {
-        carrierCode: { 
-          type: String, 
-          required: true, 
-          unique: true, 
-          trim: true 
+        carrierCode: {
+          type: String,
+          required: true,
+          unique: true,
+          trim: true
         },
-        airlineName: { 
-          type: String, 
-          required: true, 
-          trim: true 
+        airlineName: {
+          type: String,
+          required: true,
+          trim: true
         },
         logoUrl: {
           type: String,
@@ -35,18 +35,18 @@ class AirlineServiceModel {
             message: 'Invalid URL format.'
           }
         },
-        country: { 
-          type: String, 
-          required: true, 
-          trim: true 
+        country: {
+          type: String,
+          required: true,
+          trim: true
         },
-        isLowCost: { 
-          type: Boolean, 
-          default: false 
+        isLowCost: {
+          type: Boolean,
+          default: false
         },
-        updatedAt: { 
-          type: Date, 
-          default: Date.now 
+        updatedAt: {
+          type: Date,
+          default: Date.now
         }
       },
       { timestamps: true } // Auto-adds `createdAt` & `updatedAt`

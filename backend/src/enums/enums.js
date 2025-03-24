@@ -116,6 +116,16 @@ export const Codes = Object.freeze({
   //General
   GNR_1001: "GNR_1001",
 
+  //Airline Codes
+  AIR_1001: "AIR_1001", // Airline created successfully
+  AIR_1002: "AIR_1002", // Missing required fields
+  AIR_1003: "AIR_1003", // Airline with carrierCode already exists
+  AIR_1004: "AIR_1004", // Airline retrieved successfully
+  AIR_1005: "AIR_1005", // Airline not found
+  AIR_1006: "AIR_1006", // Airline updated successfully
+  AIR_1007: "AIR_1007", // Airline deleted successfully
+  AIR_1008: "AIR_1008", // Airline validation error
+
 });
 
 export const Messages = Object.freeze({
@@ -213,6 +223,16 @@ export const Messages = Object.freeze({
 
   //General Messages
   GNR_1001: "Internal Server Error",
+
+  // Airline Messages
+  AIR_1001: "Airline created successfully.",
+  AIR_1002: "Missing required fields: carrierCode, airlineName, logoUrl, country.",
+  AIR_1003: "Airline with this carrierCode already exists.",
+  AIR_1004: "Airline retrieved successfully.",
+  AIR_1005: "Airline not found.",
+  AIR_1006: "Airline updated successfully.",
+  AIR_1007: "Airline deleted successfully.",
+  AIR_1008: "Airline validation error. Please check your data.",
 
 });
 
