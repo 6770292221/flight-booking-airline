@@ -15,18 +15,8 @@ export async function createBooking(req, res) {
         }
 
         const userId = req.user.userId;
-        const firstName = req.user.firstName;
         const bookingData = req.body;
-
-        if (!bookingData.bookingId) {
-            const timestamp = Date.now();
-            bookingData.bookingId = `BK${timestamp}`;
-        }
-
         bookingData.userId = userId;
-        bookingData.createdAt = new Date();
-        bookingData.updatedAt = new Date();
-
         const newBooking = new BookingMongooseModel(bookingData);
 
         const validationError = newBooking.validateSync();
@@ -39,7 +29,6 @@ export async function createBooking(req, res) {
         }
 
         await newBooking.save();
-
         await sendBookingPendingPaymentEmail({
             bookingResponse: newBooking.toObject(),
             reqUser: req.user
@@ -96,11 +85,7 @@ export async function getBookingById(req, res) {
             }, 0);
         }
 
-        const totalPrice = flightTotal + addonsTotal;
-
-        // console.log("Flight Total:", flightTotal);
-        // console.log("Addons Total:", addonsTotal);
-        // console.log("Sum Total:", total);
+        const totalPrice = flightTotal + addonsTotal
 
         res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
