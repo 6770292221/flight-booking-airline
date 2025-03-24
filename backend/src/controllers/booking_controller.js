@@ -1,13 +1,11 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
-import MailService from '../utils/mail_utils.js';
+import { sendBookingPendingPaymentEmail } from '../email/emailService.js'
+
 
 export async function createBooking(req, res) {
     try {
-
-        const userId = req.user.userId;
-
         if (!req.user || !req.user.userId) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
@@ -16,6 +14,8 @@ export async function createBooking(req, res) {
             });
         }
 
+        const userId = req.user.userId;
+        const firstName = req.user.firstName;
         const bookingData = req.body;
 
         if (!bookingData.bookingId) {
@@ -26,7 +26,6 @@ export async function createBooking(req, res) {
         bookingData.userId = userId;
         bookingData.createdAt = new Date();
         bookingData.updatedAt = new Date();
-
 
         const newBooking = new BookingMongooseModel(bookingData);
 
@@ -39,14 +38,12 @@ export async function createBooking(req, res) {
             });
         }
 
-        try {
-            await newBooking.save();
-        } catch (saveError) {
-            return res.status(StatusCodes.SERVER_ERROR).json({
-                status: StatusMessages.FAILED,
-                message: StatusMessages.SERVER_ERROR,
-            });
-        }
+        await newBooking.save();
+
+        await sendBookingPendingPaymentEmail({
+            bookingResponse: newBooking.toObject(),
+            reqUser: req.user
+        });
 
         return res.status(StatusCodes.CREATE).json({
             status: StatusMessages.SUCCESS,
@@ -56,12 +53,14 @@ export async function createBooking(req, res) {
         });
 
     } catch (error) {
+        console.error("Error in createBooking:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
         });
     }
 }
+
 
 export async function getBookingById(req, res) {
     try {
