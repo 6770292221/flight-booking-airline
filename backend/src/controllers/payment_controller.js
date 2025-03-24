@@ -4,8 +4,6 @@ import {
   StatusMessages,
   Messages,
 } from "../enums/enums.js";
-// import { ReservationMongooseModel } from "../models/reservation_models.js";
-// import { SeatMongooseModel } from "../models/seats_modeles.js";
 import {
   paymentServiceProvider,
   bankPaymentService,
@@ -56,7 +54,7 @@ export const createPayment = async (req, res) => {
           message: Messages.PMT_1007,
         });
       }
-      // TODO: Check if the amount is matched with the reservation price
+
       try {
         const paymentIntent =
           await paymentServiceProvider.paymentIntents.create({

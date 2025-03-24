@@ -9,8 +9,6 @@ import {
 } from "../enums/enums.js";
 import { addToBlacklist } from "../middleware/token_blacklist.js";
 import redisClient from "../utils/redis_utils.js";
-import speakeasy from "speakeasy";
-import { verify } from "crypto";
 
 export async function loginUser(req, res) {
   const { email, password } = req.body;
@@ -119,88 +117,9 @@ export const logoutUser = async (req, res) => {
 
 export const verify2fa = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.TKN_6001,
-        message: Messages.TKN_6001,
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.TKN_6001,
-        message: Messages.TKN_6001,
-      });
-    }
-
-    const userId = req.user.userId;
-
-    const { verificationCode } = req.body;
-    if (!verificationCode) {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.ATH_4003,
-        message: Messages.ATH_4003,
-      });
-    }
-
-    const user = await AccountMongooseModel.findById(userId);
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        code: Codes.REG_1002,
-        message: Messages.REG_1002,
-      });
-    }
-
-    const twoFactorSecret = user.twoFactorSecret;
-    if (!twoFactorSecret) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.LGN_2004,
-        message: Messages.LGN_2004,
-      });
-    }
-
-    const isValidOTP = speakeasy.totp.verify({
-      secret: twoFactorSecret,
-      encoding: "base32",
-      token: verificationCode,
-      window: 1,
-    });
-
-    if (!isValidOTP) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.ATH_4002,
-        message: Messages.ATH_4002,
-        verifie: false,
-      });
-    }
-
-    await redisClient.set(token, JSON.stringify({ verified: true }));
-
-    return res.status(200).json({
-      status: StatusMessages.SUCCESS,
-      code: Codes.LGN_2001,
-      message: Messages.LGN_2001,
-      data: {
-        token,
-        userId: user._id,
-        email: user.email,
-        name: user.name,
-        isAdmin: user.isAdmin,
-        verified: true,
-      },
-    });
+    const email = req.param;
+    console.log(await AccountMongooseModel.findOne({ email }));
   } catch (error) {
-    return res.status(StatusCodes.SERVER_ERROR).json({
-      status: StatusMessages.FAILED,
-      message: StatusMessages.SERVER_ERROR,
-    });
+    console.log(error);
   }
 };

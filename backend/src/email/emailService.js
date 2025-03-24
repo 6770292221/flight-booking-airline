@@ -3,6 +3,7 @@ import bookingPendingPaymentTemplate from './templates/ booking_pending_payment.
 import eTicketsIssuedTemplate from './templates/e_tickets_issued.js';
 import paymentSuccessTemplate from './templates/payment_success.js';
 import paymentFailedTemplate from './templates/payment_failed.js';
+import verifyRegisterTemplate from './templates/verify_register.js';
 
 
 export async function sendBookingPendingPaymentEmail({ bookingResponse, reqUser }) {
@@ -56,5 +57,18 @@ export async function sendPaymentFailedEmail({ bookingResponse, reqUser }) {
         console.log(`Payment Failed email sent to ${userEmail}`);
     } catch (error) {
         console.error("Failed to send Payment Failed email:", error);
+    }
+}
+
+
+export async function sendVerifyRegisterEmail(reqUser) {
+    const { subject, text, html } = verifyRegisterTemplate({ reqUser });
+    try {
+        const userEmail = reqUser.email;
+        await MailService.sendEmail(userEmail, subject, text, html);
+        console.log(`Verify email sent to ${userEmail}`);
+
+    } catch (error) {
+        console.error("Failed to send Verify email:", error);
     }
 }

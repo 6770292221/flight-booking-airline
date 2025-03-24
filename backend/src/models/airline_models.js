@@ -30,7 +30,7 @@ class AirlineServiceModel {
           required: true,
           validate: {
             validator: function (v) {
-              return /^https?:\/\/.+/i.test(v); // Validates proper URL format
+              return /^https?:\/\/.+/i.test(v);
             },
             message: 'Invalid URL format.'
           }
@@ -49,12 +49,11 @@ class AirlineServiceModel {
           default: Date.now
         }
       },
-      { timestamps: true } // Auto-adds `createdAt` & `updatedAt`
+      { timestamps: true }
     );
   }
 }
 
-// Create and export the model
 const AirlineMongooseModel = flightDb.model("airlines", AirlineServiceModel.getSchema());
 
 export { AirlineServiceModel, AirlineMongooseModel };

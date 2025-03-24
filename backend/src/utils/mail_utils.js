@@ -56,38 +56,3 @@ class MailService {
 
 
 export default MailService.getInstance()
-
-
-// import nodemailer from 'nodemailer';
-// import dotenv from 'dotenv'
-// dotenv.config({ path: "../config/config.env" });
-// let transporter = nodemailer.createTransport({
-//     service: 'Gmail',
-//     host: 'smtp.gmail.com',
-//     port: 465,
-//     secure: true,
-//     auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASSWORD
-//     }
-// });
-
-// const mailOptions = {
-//     from: "titi.changpoo@gmail.com",
-//     to: "mindwua@gmail.com",
-//     subject: "Hello from Node.js",
-//     text: "This is a test email sent from Node.js using Nodemailer!",
-// };
-
-// async function sendMail() {
-//     transporter.sendMail(mailOptions, (error, info) => {
-//         if (error) {
-//             console.error("Error sending email:", error);
-//         } else {
-//             console.log("Email sent:", info.response);
-//         }
-//     });
-// }
-
-
-// export default sendMail
