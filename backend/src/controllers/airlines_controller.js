@@ -19,6 +19,7 @@ export async function getAirlines(req, res) {
         const totalAirlines = await AirlineMongooseModel.countDocuments(query);
 
         return res.status(StatusCodes.OK).json({
+            status: StatusMessages.SUCCESS,
             code: Codes.AIR_1004,
             message: Messages.AIR_1004,
             data: {
@@ -49,7 +50,6 @@ export async function getAirlineById(req, res) {
 
         if (!airline) {
             return res.status(StatusCodes.NOT_FOUND).json({
-                success: false,
                 error: {
                     status: StatusMessages.FAILED,
                     code: Codes.AIR_1005,
