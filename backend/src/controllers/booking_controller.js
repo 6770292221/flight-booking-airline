@@ -1,7 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
-import { sendBookingPendingPaymentEmail } from '../email/emailService.js'
+import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail } from '../email/emailService.js'
 
 
 export async function createBooking(req, res) {
@@ -49,7 +49,6 @@ export async function createBooking(req, res) {
         });
     }
 }
-
 
 export async function getBookingById(req, res) {
     try {
@@ -239,6 +238,8 @@ export async function updateBooking(req, res) {
     }
 }
 
+import { AccountMongooseModel } from '../models/account_models.js';
+
 export async function updateTickets(req, res) {
     try {
         const bookingId = req.params._id;
@@ -305,6 +306,20 @@ export async function updateTickets(req, res) {
 
         await booking.save();
 
+        const user = await AccountMongooseModel.findById(booking.userId).lean();
+
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                status: StatusMessages.FAILED,
+                message: "User not found for this booking."
+            });
+        }
+
+        await sendETicketsIssuedEmail({
+            bookingResponse: booking.toObject(),
+            reqUser: user
+        });
+
         return res.status(StatusCodes.OK).json({
             status: StatusMessages.SUCCESS,
             code: Codes.RSV_3007,
@@ -313,6 +328,7 @@ export async function updateTickets(req, res) {
         });
 
     } catch (error) {
+        console.error("Error in updateTickets:", error);
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
             message: StatusMessages.SERVER_ERROR,
