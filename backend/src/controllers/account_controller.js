@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 import jwt from "jsonwebtoken";
+import { sendVerifyRegisterEmail } from '../email/emailService.js'
 
 const hideEmail = (email) => {
   const [localPart, domainPart] = email.split('@');
@@ -71,14 +72,13 @@ export async function createAccount(req, res) {
         message: accountError.message
       });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
     const hiddenEmail = hideEmail(email);
 
     const twoFASecret = speakeasy.generateSecret({
       name: `Ariline-booking (${email})`
     });
-
+    // await sendVerifyRegisterEmail(req.user)
     const qrCodeDataURL = await qrcode.toDataURL(twoFASecret.otpauth_url);
     const newAccount = new AccountMongooseModel({
       firstName,
@@ -118,6 +118,7 @@ export async function createAccount(req, res) {
       { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
     );
 
+    sendVerifyRegisterEmail(req.body)
     res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1001,
@@ -151,7 +152,7 @@ export async function createAccount(req, res) {
 
 export async function verifyUserByEmail(req, res) {
   try {
-    const { email } = req.body;
+    const { email } = req.params;
 
     if (!email) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -178,10 +179,9 @@ export async function verifyUserByEmail(req, res) {
         message: Messages.REG_1007
       });
     }
-
     user.verified = true;
     await user.save();
-
+    res.redirect(`http://127.0.0.1:5500/frontend/src/pages/index.html`);
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
