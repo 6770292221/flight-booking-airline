@@ -1,6 +1,5 @@
 
-import { Codes, Enums, Messages, StatusCodes, StatusMessages } from "../enums/enums.js";
-import { bookingSchema } from "../utils/joi_validator_utils.js";
+import { Codes, Messages, StatusCodes, StatusMessages } from "../enums/enums.js";
 import logger from "../utils/logger_utils.js";
 
 const validateBody = (schema) => (req, res, next) => {

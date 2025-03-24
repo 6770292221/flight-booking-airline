@@ -1,4 +1,3 @@
-import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -22,21 +21,5 @@ export const sendSlackMessage = async (message) => {
       "Slack Webhook Error:",
       error.response?.data || error.message
     );
-    // throw new Error("Failed to send message to Slack");
   }
 };
-
-// app.post("/slack/send", async (req, res) => {
-//   const { text } = req.body;
-
-//   if (!text) {
-//     return res.status(400).json({ error: "Text message is required" });
-//   }
-
-//   try {
-//     await sendSlackMessage(text);
-//     res.json({ success: true, message: "Message sent to Slack successfully" });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// });

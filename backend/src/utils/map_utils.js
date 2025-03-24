@@ -1,5 +1,3 @@
-import { response } from "express";
-
 export class MapUtils {
   static createMappedFlightDetails(
     obj,

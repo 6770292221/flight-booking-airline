@@ -7,11 +7,8 @@ import logger from "./utils/logger_utils.js";
 import routerAccount from "./routes/account_routes.js";
 import routerAuth from './routes/auth_routes.js';
 import routerBooking from './routes/booking_routes.js';
-import { cancelReservation } from './schedules/cancel_reservation_schedules.js';
 import routerPayment from "./routes/payment_routes.js";
 import cors from "cors";
-import mailService from './utils/mail_utils.js'
-import { HeaderInterceptor } from "./utils/header_interceptor.js";
 import routerFlight from "./routes/flights_routes.js";
 
 dotenv.config({ path: "./src/config/config.env" });
@@ -32,11 +29,6 @@ connectDB(logger);
 redisClient.connect();
 
 app.listen(port, () => {
-  // mailService.sendEmail(
-  //   'apitrak.photisa@hotmail.com',
-  //   'Verify Email',
-  //   'OTP: 123456'
-  // );
   console.log('Notification email sent successfully.');
   logger.info(`server started on port ${port}`);
 });

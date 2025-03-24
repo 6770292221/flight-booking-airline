@@ -71,5 +71,4 @@ export async function sendVerifyRegisterEmail(reqUser) {
     } catch (error) {
         console.error("Failed to send Verify email:", error);
     }
-    
 }

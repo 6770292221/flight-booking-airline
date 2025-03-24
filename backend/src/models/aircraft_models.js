@@ -45,12 +45,11 @@ class AircraftServiceModel {
                     default: Date.now
                 }
             },
-            { timestamps: true } // Automatically manages `createdAt` & `updatedAt`
+            { timestamps: true }
         );
     }
 }
 
-// Create and export the model
 const AircraftMongooseModel = flightDb.model("Aircraft", AircraftServiceModel.getSchema());
 
 export { AircraftServiceModel, AircraftMongooseModel };

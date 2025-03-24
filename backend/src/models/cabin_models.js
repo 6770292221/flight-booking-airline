@@ -39,12 +39,11 @@ class CabinClassServiceModel {
                     default: Date.now
                 }
             },
-            { timestamps: true } // Automatically manages `createdAt` & `updatedAt`
+            { timestamps: true }
         );
     }
 }
 
-// Create and export the model
 const CabinClassMongooseModel = flightDb.model("cabin", CabinClassServiceModel.getSchema());
 
 export { CabinClassServiceModel, CabinClassMongooseModel };

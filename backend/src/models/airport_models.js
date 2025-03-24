@@ -45,12 +45,11 @@ class AirportServiceModel {
                     default: Date.now
                 }
             },
-            { timestamps: true } // Auto-adds `createdAt` & `updatedAt`
+            { timestamps: true }
         );
     }
 }
 
-// Create and export the model
 const AirportMongooseModel = flightDb.model("Airport", AirportServiceModel.getSchema());
 
 export { AirportServiceModel, AirportMongooseModel };

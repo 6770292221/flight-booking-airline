@@ -1,4 +1,4 @@
-import { AccountServiceModel, AccountMongooseModel } from "../models/account_models.js";
+import { AccountMongooseModel } from "../models/account_models.js";
 import { ResponseModel } from "../models/response_models.js";
 import { Codes, StatusCodes, StatusMessages, Messages } from "../enums/enums.js";
 import bcrypt from 'bcrypt';
@@ -78,7 +78,6 @@ export async function createAccount(req, res) {
     const twoFASecret = speakeasy.generateSecret({
       name: `Ariline-booking (${email})`
     });
-    // await sendVerifyRegisterEmail(req.user)
     const qrCodeDataURL = await qrcode.toDataURL(twoFASecret.otpauth_url);
     const newAccount = new AccountMongooseModel({
       firstName,
