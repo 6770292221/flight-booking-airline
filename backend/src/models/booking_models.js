@@ -58,15 +58,24 @@ const paymentSchema = new mongoose.Schema({
 }, { _id: false });
 
 const bookingSchema = new mongoose.Schema({
-    bookingId: { type: String, required: true, unique: true },
+    bookingId: {
+        type: String,
+        unique: true,
+        required: true,
+        default: () => `BK${Date.now()}`
+    },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     flights: [flightSchema],
     passengers: [passengerSchema],
     payments: [paymentSchema],
     status: { type: String, default: "PENDING" },
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date },
-    expiresAt: { type: Date }
+    updatedAt: { type: Date, default: Date.now },
+    expiresAt: {
+        type: Date,
+        default: () => new Date(Date.now() + 10 * 60 * 1000)
+    }
+
 });
 
 const BookingMongooseModel = bookingDb.model("Booking", bookingSchema);
