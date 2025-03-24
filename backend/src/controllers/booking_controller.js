@@ -2,8 +2,9 @@ import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
 import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
-
-
+import { EmailContext } from "../state/mailing_context.js";
+import {BookingPendingPaymentState} from "../state/mailing_concrete.js"
+const emailContext = new EmailContext();
 export async function createBooking(req, res) {
     try {
         if (!req.user || !req.user.userId) {
@@ -29,10 +30,13 @@ export async function createBooking(req, res) {
         }
 
         await newBooking.save();
-        await sendBookingPendingPaymentEmail({
-            bookingResponse: newBooking.toObject(),
-            reqUser: req.user
-        });
+
+        emailContext.setState(new BookingPendingPaymentState())
+        await emailContext.sendEmail({bookingResponse: newBooking.toObject(), reqUser: req.user})
+        // await sendBookingPendingPaymentEmail({
+        //     bookingResponse: newBooking.toObject(),
+        //     reqUser: req.user
+        // });
 
         return res.status(StatusCodes.CREATE).json({
             status: StatusMessages.SUCCESS,
@@ -239,6 +243,7 @@ export async function updateBooking(req, res) {
 }
 
 import { AccountMongooseModel } from '../models/account_models.js';
+
 
 export async function updateTickets(req, res) {
     try {

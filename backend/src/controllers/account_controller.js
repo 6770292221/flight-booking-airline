@@ -179,7 +179,7 @@ export async function createAccount(req, res) {
     );
 
     emailContext.setState(new VerifyRegisterState());
-    await emailContext.sendEmail({data: '', reqUser: req.body})
+    await emailContext.sendEmail({bookingResponse: '', reqUser: req.body})
   
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
