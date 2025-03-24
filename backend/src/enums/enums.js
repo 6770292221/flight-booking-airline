@@ -117,15 +117,23 @@ export const Codes = Object.freeze({
   GNR_1001: "GNR_1001",
 
   //Airline Codes
-  AIR_1001: "AIR_1001", // Airline created successfully
-  AIR_1002: "AIR_1002", // Missing required fields
-  AIR_1003: "AIR_1003", // Airline with carrierCode already exists
-  AIR_1004: "AIR_1004", // Airline retrieved successfully
-  AIR_1005: "AIR_1005", // Airline not found
-  AIR_1006: "AIR_1006", // Airline updated successfully
-  AIR_1007: "AIR_1007", // Airline deleted successfully
-  AIR_1008: "AIR_1008", // Airline validation error
+  AIR_1001: "AIR_1001",
+  AIR_1002: "AIR_1002",
+  AIR_1003: "AIR_1003",
+  AIR_1004: "AIR_1004",
+  AIR_1005: "AIR_1005",
+  AIR_1006: "AIR_1006",
+  AIR_1007: "AIR_1007",
+  AIR_1008: "AIR_1008",
 
+  // Cabin Class Codes
+  CABIN_1001: "CABIN_1001",
+  CABIN_1002: "CABIN_1002",
+  CABIN_1003: "CABIN_1003",
+  CABIN_1004: "CABIN_1004",
+  CABIN_1005: "CABIN_1005",
+  CABIN_1006: "CABIN_1006",
+  CABIN_1007: "CABIN_1007",
 });
 
 export const Messages = Object.freeze({
@@ -136,7 +144,7 @@ export const Messages = Object.freeze({
   REG_1004: "Name Already Exists: The name already exists in the system.",
   REG_1005: "Email Already Exists: The email already exists in the system.",
   REG_1006: "Password must meet the following requirements: 1. Length between 8 and 20 characters, 2. At least one uppercase letter (A-Z), 3. At least one lowercase letter (a-z), 4. At least one number (0-9), 5. At least one special character (e.g., !@#$%^&*(),.?\":{}|<>).",
-  REG_1007: "Account already verified.",
+  REG_1007: "Account not verified. Please confirm your email address.",
   REG_1008: "Account successfully verified",
 
   // Auth Messages
@@ -234,8 +242,16 @@ export const Messages = Object.freeze({
   AIR_1007: "Airline deleted successfully.",
   AIR_1008: "Airline validation error. Please check your data.",
 
-});
+  // Cabin Class Messages
+  CABIN_1001: "Cabin Class created successfully.",
+  CABIN_1002: "Missing required fields: code, name, checked, carryOn.",
+  CABIN_1003: "Cabin Class with this code already exists.",
+  CABIN_1004: "Cabin Class retrieved successfully.",
+  CABIN_1005: "Cabin Class not found.",
+  CABIN_1006: "Cabin Class updated successfully.",
+  CABIN_1007: "Cabin Class deleted successfully."
 
+});
 
 export const Status = Object.freeze({
   PENDING: "Pending",

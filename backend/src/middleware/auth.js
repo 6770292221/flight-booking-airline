@@ -37,7 +37,6 @@ const verifyToken = async (req, res, next) => {
         req.user = decoded;
 
         const storedData = await redisClient.get(token);
-        // console.log(storedData)
 
         if (!storedData) {
             return res.status(StatusCodes.FORBIDDEN).json({
@@ -51,8 +50,8 @@ const verifyToken = async (req, res, next) => {
         if (!tokenData.verified) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 status: StatusMessages.FAILED,
-                code: Codes.OTP_6005,
-                message: Messages.OTP_6005,
+                code: Codes.REG_1007,
+                message: Messages.REG_1007,
             });
         }
 

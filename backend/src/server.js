@@ -14,6 +14,8 @@ import mailService from './utils/mail_utils.js'
 import { HeaderInterceptor } from "./utils/header_interceptor.js";
 import routerFlight from "./routes/flights_routes.js";
 import routerAirlines from "./routes/airlines_routes.js";
+import routerCabin from "./routes/cabin_routes.js";
+
 
 
 dotenv.config({ path: "./src/config/config.env" });
@@ -29,6 +31,7 @@ app.use("/api/v1/payment-core-api", routerPayment);
 app.use("/api/v1/booking-core-api", routerBooking);
 app.use("/api/v1/flight-core-api", routerFlight);
 app.use('/api/v1/airline-core-api', routerAirlines);
+app.use('/api/v1/cabin-core-api', routerCabin);
 
 
 connectDB(logger);
