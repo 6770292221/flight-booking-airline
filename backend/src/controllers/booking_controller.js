@@ -528,3 +528,112 @@ export async function getAllBookingsByAdmin(req, res) {
         });
     }
 }
+
+
+export async function cancelExpiredBookings(req, res) {
+    try {
+        const now = new Date();
+
+        const expiredBookings = await BookingMongooseModel.find({
+            status: 'PENDING',
+            expiresAt: { $lt: now }
+        });
+
+        if (expiredBookings.length === 0) {
+            return res.status(StatusCodes.OK).json({
+                status: StatusMessages.SUCCESS,
+                code: Codes.RSV_3004,
+                message: Messages.RSV_3004,
+                cancelledCount: 0
+            });
+        }
+
+        const bulkOps = expiredBookings.map(b => ({
+            updateOne: {
+                filter: { _id: b._id },
+                update: {
+                    $set: {
+                        status: 'CANCELLED',
+                        updatedAt: new Date()
+                    }
+                }
+            }
+        }));
+
+        await BookingMongooseModel.bulkWrite(bulkOps);
+
+        return res.status(StatusCodes.OK).json({
+            status: StatusMessages.SUCCESS,
+            code: Codes.RSV_3003,
+            message: Messages.RSV_3003,
+            cancelledCount: expiredBookings.length
+        });
+
+    } catch (error) {
+        return res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
+    }
+}
+
+
+export async function cancelMyBooking(req, res) {
+    try {
+        if (!req.user || !req.user.userId) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
+            });
+        }
+
+        const userId = req.user.userId;
+        const bookingId = req.params._id;
+
+        const booking = await BookingMongooseModel.findById(bookingId);
+
+        if (!booking) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+                status: StatusMessages.FAILED,
+                code: Codes.RSV_3011,
+                message: Messages.RSV_3011
+            });
+        }
+
+        const isOwner = booking.userId.toString() === userId.toString();
+
+        if (!isOwner) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001
+            });
+        }
+
+        if (booking.status !== 'PENDING') {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                status: StatusMessages.FAILED,
+                code: Codes.RSV_3002,
+                message: Messages.RSV_3002
+            });
+        }
+
+        booking.status = 'CANCELLED';
+        booking.updatedAt = new Date();
+
+        await booking.save();
+
+        return res.status(StatusCodes.OK).json({
+            status: StatusMessages.SUCCESS,
+            code: Codes.RSV_3015,
+            message: Messages.RSV_3015,
+        });
+
+    } catch (error) {
+        return res.status(StatusCodes.SERVER_ERROR).json({
+            status: StatusMessages.FAILED,
+            message: StatusMessages.SERVER_ERROR,
+        });
+    }
+}

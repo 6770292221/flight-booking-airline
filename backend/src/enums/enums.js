@@ -55,6 +55,7 @@ export const Codes = Object.freeze({
   RSV_3012: "RSV_3012",
   RSV_3013: "RSV_3013",
   RSV_3014: "RSV_3014",
+  RSV_3015: "RSV_3015",
 
 
   // Validation Codes
@@ -166,9 +167,9 @@ export const Messages = Object.freeze({
 
   // Booking Messages
   RSV_3001: "Missing required information: flightId and passenger are mandatory.",
-  RSV_3002: "Invalid flight number.",
-  RSV_3003: "Flight information not found",
-  RSV_3004: "Duplicate seat booking is not allowed.",
+  RSV_3002: "Only bookings with status 'PENDING' can be cancelled.",
+  RSV_3003: "Expired bookings cancelled successfully.",
+  RSV_3004: "No expired bookings found.",
   RSV_3005: "Payments updated successfully.",
   RSV_3006: "Payments array is required.",
   RSV_3007: "Tickets updated successfully.",
@@ -179,6 +180,7 @@ export const Messages = Object.freeze({
   RSV_3012: "Booking deleted successfully.",
   RSV_3013: "Booking updated successfully.",
   RSV_3014: "Passengers array is required.",
+  RSV_3015: "Booking cancelled successfully",
 
   // Seat
   SAT_1001: "Missing required information: flightId, seatId, and userId are mandatory.",
