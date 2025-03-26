@@ -54,13 +54,34 @@ export async function createBooking(req, res) {
 export async function getBookingById(req, res) {
     try {
         const { _id } = req.params;
+
+
+        if (!req.user || !req.user.userId) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
+            });
+        }
+
         const booking = await BookingMongooseModel.findById(_id);
+
 
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3011,
                 message: Messages.RSV_3011
+            });
+        }
+
+        const isOwner = booking.userId.toString() === req.user.userId.toString();
+
+        if (!isOwner) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                status: StatusMessages.FAILED,
+                code: Codes.TKN_6001,
+                message: Messages.TKN_6001,
             });
         }
 
