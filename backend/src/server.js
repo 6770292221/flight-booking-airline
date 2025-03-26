@@ -14,7 +14,7 @@ import routerAirlines from "./routes/airlines_routes.js";
 import logger from "./utils/logger_utils.js";
 import routerCabin from "./routes/cabin_routes.js";
 import { cancelBooking } from "./schedules/cancel_expired_schedules.js"
-
+import routerAircraft from "./routes/aircraft_routes.js";
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
@@ -30,6 +30,7 @@ app.use("/api/v1/flight-core-api", routerFlight);
 app.use('/api/v1/airline-core-api', routerAirlines);
 app.use('/api/v1/cabin-core-api', routerCabin);
 app.use('/api/v1/airport-core-api', routerAirports);
+app.use('/api/v1/aircraft-core-api', routerAircraft);
 
 connectDB(logger);
 redisClient.connect();
