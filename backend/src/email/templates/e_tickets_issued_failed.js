@@ -1,39 +1,63 @@
-export default function eTicketsFailedTemplate({ bookingResponse, reqUser, reason }) {
-    const { passengers, bookingNubmer } = bookingResponse;
+export default function eTicketsFailedTemplate({ bookingResponse, reqUser, reason, refundAmount, refundTransactionId }) {
+    const { bookingNubmer } = bookingResponse;
 
-    const subject = `Important: Issue with Your Booking ID ${bookingNubmer}`;
+    const subject = `❌ Ticket Issuance Failed - Booking ID ${bookingNubmer}`;
 
     const text = `
-Dear ${reqUser.firstName} ${reqUser.lastName},
-
-We regret to inform you that there was an issue issuing the tickets for your booking number: ${bookingNubmer} due to: ${reason}
-
-Affected passenger(s):
-${passengers.map((p, index) => `
-${index + 1}. ${p.firstName} ${p.lastName}
-`).join('')}
-
-We will process your refund within 24 hours. Please check your account later. If you have any questions or concerns, feel free to contact our customer service at [contact information].
-
-We sincerely apologize for the inconvenience.
+  Dear ${reqUser.firstName} ${reqUser.lastName},
+  
+  Unfortunately, your ticket issuance for Booking ID ${bookingNubmer} has failed.
+  
+  Reason: ${reason}
+  
+  A refund of ${refundAmount} THB has been issued.
+  
+  
+  Please allow up to 24 hours for the refund to be reflected in your account.
+  
+  We apologize for the inconvenience. If you have any questions, please contact our support team.
+  
+  Best regards,  
+  Customer Service Team
     `;
 
     const html = `
-    <h1 style="color: #FF5733;">⚠️ Ticket Issuance Issue</h1>
-    <p>Dear ${reqUser.firstName} ${reqUser.lastName},</p>
-
-    <p>We regret to inform you that there was an issue issuing the tickets for your booking number: <strong>${bookingNubmer}</strong> due to: <strong>${reason}</strong></p>
-
-    <h3>Affected passenger(s):</h3>
-    ${passengers.map((p, index) => `
-        <div style="margin-bottom:15px;">
-            <strong>${index + 1}. ${p.firstName} ${p.lastName}</strong>
-        </div>
-    `).join('')}
-
-    <p>We will process your refund within 24 hours. Please check your account later. If you have any questions or concerns, feel free to contact our customer service at [contact information].</p>
-
-    <p>We sincerely apologize for the inconvenience.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9f9f9; padding: 20px;">
+      <tr>
+        <td align="center">
+          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 30px; font-family: Arial, sans-serif;">
+  
+            <tr>
+              <td align="center" style="padding-bottom: 20px;">
+                <h2 style="color: #e53935;">❌ Ticket Issuance Failed</h2>
+              </td>
+            </tr>
+  
+            <tr>
+              <td>
+                <p>Dear <strong>${reqUser.firstName} ${reqUser.lastName}</strong>,</p>
+  
+                <p>We regret to inform you that the ticket issuance for your booking <strong>${bookingNubmer}</strong> was not successful.</p>
+  
+                <p><strong>Reason:</strong> <em style="color:#e53935;">${reason}</em></p>
+  
+                <hr/>
+  
+                <p>A refund has been issued for the full amount of <strong>${refundAmount} THB</strong>.</p>
+                <p>Please allow up to <strong>24 hours</strong> for the refund to reflect in your account.</p>
+  
+                <p>If you have any questions or need assistance, please feel free to contact our support team.</p>
+  
+                <br/>
+                <p>Best regards,</p>
+                <p><strong>Customer Service Team</strong></p>
+              </td>
+            </tr>
+  
+          </table>
+        </td>
+      </tr>
+    </table>
     `;
 
     return { subject, text, html };

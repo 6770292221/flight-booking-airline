@@ -1,7 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import { AccountMongooseModel } from '../models/account_models.js';
-import { sendETicketsIssuedEmail, sendETicketsFailedTemplate } from '../email/emailService.js';
+import { sendETicketsIssuedEmail, sendETicketsFailedTemplate, sendRefundsTemplate } from '../email/emailService.js';
 import { PaymentMongooseModel } from "../models/payment_models.js";
 
 
@@ -10,12 +10,10 @@ export async function webhookUpdateTickets(req, res) {
         const bookingId = req.params._id;
         const { passengers, ticketStatus, reason } = req.body;
 
-        console.log(`Received webhook for bookingId: ${bookingId} with ticketStatus: ${ticketStatus}`);
 
         const booking = await BookingMongooseModel.findById(bookingId);
 
         if (!booking) {
-            console.error(`Booking with ID ${bookingId} not found.`);
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
                 code: Codes.RSV_3011,
@@ -25,7 +23,6 @@ export async function webhookUpdateTickets(req, res) {
 
         if (ticketStatus === "SUCCESS") {
             if (!passengers || !Array.isArray(passengers)) {
-                console.error('Passengers data is missing or not an array.');
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
                     code: Codes.RSV_3014,
@@ -41,7 +38,6 @@ export async function webhookUpdateTickets(req, res) {
                 );
 
                 if (!existingPassenger) {
-                    console.error(`Passenger at index ${i} with passportNumber '${updatedPassenger.passportNumber}' not found in booking.`);
                     return res.status(StatusCodes.BAD_REQUEST).json({
                         status: StatusMessages.FAILED,
                         code: Codes.RSV_3008,
@@ -91,7 +87,6 @@ export async function webhookUpdateTickets(req, res) {
             const user = await AccountMongooseModel.findById(booking.userId).lean();
 
             if (!user) {
-                console.error(`User with ID ${booking.userId} not found.`);
                 return res.status(StatusCodes.NOT_FOUND).json({
                     status: StatusMessages.FAILED,
                     message: "User not found for this booking."
@@ -131,7 +126,6 @@ export async function webhookUpdateTickets(req, res) {
                 const refundTxnId = `RFND${Date.now()}`;
 
                 payment.paymentStatus = "REFUNDED";
-
                 payment.refund = payment.refund || {};
                 payment.refund.isRefunded = true;
                 payment.refund.refundedAt = new Date();
@@ -151,6 +145,8 @@ export async function webhookUpdateTickets(req, res) {
                 await payment.save();
             }
 
+
+
             const user = await AccountMongooseModel.findById(booking.userId).lean();
 
             if (user) {
@@ -158,6 +154,19 @@ export async function webhookUpdateTickets(req, res) {
                 await sendETicketsFailedTemplate({
                     bookingResponse: booking.toObject(),
                     reqUser: user,
+                    refundAmount: payment.refund.refundAmount,
+                    reason: reason || "Ticket issuance failed."
+                });
+            }
+
+
+            if (user) {
+
+                await sendRefundsTemplate({
+                    bookingResponse: booking.toObject(),
+                    reqUser: user,
+                    refundTxnId: payment.paymentRef,
+                    refundAmount: payment.refund.refundAmount,
                     reason: reason || "Ticket issuance failed."
                 });
             }

@@ -5,6 +5,8 @@ import paymentSuccessTemplate from './templates/payment_success.js';
 import paymentFailedTemplate from './templates/payment_failed.js';
 import verifyRegisterTemplate from './templates/verify_register.js';
 import eTicketsFailedTemplate from './templates/e_tickets_issued_failed.js'
+import refundEmailTemplate from './templates/refunds_success.js'
+
 
 
 export async function sendBookingPendingPaymentEmail({ bookingResponse, reqUser }) {
@@ -75,9 +77,9 @@ export async function sendVerifyRegisterEmail(reqUser) {
 }
 
 
-export async function sendETicketsFailedTemplate({ bookingResponse, reqUser, reason }) {
+export async function sendETicketsFailedTemplate({ bookingResponse, reqUser, reason, refundAmount }) {
     try {
-        const { subject, text, html } = eTicketsFailedTemplate({ bookingResponse, reqUser, reason });
+        const { subject, text, html } = eTicketsFailedTemplate({ bookingResponse, reqUser, reason, refundAmount });
         const userEmail = reqUser?.email;
 
         if (!userEmail) {
@@ -91,3 +93,23 @@ export async function sendETicketsFailedTemplate({ bookingResponse, reqUser, rea
         console.error("Failed to send E-Tickets email:", error);
     }
 }
+
+
+
+export async function sendRefundsTemplate({ bookingResponse, reqUser, reason, refundTxnId, refundAmount }) {
+    try {
+        const { subject, text, html } = refundEmailTemplate({ bookingResponse, reqUser, reason, refundTxnId, refundAmount });
+        const userEmail = reqUser?.email;
+
+        if (!userEmail) {
+            console.error("No recipient email found for Refunds email");
+            return;
+        }
+
+        await MailService.sendEmail(userEmail, subject, text, html);
+        console.log(`Refunds email sent to ${userEmail}`);
+    } catch (error) {
+        console.error("Failed to send E-Tickets email:", error);
+    }
+}
+
