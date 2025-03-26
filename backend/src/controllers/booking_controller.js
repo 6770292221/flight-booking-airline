@@ -1,7 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
-import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
+import { sendBookingPendingPaymentEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
 import { AccountMongooseModel } from '../models/account_models.js';
 import axios from "axios";
 
@@ -34,7 +34,7 @@ export async function createBooking(req, res) {
 
         try {
             await axios.post(`http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`, {
-                bookingId: newBooking.bookingId
+                bookingId: newBooking._id.toString()
             });
         } catch (err) {
             console.error("Error calling /payments/initiate:", err.response?.data || err.message);
@@ -146,12 +146,12 @@ export async function deleteBooking(req, res) {
         }
 
         const userId = req.user.userId;
-        const bookingId = req.params._id;
+        const bookingNubmer = req.params._id;
 
         console.log("userId:", userId);
-        console.log("bookingId:", bookingId);
+        console.log("bookingNubmer:", bookingNubmer);
 
-        const booking = await BookingMongooseModel.findById(bookingId);
+        const booking = await BookingMongooseModel.findById(bookingNubmer);
 
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
@@ -179,7 +179,7 @@ export async function deleteBooking(req, res) {
             code: Codes.RSV_3012,
             message: Messages.RSV_3012,
             data: {
-                deletedId: bookingId
+                deletedId: bookingNubmer
             }
         });
 
@@ -202,10 +202,10 @@ export async function updateBooking(req, res) {
         }
 
         const userId = req.user.userId;
-        const bookingId = req.params._id;
+        const bookingNubmer = req.params._id;
         const updateData = req.body;
 
-        const booking = await BookingMongooseModel.findById(bookingId);
+        const booking = await BookingMongooseModel.findById(bookingNubmer);
 
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
@@ -270,105 +270,9 @@ export async function updateBooking(req, res) {
     }
 }
 
-export async function updateTickets(req, res) {
-    try {
-        const bookingId = req.params._id;
-        const { passengers } = req.body;
-
-        if (!passengers || !Array.isArray(passengers)) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                status: StatusMessages.FAILED,
-                code: Codes.RSV_3014,
-                message: Messages.RSV_3014,
-            });
-        }
-
-        const booking = await BookingMongooseModel.findById(bookingId);
-
-        if (!booking) {
-            return res.status(StatusCodes.NOT_FOUND).json({
-                status: StatusMessages.FAILED,
-                code: Codes.RSV_3011,
-                message: Messages.RSV_3011,
-            });
-        }
-
-        for (let i = 0; i < passengers.length; i++) {
-            const updatedPassenger = passengers[i];
-
-            const existingPassenger = booking.passengers.find(
-                (p) => p.passportNumber === updatedPassenger.passportNumber
-            );
-
-            if (!existingPassenger) {
-                return res.status(StatusCodes.BAD_REQUEST).json({
-                    status: StatusMessages.FAILED,
-                    code: Codes.RSV_3008,
-                    message: `Passenger at index ${i} with passportNumber '${updatedPassenger.passportNumber}' not found in booking.`,
-                });
-            }
-
-            if (updatedPassenger.tickets && Array.isArray(updatedPassenger.tickets)) {
-                updatedPassenger.tickets.forEach((newTicket) => {
-                    const isDuplicate = existingPassenger.tickets.some(
-                        (existingTicket) =>
-                            existingTicket.flightNumber === newTicket.flightNumber &&
-                            existingTicket.ticketNumber === newTicket.ticketNumber
-                    );
-
-                    if (!isDuplicate) {
-                        existingPassenger.tickets.push(newTicket);
-                    }
-                });
-            }
-        }
-
-        booking.updatedAt = new Date();
-
-        const validationError = booking.validateSync();
-        if (validationError) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                status: StatusMessages.FAILED,
-                code: Codes.VAL_4004,
-                message: Messages.VAL_4004,
-            });
-        }
-
-        await booking.save();
-
-        const user = await AccountMongooseModel.findById(booking.userId).lean();
-
-        if (!user) {
-            return res.status(StatusCodes.NOT_FOUND).json({
-                status: StatusMessages.FAILED,
-                message: "User not found for this booking."
-            });
-        }
-
-        await sendETicketsIssuedEmail({
-            bookingResponse: booking.toObject(),
-            reqUser: user
-        });
-
-        return res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
-            code: Codes.RSV_3007,
-            message: Messages.RSV_3007,
-            data: booking,
-        });
-
-    } catch (error) {
-        console.error("Error in updateTickets:", error);
-        return res.status(StatusCodes.SERVER_ERROR).json({
-            status: StatusMessages.FAILED,
-            message: StatusMessages.SERVER_ERROR,
-        });
-    }
-}
-
 export async function updatePayments(req, res) {
     try {
-        const bookingId = req.params._id;
+        const bookingNubmer = req.params._id;
 
         const { payments, status } = req.body;
 
@@ -380,7 +284,7 @@ export async function updatePayments(req, res) {
             });
         }
 
-        const booking = await BookingMongooseModel.findById(bookingId);
+        const booking = await BookingMongooseModel.findById(bookingNubmer);
 
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
@@ -608,9 +512,9 @@ export async function cancelMyBooking(req, res) {
         }
 
         const userId = req.user.userId;
-        const bookingId = req.params._id;
+        const bookingNubmer = req.params._id;
 
-        const booking = await BookingMongooseModel.findById(bookingId);
+        const booking = await BookingMongooseModel.findById(bookingNubmer);
 
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({

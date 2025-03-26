@@ -1,10 +1,35 @@
 import mongoose from "mongoose";
 import { paymentDb } from "../config/connections.js";
 
+const eventSchema = new mongoose.Schema({
+    type: { type: String, required: true },
+    status: { type: String, enum: ["SUCCESS", "FAILED"], required: true },
+    source: { type: String, enum: ["SYSTEM", "USER", "WEBHOOK"], required: true },
+    message: { type: String },
+    payload: { type: mongoose.Schema.Types.Mixed },
+    createdAt: { type: Date, default: Date.now }
+}, { _id: false });
+
+const refundSchema = new mongoose.Schema({
+    isRefunded: { type: Boolean, default: false },
+    refundAmount: { type: Number },
+    refundStatus: { type: String, enum: ["PENDING", "SUCCESS", "FAILED", "REFUNDED"], default: null },
+    refundTransactionId: { type: String },
+    refundedAt: { type: Date }
+}, { _id: false });
+
 const paymentSchema = new mongoose.Schema({
     bookingId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
-    paymentRef: { type: String, required: true, unique: true },
-    paymentStatus: { type: String, default: "PENDING" }, // PENDING, PAID, FAILED, REFUNDED
+    paymentRef: {
+        type: String,
+        unique: true,
+        required: false
+    },
+    paymentStatus: {
+        type: String,
+        enum: ["PENDING", "REFUNDED", "FAILED"],
+        default: "PENDING"
+    },
     paymentMethod: { type: String },
     paymentProvider: { type: String },
     paymentTransactionId: { type: String },
@@ -12,14 +37,18 @@ const paymentSchema = new mongoose.Schema({
     currency: { type: String, default: "THB" },
     paidAt: { type: Date },
 
-    isRefunded: { type: Boolean, default: false },
-    refundAmount: { type: Number },
-    refundStatus: { type: String, enum: ["PENDING", "SUCCESS", "FAILED"], default: null },
-    refundTransactionId: { type: String },
-    refundedAt: { type: Date }
+    refund: refundSchema,
+    events: [eventSchema]
 
 }, { timestamps: true });
 
-const PaymentMongooseModel = paymentDb.model("Payment", paymentSchema);
+paymentSchema.pre('save', function (next) {
+    if (!this.paymentRef) {
+        this.paymentRef = `TXN-${this._id.toString().slice(-6).toUpperCase()}`;
+    }
+    next();
+});
 
+
+const PaymentMongooseModel = paymentDb.model("Payment", paymentSchema);
 export { PaymentMongooseModel };
