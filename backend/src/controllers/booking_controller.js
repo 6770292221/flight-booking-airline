@@ -3,6 +3,7 @@ import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js"
 import mongoose from "mongoose";
 import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
 import { AccountMongooseModel } from '../models/account_models.js';
+import axios from "axios";
 
 
 export async function createBooking(req, res) {
@@ -30,6 +31,15 @@ export async function createBooking(req, res) {
         }
 
         await newBooking.save();
+
+        try {
+            await axios.post(`http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`, {
+                bookingId: newBooking.bookingId
+            });
+        } catch (err) {
+            console.error("Error calling /payments/initiate:", err.response?.data || err.message);
+        }
+
         await sendBookingPendingPaymentEmail({
             bookingResponse: newBooking.toObject(),
             reqUser: req.user

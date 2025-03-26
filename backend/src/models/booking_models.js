@@ -46,16 +46,6 @@ const passengerSchema = new mongoose.Schema({
     }]
 }, { _id: false });
 
-const paymentSchema = new mongoose.Schema({
-    paymentRef: String,
-    paymentStatus: String,
-    paymentTransactionId: String,
-    paymentMethod: String,
-    paymentProvider: String,
-    amount: Number,
-    currency: String,
-    paidAt: Date
-}, { _id: false });
 
 const bookingSchema = new mongoose.Schema({
     bookingId: {
@@ -67,7 +57,6 @@ const bookingSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     flights: [flightSchema],
     passengers: [passengerSchema],
-    payments: [paymentSchema],
     status: { type: String, default: "PENDING" },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
@@ -79,5 +68,4 @@ const bookingSchema = new mongoose.Schema({
 });
 
 const BookingMongooseModel = bookingDb.model("Booking", bookingSchema);
-
 export { BookingMongooseModel };

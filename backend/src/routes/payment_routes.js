@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { createPayment } from "../controllers/payment_controller.js";
+import { initiatePayment } from "../controllers/payment_controller.js";
 import { verifyToken } from "../middleware/auth.js";
 
 const routerPayment = Router();
 
-routerPayment.post("/createPayment", verifyToken, createPayment);
+routerPayment.post("/payments/initiate", initiatePayment);
 
 export default routerPayment;
