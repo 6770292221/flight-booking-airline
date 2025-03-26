@@ -2,6 +2,7 @@ import { BookingMongooseModel } from "../models/booking_models.js";
 import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js";
 import mongoose from "mongoose";
 import { sendBookingPendingPaymentEmail, sendETicketsIssuedEmail, sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../email/emailService.js'
+import { AccountMongooseModel } from '../models/account_models.js';
 
 
 export async function createBooking(req, res) {
@@ -237,8 +238,6 @@ export async function updateBooking(req, res) {
         });
     }
 }
-
-import { AccountMongooseModel } from '../models/account_models.js';
 
 export async function updateTickets(req, res) {
     try {
@@ -529,7 +528,6 @@ export async function getAllBookingsByAdmin(req, res) {
     }
 }
 
-
 export async function cancelExpiredBookings(req, res) {
     try {
         const now = new Date();
@@ -576,7 +574,6 @@ export async function cancelExpiredBookings(req, res) {
         });
     }
 }
-
 
 export async function cancelMyBooking(req, res) {
     try {

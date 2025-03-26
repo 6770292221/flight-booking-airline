@@ -13,7 +13,7 @@ import routerAirports from "./routes/airports_routes.js";
 import routerAirlines from "./routes/airlines_routes.js";
 import logger from "./utils/logger_utils.js";
 import routerCabin from "./routes/cabin_routes.js";
-
+import { cancelBooking } from "./schedules/cancel_expired_schedules.js"
 
 
 dotenv.config({ path: "./src/config/config.env" });
@@ -39,9 +39,9 @@ app.listen(port, () => {
   logger.info(`server started on port ${port}`);
 });
 
-// cron.schedule("*/1 * * * *", async () => {
-//   console.log(`[Scheduler] Calling cancelReservation API...`);
-//   await cancelReservation();
-// });
+cron.schedule("*/1 * * * *", async () => {
+  console.log(`[Scheduler] Calling cancelBooking API...`);
+  await cancelBooking();
+});
 
 export default app;
