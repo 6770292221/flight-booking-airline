@@ -502,15 +502,6 @@ export async function getMyBookings(req, res) {
 
 export async function getAllBookingsByAdmin(req, res) {
     try {
-        const isAdmin = req.user.isAdmin === true;
-
-        if (!isAdmin) {
-            return res.status(StatusCodes.FORBIDDEN).json({
-                status: StatusMessages.FAILED,
-                code: Codes.TKN_6001,
-                message: Messages.TKN_6001
-            });
-        }
 
         let bookings = [];
         try {
