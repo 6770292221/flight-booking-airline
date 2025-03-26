@@ -6,6 +6,9 @@ import { AccountMongooseModel } from '../models/account_models.js';
 import axios from "axios";
 
 
+import { EmailContext } from "../state/mailing_context.js";
+import {BookingPendingPaymentState} from "../state/mailing_concrete.js"
+const emailContext = new EmailContext();
 export async function createBooking(req, res) {
     try {
         if (!req.user || !req.user.userId) {
@@ -40,10 +43,12 @@ export async function createBooking(req, res) {
             console.error("Error calling /payments/initiate:", err.response?.data || err.message);
         }
 
-        await sendBookingPendingPaymentEmail({
-            bookingResponse: newBooking.toObject(),
-            reqUser: req.user
-        });
+        emailContext.setState(new BookingPendingPaymentState())
+        await emailContext.sendEmail({bookingResponse: newBooking.toObject(), reqUser: req.user})
+        // await sendBookingPendingPaymentEmail({
+        //     bookingResponse: newBooking.toObject(),
+        //     reqUser: req.user
+        // });
 
         return res.status(StatusCodes.CREATE).json({
             status: StatusMessages.SUCCESS,

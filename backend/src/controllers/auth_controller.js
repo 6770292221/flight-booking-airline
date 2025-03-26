@@ -60,7 +60,7 @@ export async function loginUser(req, res) {
       { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
     );
 
-    await redisClient.set(token, JSON.stringify({ verified: false }));
+    await redisClient.set(token, JSON.stringify({ verified: true }));
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
@@ -72,7 +72,7 @@ export async function loginUser(req, res) {
         email: user.email,
         name: user.name,
         isAdmin: user.isAdmin,
-        verified: false,
+        verified: true,
       },
     });
   } catch (error) {
