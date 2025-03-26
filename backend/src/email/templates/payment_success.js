@@ -1,13 +1,13 @@
 export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
-    const payment = bookingResponse.payments[0];
-    const subject = `Payment Successful - Booking ID ${bookingResponse.bookingId}`;
+  const payment = bookingResponse.payments[0];
+  const subject = `Payment Successful - Booking ID ${bookingResponse.bookingNubmer}`;
 
-    const text = `
+  const text = `
   Dear ${reqUser.firstName} ${reqUser.lastName},
   
   We have received your payment successfully!
   
-  Booking ID: ${bookingResponse.bookingId}
+  Booking ID: ${bookingResponse.bookingNubmer}
   Payment Reference: ${payment.paymentRef}
   Amount Paid: ${payment.amount} ${payment.currency}
   Payment Method: ${payment.paymentMethod}
@@ -17,7 +17,7 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
   Thank you for choosing our service.
   `;
 
-    const html = `
+  const html = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9f9f9; padding: 20px;">
       <tr>
         <td align="center">
@@ -35,7 +35,7 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
   
                 <h3>Booking Details</h3>
                 <ul>
-                  <li><strong>Booking ID:</strong> ${bookingResponse.bookingId}</li>
+                  <li><strong>Booking ID:</strong> ${bookingResponse.bookingNubmer}</li>
                   <li><strong>Status:</strong> ${bookingResponse.status}</li>
                 </ul>
   
@@ -51,7 +51,7 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
                 <p style="margin-top: 20px;">Thank you for choosing our airline service.</p>
   
                 <p style="text-align: center; margin: 30px 0;">
-                  <a href="https://yourwebsite.com/bookings/${bookingResponse.bookingId}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">View Booking</a>
+                  <a href="https://yourwebsite.com/bookings/${bookingResponse.bookingNubmer}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">View Booking</a>
                 </p>
               </td>
             </tr>
@@ -62,5 +62,5 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
     </table>
     `;
 
-    return { subject, text, html };
+  return { subject, text, html };
 }

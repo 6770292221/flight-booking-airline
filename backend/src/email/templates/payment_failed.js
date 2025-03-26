@@ -1,13 +1,13 @@
 export default function paymentFailedTemplate({ bookingResponse, reqUser }) {
-    const payment = bookingResponse.payments[0];
-    const subject = `Payment Failed - Booking ID ${bookingResponse.bookingId}`;
+  const payment = bookingResponse.payments[0];
+  const subject = `Payment Failed - Booking ID ${bookingResponse.bookingNubmer}`;
 
-    const text = `
+  const text = `
   Dear ${reqUser.firstName} ${reqUser.lastName},
   
   Unfortunately, your payment was not successful.
   
-  Booking ID: ${bookingResponse.bookingId}
+  Booking ID: ${bookingResponse.bookingNubmer}
   Payment Reference: ${payment.paymentRef}
   Amount: ${payment.amount} ${payment.currency}
   Payment Method: ${payment.paymentMethod}
@@ -19,7 +19,7 @@ export default function paymentFailedTemplate({ bookingResponse, reqUser }) {
   Thank you for choosing our service.
   `;
 
-    const html = `
+  const html = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f9f9f9; padding: 20px;">
       <tr>
         <td align="center">
@@ -37,7 +37,7 @@ export default function paymentFailedTemplate({ bookingResponse, reqUser }) {
   
                 <h3>Booking Details</h3>
                 <ul>
-                  <li><strong>Booking ID:</strong> ${bookingResponse.bookingId}</li>
+                  <li><strong>Booking ID:</strong> ${bookingResponse.bookingNubmer}</li>
                   <li><strong>Status:</strong> ${bookingResponse.status}</li>
                 </ul>
   
@@ -53,7 +53,7 @@ export default function paymentFailedTemplate({ bookingResponse, reqUser }) {
                 <p style="color: #E53935;">Please try again to complete your booking. Your seat is not secured until the payment is completed.</p>
   
                 <p style="text-align: center; margin: 30px 0;">
-                  <a href="https://yourwebsite.com/payments/${bookingResponse.bookingId}" style="background-color: #E53935; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">Retry Payment</a>
+                  <a href="https://yourwebsite.com/payments/${bookingResponse.bookingNubmer}" style="background-color: #E53935; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">Retry Payment</a>
                 </p>
               </td>
             </tr>
@@ -64,5 +64,5 @@ export default function paymentFailedTemplate({ bookingResponse, reqUser }) {
     </table>
     `;
 
-    return { subject, text, html };
+  return { subject, text, html };
 }

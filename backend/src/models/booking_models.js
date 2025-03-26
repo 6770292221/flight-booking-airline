@@ -48,7 +48,7 @@ const passengerSchema = new mongoose.Schema({
 
 
 const bookingSchema = new mongoose.Schema({
-    bookingId: {
+    bookingNubmer: {
         type: String,
         unique: true,
         required: true,
@@ -63,9 +63,17 @@ const bookingSchema = new mongoose.Schema({
     expiresAt: {
         type: Date,
         default: () => new Date(Date.now() + 10 * 60 * 1000)
-    }
-
+    },
+    events: [
+        {
+            type: { type: String, required: true },
+            status: { type: String, enum: ["SUCCESS", "FAILED"], required: true },
+            source: { type: String, enum: ["SYSTEM", "USER", "WEBHOOK"], required: true },
+            message: { type: String },
+            payload: { type: mongoose.Schema.Types.Mixed },
+            createdAt: { type: Date, default: Date.now }
+        }
+    ]
 });
-
 const BookingMongooseModel = bookingDb.model("Booking", bookingSchema);
 export { BookingMongooseModel };

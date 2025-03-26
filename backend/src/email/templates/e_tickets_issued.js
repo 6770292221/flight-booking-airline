@@ -1,12 +1,12 @@
 export default function eTicketsIssuedTemplate({ bookingResponse, reqUser }) {
-  const { passengers, bookingId, flights } = bookingResponse;
+  const { passengers, bookingNubmer, flights } = bookingResponse;
 
-  const subject = `Your E-Tickets Are Ready - Booking ID ${bookingId}`;
+  const subject = `Your E-Tickets Are Ready - Booking ID ${bookingNubmer}`;
 
   const text = `
 Dear ${reqUser.firstName} ${reqUser.lastName},
 
-Your E-Tickets have been issued successfully for Booking ID: ${bookingId}.
+Your E-Tickets have been issued successfully for Booking ID: ${bookingNubmer}.
 
 Passenger Tickets:
 ${passengers.map((p, index) => `
@@ -21,7 +21,7 @@ Thank you and have a nice trip!
   <h1 style="color: #4CAF50;">🎟️ E-Tickets Issued</h1>
   <p>Dear ${reqUser.firstName} ${reqUser.lastName},</p>
 
-  <p>Your E-Tickets are now available for Booking <strong>${bookingId}</strong>.</p>
+  <p>Your E-Tickets are now available for Booking <strong>${bookingNubmer}</strong>.</p>
 
   <h3>Passenger Tickets:</h3>
   ${passengers.map((p, index) => `

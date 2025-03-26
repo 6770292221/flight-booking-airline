@@ -4,7 +4,6 @@ import {
     getBookingById,
     updateBooking,
     deleteBooking,
-    updateTickets,
     updatePayments,
     getMyBookings,
     getAllBookingsByAdmin,
@@ -20,7 +19,6 @@ routerBooking.post("/booking", verifyToken, createBooking);
 routerBooking.get("/booking/:_id", verifyToken, getBookingById);
 routerBooking.patch("/booking/:_id", verifyToken, updateBooking);
 routerBooking.delete("/booking/:_id", verifyToken, deleteBooking);
-routerBooking.patch("/booking/tickets/:_id", updateTickets);
 routerBooking.patch("/booking/payments/:_id", updatePayments);
 routerBooking.get("/my/booking", verifyToken, getMyBookings);
 routerBooking.get("/admin/booking", verifyAdmin, getAllBookingsByAdmin);

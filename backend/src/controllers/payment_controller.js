@@ -6,7 +6,7 @@ export async function initiatePayment(req, res) {
   try {
     const { bookingId, paymentMethod } = req.body;
 
-    const booking = await BookingMongooseModel.findOne({ bookingId });
+    const booking = await BookingMongooseModel.findById(bookingId);
 
     if (!booking) {
       return res.status(StatusCodes.NOT_FOUND).json({

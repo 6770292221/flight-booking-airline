@@ -1,24 +1,24 @@
 export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser }) {
 
-    const outboundFlight = bookingResponse.flights.find(f => f.direction === "OUTBOUND");
-    const inboundFlight = bookingResponse.flights.find(f => f.direction === "INBOUND");
-    const passengers = bookingResponse.passengers || [];
+  const outboundFlight = bookingResponse.flights.find(f => f.direction === "OUTBOUND");
+  const inboundFlight = bookingResponse.flights.find(f => f.direction === "INBOUND");
+  const passengers = bookingResponse.passengers || [];
 
-    const paymentDeadline = bookingResponse.expiresAt
-        ? new Date(bookingResponse.expiresAt).toLocaleString()
-        : "N/A";
+  const paymentDeadline = bookingResponse.expiresAt
+    ? new Date(bookingResponse.expiresAt).toLocaleString()
+    : "N/A";
 
-    const flightTotalPrice = bookingResponse.flights.reduce((sum, f) => sum + parseFloat(f.price.amount || 0), 0);
-    const addonsTotalPrice = passengers.reduce((sum, p) => {
-        return sum + (p.addons || []).reduce((aSum, a) => aSum + parseFloat(a.price.amount || 0), 0);
-    }, 0);
+  const flightTotalPrice = bookingResponse.flights.reduce((sum, f) => sum + parseFloat(f.price.amount || 0), 0);
+  const addonsTotalPrice = passengers.reduce((sum, p) => {
+    return sum + (p.addons || []).reduce((aSum, a) => aSum + parseFloat(a.price.amount || 0), 0);
+  }, 0);
 
-    const totalPrice = (flightTotalPrice + addonsTotalPrice).toFixed(2);
+  const totalPrice = (flightTotalPrice + addonsTotalPrice).toFixed(2);
 
-    const subject = `Booking Pending Payment - ${bookingResponse.bookingId}`;
+  const subject = `Booking Pending Payment - ${bookingResponse.bookingId}`;
 
 
-    const html = `
+  const html = `
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px 0;">
       <tr>
         <td align="center">
@@ -148,5 +148,5 @@ export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser
     </table>
     `;
 
-    return { subject, html };
+  return { subject, html };
 }

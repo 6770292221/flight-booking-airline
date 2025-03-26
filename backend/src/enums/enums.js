@@ -223,7 +223,7 @@ export const Messages = Object.freeze({
   // Payment Messages
   PMT_1001: "Payment successful",
   PMT_1002: "Payment failed",
-  PMT_1003: "Missing required information: BookingId",
+  PMT_1003: "Missing required information: bookingNubmer",
   PMT_1004: "Booking not found",
   PMT_1005: "The user id does not match the user id associated with the booking",
   PMT_1006: "Booking status is not pending",
