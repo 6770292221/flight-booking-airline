@@ -12,11 +12,9 @@ import qrcode from "qrcode";
 import jwt from "jsonwebtoken";
 import { sendVerifyRegisterEmail } from "../email/emailService.js";
 import logger from "../utils/logger_utils.js";
-import { EmailContext } from "../state/mailing_context.js";
 import { VerifyRegisterState} from "../state/mailing_concrete.js";
 import { validateBody } from "../middleware/validate.js";
 
-const emailContext = new EmailContext();
 
 const hideEmail = (email) => {
   const [localPart, domainPart] = email.split("@");
@@ -178,8 +176,8 @@ export async function createAccount(req, res) {
       { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
     );
 
-    emailContext.setState(new VerifyRegisterState());
-    await emailContext.sendEmail({data: '', reqUser: req.body})
+    await sendVerifyRegisterEmail(req.body)
+
   
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
