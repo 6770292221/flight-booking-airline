@@ -60,19 +60,7 @@ export class OnewayState extends FlightSearchState {
       true
     );
     const resp = await axios.request(config);
-    const interpreter = new MappingInterpreter(this.expressions);
-    const mappedx = interpreter.interpret({
 
-      // resp: resp.data.data,
-      // segment: resp.data.data.itineraries[0].segments[0],
-      // travelerPricing: reqBody.travelerPricings[0],
-      // fareDetails: travelerPricing.fareDetailsBySegment[0],
-      flag,
-      airlines,
-      airports,
-      aircrafts,
-      cabins,
-    });
     const mapped = MapUtils.createMappedFlightDetails(
       resp.data.data,
       "OUTBOUND",
