@@ -18,42 +18,42 @@ export class FlightSearchState {
     throw new Error("search() must be implemented by subclass");
   }
 
-  async getCache(key) {
-    const result = await redisClient.get(key);
-    return result ? JSON.parse(result) : null;
-  }
+  // async getCache(key) {
+  //   const result = await redisClient.get(key);
+  //   return result ? JSON.parse(result) : null;
+  // }
 
-  async setCache(key, value, ttlSeconds = 300) {
-    await redisClient.setEx(key, ttlSeconds, JSON.stringify(value));
-  }
+  // async setCache(key, value, ttlSeconds = 300) {
+  //   await redisClient.setEx(key, ttlSeconds, JSON.stringify(value));
+  // }
 
-  buildCacheKey(reqBody, direction = OnewayState.name) {
-    const {
-      originLocationCode,
-      destinationLocationCode,
-      departureDate,
-      adults,
-      children,
-      infants,
-    } = reqBody;
-    return direction == OnewayState.name
-      ? `${originLocationCode}:${destinationLocationCode}:${departureDate}:${adults}:${children}:${infants}`
-      : `${destinationLocationCode}:${originLocationCode}:${departureDate}:${adults}:${children}:${infants}`;
-  }
+  // buildCacheKey(reqBody, direction = OnewayState.name) {
+  //   const {
+  //     originLocationCode,
+  //     destinationLocationCode,
+  //     departureDate,
+  //     adults,
+  //     children,
+  //     infants,
+  //   } = reqBody;
+  //   return direction == OnewayState.name
+  //     ? `${originLocationCode}:${destinationLocationCode}:${departureDate}:${adults}:${children}:${infants}`
+  //     : `${destinationLocationCode}:${originLocationCode}:${departureDate}:${adults}:${children}:${infants}`;
+  // }
 }
 
 export class OnewayState extends FlightSearchState {
   async search(reqBody, sharedData) {
   
-    const cacheKey = this.buildCacheKey(reqBody, OnewayState.name);
-    const cached = await this.getCache(cacheKey);
-    if (cached) {
-      console.log("✅ Cache hit: ONEWAY");
-      return {
-        direction: "ONEWAY",
-        outbound: cached,
-      };
-    }
+    // const cacheKey = this.buildCacheKey(reqBody, OnewayState.name);
+    // const cached = await this.getCache(cacheKey);
+    // if (cached) {
+    //   console.log("✅ Cache hit: ONEWAY");
+    //   return {
+    //     direction: "ONEWAY",
+    //     outbound: cached,
+    //   };
+    // }
     const config = HeaderInterceptor.setConfigOffer(
       reqBody,
       sharedData.domestic,
@@ -69,7 +69,7 @@ export class OnewayState extends FlightSearchState {
       sharedData.aircrafts,
       sharedData.cabins
     );
-    await this.setCache(cacheKey, mapped);
+    // await this.setCache(cacheKey, mapped);
 
     return {
       direction: "ONEWAY",
@@ -80,22 +80,22 @@ export class OnewayState extends FlightSearchState {
 
 export class RoundtripState extends FlightSearchState {
   async search(reqBody, sharedData) {
-    const keyOut = this.buildCacheKey(reqBody, "ROUNDTRIP_OUTBOUND");
-    const keyIn = this.buildCacheKey(reqBody, "ROUNDTRIP_INBOUND");
+    // const keyOut = this.buildCacheKey(reqBody, "ROUNDTRIP_OUTBOUND");
+    // const keyIn = this.buildCacheKey(reqBody, "ROUNDTRIP_INBOUND");
 
-    const [cachedOut, cachedIn] = await Promise.all([
-      this.getCache(keyOut),
-      this.getCache(keyIn),
-    ]);
+    // const [cachedOut, cachedIn] = await Promise.all([
+    //   this.getCache(keyOut),
+    //   this.getCache(keyIn),
+    // ]);
 
-    if (cachedOut && cachedIn) {
-      console.log("✅ Cache hit: ROUNDTRIP");
-      return {
-        direction: "ROUNDTRIP",
-        outbound: cachedOut,
-        inbound: cachedIn,
-      };
-    }
+    // if (cachedOut && cachedIn) {
+    //   console.log("✅ Cache hit: ROUNDTRIP");
+    //   return {
+    //     direction: "ROUNDTRIP",
+    //     outbound: cachedOut,
+    //     inbound: cachedIn,
+    //   };
+    // }
 
     const configOut = HeaderInterceptor.setConfigOffer(
       reqBody,
@@ -132,10 +132,10 @@ export class RoundtripState extends FlightSearchState {
       sharedData.cabins
     );
 
-    await Promise.all([
-      this.setCache(keyOut, mappedOut),
-      this.setCache(keyIn, mappedIn),
-    ]);
+    // await Promise.all([
+    //   this.setCache(keyOut, mappedOut),
+    //   this.setCache(keyIn, mappedIn),
+    // ]);
 
     return {
       direction: "ROUNDTRIP",
