@@ -15,7 +15,7 @@ export const StatusCodes = Object.freeze({
 export const StatusMessages = Object.freeze({
   SUCCESS: "success",
   FAILED: "failed",
-  SERVER_ERROR: "server_error",
+  SERVER_ERROR: "An unexpected error occurred. Please try again later.",
 
 
 });
@@ -143,8 +143,17 @@ export const Codes = Object.freeze({
   AIR_1007: "AIR_1007",
   AIR_1008: "AIR_1008",
   AIR_1009: "AIR_1009",
-  AIR_1010: "AIR_1010"
+  AIR_1010: "AIR_1010",
+
+  // OTP
+  OTP_1001: "OTP_1001",
+  OTP_1002: "OTP_1002",
+  OTP_1003: "OTP_1003",
+  OTP_1004: "OTP_1004",
+  OTP_3005: "OTP_1005"
 });
+
+
 
 export const Messages = Object.freeze({
   // Register Messages
@@ -270,6 +279,13 @@ export const Messages = Object.freeze({
   AIR_1008: "Airports with this code already exists.",
   AIR_1009: "Airport updated successfully",
   AIR_1010: "Airport deleted successfully",
+
+  // OTP Messages
+  OTP_1001: "A one-time password (OTP) has been successfully sent to your email address.",
+  OTP_1002: "Invalid OTP. Please try again.",
+  OTP_1003: "OTP has expired. Please request a new code.",
+  OTP_3004: "OTP verified successfully.",
+  OTP_3005: "User not found."
 
 
 });

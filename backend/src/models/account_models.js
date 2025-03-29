@@ -2,15 +2,13 @@ import mongoose from "mongoose";
 import { userDb } from "../config/connections.js";
 
 class AccountServiceModel {
-  constructor(firstName, lastName, password, email, telephone, isAdmin, twoFactorSecret, qrCode, verified) {
+  constructor(firstName, lastName, password, email, telephone, isAdmin, verified) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.password = password;
     this.email = email;
     this.phoneNumber = telephone;
     this.isAdmin = isAdmin;
-    this.twoFactorSecret = twoFactorSecret;
-    this.qrCode = qrCode;
     this.verified = verified;
   }
 
@@ -23,8 +21,6 @@ class AccountServiceModel {
         email: { type: String, required: true, unique: true },
         phoneNumber: { type: String, required: true },
         isAdmin: { type: Boolean, default: false },
-        twoFactorSecret: { type: String, required: true },
-        qrCode: { type: String, required: true },
         verified: {
           type: Boolean,
           default: false,

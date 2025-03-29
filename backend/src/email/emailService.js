@@ -6,6 +6,7 @@ import paymentFailedTemplate from './templates/payment_failed.js';
 import verifyRegisterTemplate from './templates/verify_register.js';
 import eTicketsFailedTemplate from './templates/e_tickets_issued_failed.js'
 import refundEmailTemplate from './templates/refunds_success.js'
+import emailOtpTemplate from './templates/email_otp.js';
 
 
 
@@ -113,3 +114,11 @@ export async function sendRefundsTemplate({ bookingResponse, reqUser, reason, re
     }
 }
 
+
+export async function sendOtpEmail(reqUser, otp) {
+    const { subject, html } = emailOtpTemplate({ reqUser, otp });
+
+    const to = reqUser.email;
+
+    await MailService.sendEmail(to, subject, null, html);
+}

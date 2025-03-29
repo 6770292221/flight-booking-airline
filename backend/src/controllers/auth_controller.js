@@ -7,15 +7,19 @@ import {
   StatusMessages,
   Messages,
 } from "../enums/enums.js";
-import { addToBlacklist } from "../middleware/token_blacklist.js";
 import redisClient from "../utils/redis_utils.js";
-import speakeasy from "speakeasy";
+import { sendOtpEmail } from "../email/emailService.js";
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export async function loginUser(req, res) {
   const { email, password } = req.body;
+
   try {
     if (!email || !password) {
-      return res.status(400).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2002,
         message: Messages.LGN_2002,
@@ -40,7 +44,7 @@ export async function loginUser(req, res) {
       });
     }
 
-    if (user.verified === false) {
+    if (!user.verified) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2005,
@@ -48,51 +52,31 @@ export async function loginUser(req, res) {
       });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneName: user.phoneName,
-        isAdmin: user.isAdmin,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
-    );
+    const otp = generateOTP();
+    await redisClient.set(`emailOtp:${user._id}`, otp, { EX: 300 }); // 5 min
 
-    await redisClient.set(token, JSON.stringify({ verified: false }));
-
+    await sendOtpEmail(user, otp);
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.LGN_2001,
-      message: Messages.LGN_2001,
+      code: Codes.OTP_1001,
+      message: Messages.OTP_1001,
       data: {
-        token,
         userId: user._id,
         email: user.email,
         name: user.name,
-        isAdmin: user.isAdmin,
-        verified: false,
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(StatusMessages.SERVER_ERROR).json({
+    return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       message: StatusMessages.SERVER_ERROR,
     });
   }
 }
 
-export const logoutUser = async (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "Strict",
-  });
 
+export const logoutUser = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -103,7 +87,10 @@ export const logoutUser = async (req, res) => {
       });
     }
 
-    await addToBlacklist(token);
+    await redisClient.set(`blacklist:${token}`, "blacklist", {
+      EX: 3600,
+    });
+
     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.LOT_5001,
@@ -117,34 +104,34 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-export const smsOtpVerify = async (req, res) => {
+
+export async function verifyEmailOtp(req, res) {
+  const { userId, otp } = req.body;
+
+
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
+    if (!userId || !otp) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: Codes.TKN_6001,
-        message: Messages.TKN_6001,
+        code: Codes.VAL_4001,
+        message: Messages.VAL_4001,
       });
     }
 
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
+    const storedOtp = await redisClient.get(`emailOtp:${userId}`);
+    if (!storedOtp) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: Codes.TKN_6001,
-        message: Messages.TKN_6001,
+        code: Codes.OTP_1003,
+        message: Messages.OTP_1003,
       });
     }
 
-    const userId = req.user.userId;
-
-    const { verificationCode } = req.body;
-    if (!verificationCode) {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.ATH_4003,
-        message: Messages.ATH_4003,
+    if (storedOtp !== otp) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.OTP_1002,
+        message: Messages.OTP_1002,
       });
     }
 
@@ -152,43 +139,33 @@ export const smsOtpVerify = async (req, res) => {
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
-        code: Codes.REG_1002,
-        message: Messages.REG_1002,
+        code: Codes.OTP_3005,
+        message: Messages.OTP_3005,
       });
     }
 
-    const twoFactorSecret = user.twoFactorSecret;
-    if (!twoFactorSecret) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.LGN_2004,
-        message: Messages.LGN_2004,
-      });
-    }
+    await redisClient.del(`emailOtp:${userId}`);
 
-    const isValidOTP = speakeasy.totp.verify({
-      secret: twoFactorSecret,
-      encoding: "base32",
-      token: verificationCode,
-      window: 1,
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        name: user.name,
+        isAdmin: user.isAdmin,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
+    );
+
+    const redisKey = `token:${token}`;
+    await redisClient.set(redisKey, JSON.stringify({ verified: true }), {
+      EX: 3600,
     });
 
-
-    if (!isValidOTP) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.ATH_4002,
-        message: Messages.ATH_4002,
-        verifie: false,
-      });
-    }
-
-    await redisClient.set(token, JSON.stringify({ verified: false }));
-
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.LGN_2001,
-      message: Messages.LGN_2001,
+      code: Codes.OTP_3004,
+      message: Messages.OTP_3004,
       data: {
         token,
         userId: user._id,
@@ -199,9 +176,9 @@ export const smsOtpVerify = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(StatusCodes.SERVER_ERROR).json({
+    res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
-      message: StatusMessages.SERVER_ERROR,
+      message: Messages.SERVER_ERROR,
     });
   }
-};
+}
