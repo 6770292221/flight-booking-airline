@@ -9,6 +9,7 @@ import {
 } from "../enums/enums.js";
 import { addToBlacklist } from "../middleware/token_blacklist.js";
 import redisClient from "../utils/redis_utils.js";
+import speakeasy from "speakeasy";
 
 export async function loginUser(req, res) {
   const { email, password } = req.body;
@@ -116,7 +117,7 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-export const verify2fa = async (req, res) => {
+export const smsOtpVerify = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -172,6 +173,7 @@ export const verify2fa = async (req, res) => {
       window: 1,
     });
 
+
     if (!isValidOTP) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusMessages.FAILED,
@@ -193,7 +195,7 @@ export const verify2fa = async (req, res) => {
         email: user.email,
         name: user.name,
         isAdmin: user.isAdmin,
-        verified: false,
+        verified: true,
       },
     });
   } catch (error) {
