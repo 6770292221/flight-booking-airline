@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { loginUser, logoutUser, smsOtpVerify } from "../controllers/auth_controller.js";
-import { verifyToken, getTokenData } from "../middleware/auth.js";
+import { loginUser, logoutUser, verifyEmailOtp } from "../controllers/auth_controller.js";
+import { verifyToken } from "../middleware/auth.js";
 const routerAuth = Router();
 
 routerAuth.post("/auth/login", loginUser);
 routerAuth.post("/auth/logout", verifyToken, logoutUser);
-routerAuth.post('/auth/sms-otp/verify', getTokenData, smsOtpVerify);
+routerAuth.post('/auth/email-otp/verify', verifyEmailOtp);
 
 
 export default routerAuth;

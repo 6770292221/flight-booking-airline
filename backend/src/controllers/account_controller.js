@@ -12,7 +12,7 @@ import qrcode from "qrcode";
 import jwt from "jsonwebtoken";
 import { sendVerifyRegisterEmail } from "../email/emailService.js";
 import logger from "../utils/logger_utils.js";
-import { VerifyRegisterState} from "../state/mailing_concrete.js";
+import { VerifyRegisterState } from "../state/mailing_concrete.js";
 import { validateBody } from "../middleware/validate.js";
 
 
@@ -129,12 +129,6 @@ export async function createAccount(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const hiddenEmail = hideEmail(email);
 
-    const twoFASecret = speakeasy.generateSecret({
-      name: `Airline-booking (${email})`,
-    });
-
-    const qrCodeDataURL = await qrcode.toDataURL(twoFASecret.otpauth_url);
-
     const newAccount = new AccountMongooseModel({
       firstName,
       lastName,
@@ -142,8 +136,6 @@ export async function createAccount(req, res) {
       email,
       phoneNumber,
       isAdmin,
-      twoFactorSecret: twoFASecret.base32,
-      qrCode: qrCodeDataURL,
       verified: false,
     });
 
@@ -178,7 +170,7 @@ export async function createAccount(req, res) {
 
     await sendVerifyRegisterEmail(req.body)
 
-  
+
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1001,
@@ -190,8 +182,6 @@ export async function createAccount(req, res) {
         phoneNumber: newAccount.phoneNumber,
         password: hashedPassword,
         isAdmin: isAdmin,
-        twoFactorSecret: twoFASecret.base32,
-        qrCode: qrCodeDataURL,
         verified: newAccount.verified,
         token: token,
       },
