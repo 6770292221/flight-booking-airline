@@ -5,6 +5,7 @@ export const Enums = Object.freeze({
 export const StatusCodes = Object.freeze({
   OK: 200,
   CREATE: 201,
+  ACCEPTED: 202,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -16,6 +17,7 @@ export const StatusMessages = Object.freeze({
   SUCCESS: "success",
   FAILED: "failed",
   SERVER_ERROR: "An unexpected error occurred. Please try again later.",
+  ACCEPTED: "accepted"
 
 
 });
@@ -56,6 +58,7 @@ export const Codes = Object.freeze({
   RSV_3013: "RSV_3013",
   RSV_3014: "RSV_3014",
   RSV_3015: "RSV_3015",
+
 
 
   // Validation Codes
@@ -150,7 +153,17 @@ export const Codes = Object.freeze({
   OTP_1002: "OTP_1002",
   OTP_1003: "OTP_1003",
   OTP_1004: "OTP_1004",
-  OTP_3005: "OTP_1005"
+  OTP_3005: "OTP_1005",
+
+  //PAYMENT
+  PAY_1001: "PAY_1001",
+  PAY_1002: "PAY_1002",
+
+  //TICKETING
+  TKT_1001: "TKT_1001",
+  TKT_1002: "TKT_1002",
+  TKT_1003: "TKT_1003",
+  TKT_1004: "TKT_1004"
 });
 
 
@@ -285,8 +298,17 @@ export const Messages = Object.freeze({
   OTP_1002: "Invalid OTP. Please try again.",
   OTP_1003: "OTP has expired. Please request a new code.",
   OTP_3004: "OTP verified successfully.",
-  OTP_3005: "User not found."
+  OTP_3005: "User not found.",
 
+  //PAYMENT
+  PAY_1001: "Payment successful",
+  PAY_1002: "Invalid Event",
+
+  //TICKETING
+  TKT_1001: "Issue ticket successfully",
+  TKT_1002: "Booking status is not PAID",
+  TKT_1003: "Ticketing successfully",
+  TKT_1004: "Ticketing failed",
 
 });
 

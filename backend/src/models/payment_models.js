@@ -3,7 +3,7 @@ import { paymentDb } from "../config/connections.js";
 
 const eventSchema = new mongoose.Schema({
     type: { type: String, required: true },
-    status: { type: String, enum: ["SUCCESS", "FAILED"], required: true },
+    status: { type: String, enum: ["SUCCESS", "FAILED", "REFUNDED"], required: true },
     source: { type: String, enum: ["SYSTEM", "USER", "WEBHOOK"], required: true },
     message: { type: String },
     payload: { type: mongoose.Schema.Types.Mixed },
@@ -27,10 +27,10 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ["PENDING", "REFUNDED", "FAILED"],
+        enum: ["SUCCESS", "PENDING", "REFUNDED", "FAILED"],
         default: "PENDING"
     },
-    paymentMethod: { type: String },
+    paymentMethod: { type: String, enum: ["CREDIT_CARD", "BANK_TRANSFER"] },
     paymentProvider: { type: String },
     paymentTransactionId: { type: String },
     amount: { type: Number, required: true },

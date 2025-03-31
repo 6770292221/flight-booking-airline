@@ -108,7 +108,6 @@ export const logoutUser = async (req, res) => {
 export async function verifyEmailOtp(req, res) {
   const { userId, otp } = req.body;
 
-
   try {
     if (!userId || !otp) {
       return res.status(StatusCodes.BAD_REQUEST).json({
