@@ -158,6 +158,10 @@ export const Codes = Object.freeze({
   //PAYMENT
   PAY_1001: "PAY_1001",
   PAY_1002: "PAY_1002",
+  PAY_1003: "PAY_1003",
+  PAY_1004: "PAY_1004",
+  PAY_1005: "PAY_1005",
+  PAY_1006: "PAY_1006",
 
   //TICKETING
   TKT_1001: "TKT_1001",
@@ -303,6 +307,11 @@ export const Messages = Object.freeze({
   //PAYMENT
   PAY_1001: "Payment successful",
   PAY_1002: "Invalid Event",
+  PAY_1003: "Payment not found",
+  PAY_1004: "Booking not found",
+  PAY_1005: "User not found",
+  PAY_1006: "Update event and send email to user successfully",
+
 
   //TICKETING
   TKT_1001: "Issue ticket successfully",
