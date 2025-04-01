@@ -14,7 +14,9 @@ export const getAircrafts = async (req, res) => {
                 name: aircraft.name,
                 seatLayout: aircraft.seatLayout,
                 seatPitch: aircraft.seatPitch,
-                seatCapacity: aircraft.seatCapacity
+                seatCapacity: aircraft.seatCapacity,
+                updatedAt: aircraft.updatedAt,
+                createdAt: aircraft.createdAt
             })),
             pagination: {
                 total: aircrafts.length,
@@ -35,6 +37,7 @@ export const getAircrafts = async (req, res) => {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
         });
     }
@@ -63,6 +66,7 @@ export async function getAircraftById(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
         });
     }
@@ -77,9 +81,9 @@ export async function createAircraft(req, res) {
 
         if (existingAircraft) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                success: false,
-                code: Codes.AIR_1008,
-                message: Messages.AIR_1008,
+                status: StatusMessages.FAILED,
+                code: Codes.AIR_1003,
+                message: Messages.AIR_1003
             });
         }
 
@@ -100,6 +104,7 @@ export async function createAircraft(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
         });
     }
@@ -129,6 +134,7 @@ export async function updateAircraft(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
         });
     }
@@ -157,6 +163,7 @@ export async function deleteAircraft(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
         });
     }

@@ -56,8 +56,9 @@ export const getAirports = async (req, res) => {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 };
 
@@ -85,8 +86,9 @@ export async function getAirportById(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 }
 
@@ -123,8 +125,9 @@ export async function createAirport(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 }
 
@@ -153,8 +156,9 @@ export async function updateAirport(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 }
 
@@ -182,8 +186,9 @@ export async function deleteAirport(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 }
 
@@ -206,7 +211,9 @@ export async function getLocations(req, res) {
                 cityName: airport.cityName,
                 airportName: airport.airportName,
                 country: airport.country,
-                timezone: airport.timezone
+                timezone: airport.timezone,
+                updatedAt: airport.updatedAt,
+                createdAt: airport.createdAt
             })),
             pagination: {
                 total: airports.length,
@@ -226,7 +233,8 @@ export async function getLocations(req, res) {
     } catch (error) {
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
+            code: Codes.GNR_1001,
             message: StatusMessages.SERVER_ERROR,
-        });
+          });
     }
 }
