@@ -6,14 +6,17 @@ import {
   getAllAircrafts,
   updateAircraft,
   deleteAircraft,
-} from "../apis/aircraft"; // นำเข้า API สำหรับ Aircraft
-import "./Aircraft.css"; // สไตล์ CSS
+} from "../apis/aircraft";
+import "./Aircraft.css";
+import { showErrorPopup } from "../components/ErrorPopup";
+import ConfirmationPopup from "../components/ConfirmationPopup"; // นำเข้า ConfirmationPopup
 
 function Aircraft() {
   const [aircraftList, setAircraftList] = useState([]);
   const [editingAircraft, setEditingAircraft] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [aircraftToDelete, setAircraftToDelete] = useState(null); // Store aircraft to delete
 
-  // ฟังก์ชันดึงข้อมูลเครื่องบินทั้งหมด
   useEffect(() => {
     fetchAircrafts();
   }, []);
@@ -27,44 +30,86 @@ function Aircraft() {
     }
   };
 
-  // ฟังก์ชันสำหรับเพิ่มเครื่องบิน
   const handleAdd = async () => {
-    if (!editingAircraft.code || !editingAircraft.name) {
-      return alert("Please fill in code and name");
+    if (!editingAircraft.aircraftCode || !editingAircraft.name) {
+      return alert("Please fill in aircraft code and name");
     }
     try {
       await addAircraft(editingAircraft);
-      setEditingAircraft(null); // รีเซ็ตค่า
-      fetchAircrafts(); // รีเฟรชข้อมูล
+      setEditingAircraft(null);
+      fetchAircrafts();
     } catch (err) {
-      console.error("Add failed", err);
+      console.error("Update failed:", err);
+
+      if (err.response) {
+        const code = err.response.data.code || "UNKNOWN";
+        const message =
+          err.response.data.message ||
+          "An error occurred while updating the cabin class.";
+        showErrorPopup(code, message);
+      } else {
+        showErrorPopup(
+          "NETWORK_ERROR",
+          "Network error. Please try again later."
+        );
+      }
     }
   };
 
-  // ฟังก์ชันสำหรับลบเครื่องบิน
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure to delete this aircraft?")) return;
+  const handleDelete = async () => {
     try {
-      await deleteAircraft(id);
-      fetchAircrafts(); // รีเฟรชข้อมูล
+      if (aircraftToDelete) {
+        await deleteAircraft(aircraftToDelete); // Delete the selected aircraft
+        setShowDeletePopup(false); // Hide the confirmation popup
+        fetchAircrafts(); // Refresh the list
+      }
     } catch (err) {
       console.error("Delete failed", err);
     }
   };
 
-  // ฟังก์ชันสำหรับแก้ไขเครื่องบิน
   const handleUpdate = async () => {
     try {
-      await updateAircraft(editingAircraft._id, editingAircraft);
-      setEditingAircraft(null); // รีเซ็ตการแก้ไข
-      fetchAircrafts(); // รีเฟรชข้อมูล
+      const response = await updateAircraft(
+        editingAircraft.id,
+        editingAircraft
+      );
+      if (response.data.status === "failed") {
+        showErrorPopup(response.data.code, response.data.message);
+        return;
+      }
+      setEditingAircraft(null);
+      fetchAircrafts();
     } catch (err) {
-      console.error("Update failed", err);
+      console.error("Update failed:", err);
+
+      if (err.response) {
+        const code = err.response.data.code || "UNKNOWN";
+        const message =
+          err.response.data.message ||
+          "An error occurred while updating the cabin class.";
+        showErrorPopup(code, message);
+      } else {
+        showErrorPopup(
+          "NETWORK_ERROR",
+          "Network error. Please try again later."
+        );
+      }
     }
   };
 
+  const openDeleteConfirm = (id) => {
+    setAircraftToDelete(id);
+    setShowDeletePopup(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    setShowDeletePopup(false);
+    setAircraftToDelete(null);
+  };
+
   const openEditModal = (item) => {
-    setEditingAircraft(item); // เปิด modal และตั้งค่าข้อมูลที่จะแก้ไข
+    setEditingAircraft(item);
   };
 
   return (
@@ -76,10 +121,11 @@ function Aircraft() {
           className="btn-add"
           onClick={() =>
             setEditingAircraft({
-              code: "",
+              aircraftCode: "",
               name: "",
-              airline: "",
-              capacity: "",
+              seatLayout: "",
+              seatPitch: "",
+              seatCapacity: "",
             })
           }
         >
@@ -89,10 +135,11 @@ function Aircraft() {
         <table className="aircraft-table">
           <thead>
             <tr>
-              <th>Code</th>
+              <th>Aircraft Code</th>
               <th>Name</th>
-              <th>Airline</th>
-              <th>Capacity</th>
+              <th>Seat Layout</th>
+              <th>Seat Pitch</th>
+              <th>Seat Capacity</th>
               <th>Created</th>
               <th>Updated</th>
               <th>Actions</th>
@@ -100,11 +147,12 @@ function Aircraft() {
           </thead>
           <tbody>
             {aircraftList.map((item) => (
-              <tr key={item._id}>
-                <td>{item.code}</td>
+              <tr key={item.id}>
+                <td>{item.aircraftCode}</td>
                 <td>{item.name}</td>
-                <td>{item.airline}</td>
-                <td>{item.capacity}</td>
+                <td>{item.seatLayout}</td>
+                <td>{item.seatPitch}</td>
+                <td>{item.seatCapacity}</td>
                 <td>{new Date(item.createdAt).toLocaleString()}</td>
                 <td>{new Date(item.updatedAt).toLocaleString()}</td>
                 <td>
@@ -117,7 +165,7 @@ function Aircraft() {
                     </button>
                     <button
                       className="icon-button delete"
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => openDeleteConfirm(item.id)}
                     >
                       <FaTrash />
                     </button>
@@ -128,20 +176,28 @@ function Aircraft() {
           </tbody>
         </table>
 
+        {showDeletePopup && (
+          <ConfirmationPopup
+            message="Are you sure you want to delete this aircraft?"
+            onConfirm={handleDelete}
+            onCancel={closeDeleteConfirm}
+          />
+        )}
+
         {editingAircraft && (
           <div className="modal-overlay">
             <div className="modal">
-              <h3>{editingAircraft._id ? "Edit Aircraft" : "Add Aircraft"}</h3>
+              <h3>{editingAircraft.id ? "Edit Aircraft" : "Add Aircraft"}</h3>
               <div className="modal-form">
                 <input
-                  value={editingAircraft.code}
+                  value={editingAircraft.aircraftCode}
                   onChange={(e) =>
                     setEditingAircraft({
                       ...editingAircraft,
-                      code: e.target.value,
+                      aircraftCode: e.target.value,
                     })
                   }
-                  placeholder="Code"
+                  placeholder="Aircraft Code"
                 />
                 <input
                   value={editingAircraft.name}
@@ -151,35 +207,45 @@ function Aircraft() {
                       name: e.target.value,
                     })
                   }
-                  placeholder="Name"
+                  placeholder="Aircraft Name"
                 />
                 <input
-                  value={editingAircraft.airline}
+                  value={editingAircraft.seatLayout}
                   onChange={(e) =>
                     setEditingAircraft({
                       ...editingAircraft,
-                      airline: e.target.value,
+                      seatLayout: e.target.value,
                     })
                   }
-                  placeholder="Airline"
+                  placeholder="Seat Layout"
                 />
                 <input
-                  value={editingAircraft.capacity}
+                  value={editingAircraft.seatPitch}
                   onChange={(e) =>
                     setEditingAircraft({
                       ...editingAircraft,
-                      capacity: e.target.value,
+                      seatPitch: e.target.value,
                     })
                   }
-                  placeholder="Capacity"
+                  placeholder="Seat Pitch"
+                />
+                <input
+                  value={editingAircraft.seatCapacity}
+                  onChange={(e) =>
+                    setEditingAircraft({
+                      ...editingAircraft,
+                      seatCapacity: e.target.value,
+                    })
+                  }
+                  placeholder="Seat Capacity"
                 />
               </div>
               <div className="modal-buttons">
                 <button
                   className="btn-update"
-                  onClick={editingAircraft._id ? handleUpdate : handleAdd}
+                  onClick={editingAircraft.id ? handleUpdate : handleAdd}
                 >
-                  {editingAircraft._id ? "Update" : "Create"}
+                  {editingAircraft.id ? "Update" : "Create"}
                 </button>
                 <button
                   className="btn-cancel"

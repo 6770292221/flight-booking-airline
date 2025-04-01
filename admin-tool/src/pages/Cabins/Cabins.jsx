@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import Sidebar from "../Home/Sidebar";
 import {
   getCabinClasses,
   deleteCabinClass,
   addCabinClass,
   updateCabinClass,
 } from "../apis/cabin";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import Sidebar from "../Home/Sidebar";
-import "./Cabins.css";
 import { showErrorPopup } from "../components/ErrorPopup";
+import ConfirmationPopup from "../components/ConfirmationPopup";
+import "./Cabins.css";
 
 function Cabins() {
   const [cabinList, setCabinList] = useState([]);
   const [editingCabin, setEditingCabin] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [cabinToDelete, setCabinToDelete] = useState(null);
 
   useEffect(() => {
     fetchCabinClasses();
@@ -26,6 +29,7 @@ function Cabins() {
       console.error("Failed to fetch cabin classes", err);
     }
   };
+
   const handleAdd = async () => {
     if (!editingCabin.code || !editingCabin.name) {
       return alert("Please fill in code and name");
@@ -59,15 +63,13 @@ function Cabins() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this cabin?"
-    );
-
-    if (!isConfirmed) return;
+  const handleDelete = async () => {
     try {
-      await deleteCabinClass(id);
-      fetchCabinClasses();
+      if (cabinToDelete) {
+        await deleteCabinClass(cabinToDelete);
+        setShowDeletePopup(false);
+        fetchCabinClasses();
+      }
     } catch (err) {
       console.error("Delete failed", err);
     }
@@ -114,6 +116,16 @@ function Cabins() {
     setEditingCabin(item);
   };
 
+  const openDeleteConfirm = (id) => {
+    setCabinToDelete(id);
+    setShowDeletePopup(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    setShowDeletePopup(false);
+    setCabinToDelete(null);
+  };
+
   return (
     <div className="home-wrapper">
       <Sidebar />
@@ -147,8 +159,8 @@ function Cabins() {
                 <td>{item.name}</td>
                 <td>{item.checked}</td>
                 <td>{item.carryOn}</td>
-                <td>{formatDate(item.createdAt)}</td>
-                <td>{formatDate(item.updatedAt)}</td>
+                <td>{new Date(item.createdAt).toLocaleString()}</td>
+                <td>{new Date(item.updatedAt).toLocaleString()}</td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -159,7 +171,7 @@ function Cabins() {
                     </button>
                     <button
                       className="icon-button delete"
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => openDeleteConfirm(item._id)}
                     >
                       <FaTrash />
                     </button>
@@ -169,6 +181,15 @@ function Cabins() {
             ))}
           </tbody>
         </table>
+
+        {/* Show delete confirmation popup */}
+        {showDeletePopup && (
+          <ConfirmationPopup
+            message="Are you sure you want to delete this cabin?"
+            onConfirm={handleDelete}
+            onCancel={closeDeleteConfirm}
+          />
+        )}
 
         {editingCabin && (
           <div className="modal-overlay">

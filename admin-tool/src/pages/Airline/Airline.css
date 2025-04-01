@@ -173,3 +173,18 @@
 .btn-cancel:hover {
   background-color: #cbd5e1;
 }
+
+.modal-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-form input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 0;
+}

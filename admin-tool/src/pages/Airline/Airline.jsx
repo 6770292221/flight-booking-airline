@@ -6,13 +6,16 @@ import {
   getAllAirlines,
   updateAirline,
   deleteAirline,
-} from "../apis/airline"; // นำเข้า API สำหรับ Airline
+} from "../apis/airline";
 import "./Airline.css";
 import { showErrorPopup } from "../components/ErrorPopup";
+import ConfirmationPopup from "../components/ConfirmationPopup"; // Import the ConfirmationPopup
 
 function Airline() {
   const [airlineList, setAirlineList] = useState([]);
   const [editingAirline, setEditingAirline] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false); // State for controlling the delete popup visibility
+  const [airlineToDelete, setAirlineToDelete] = useState(null); // Store the airline to be deleted
 
   useEffect(() => {
     fetchAirlines();
@@ -63,11 +66,13 @@ function Airline() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure to delete this airline?")) return;
+  const handleDelete = async () => {
     try {
-      await deleteAirline(id);
-      fetchAirlines();
+      if (airlineToDelete) {
+        await deleteAirline(airlineToDelete);
+        setShowDeletePopup(false); // Close the delete confirmation popup
+        fetchAirlines(); // Refresh the airline list
+      }
     } catch (err) {
       console.error("Delete failed", err);
     }
@@ -77,10 +82,10 @@ function Airline() {
     try {
       const response = await updateAirline(editingAirline._id, editingAirline);
 
-      if (response.data.success === false) {
-        const code = response.data.error.code || "UNKNOWN";
+      if (response.data.status === "failed") {
+        const code = response.data.code || "UNKNOWN";
         const message =
-          response.data.error.message ||
+          response.data.message ||
           "An error occurred while updating the airline.";
         showErrorPopup(code, message);
         return;
@@ -89,13 +94,13 @@ function Airline() {
       setEditingAirline(null);
       fetchAirlines();
     } catch (err) {
-      console.error("Update failed", err);
+      console.error("Update failed:", err);
 
       if (err.response) {
-        const code = err.response.data.error.code || "UNKNOWN";
+        const code = err.response.data.code || "UNKNOWN";
         const message =
-          err.response.data.error.message ||
-          "An error occurred while updating the airline.";
+          err.response.data.message ||
+          "An error occurred while updating the cabin class.";
         showErrorPopup(code, message);
       } else {
         showErrorPopup(
@@ -108,6 +113,16 @@ function Airline() {
 
   const openEditModal = (item) => {
     setEditingAirline(item);
+  };
+
+  const openDeleteConfirm = (id) => {
+    setAirlineToDelete(id); // Set the airline to be deleted
+    setShowDeletePopup(true); // Show the confirmation popup
+  };
+
+  const closeDeleteConfirm = () => {
+    setShowDeletePopup(false); // Hide the confirmation popup
+    setAirlineToDelete(null); // Clear the airline to be deleted
   };
 
   return (
@@ -137,6 +152,7 @@ function Airline() {
               <th>Name</th>
               <th>Country</th>
               <th>Low Cost</th>
+              <th>Logo</th> {/* Add new column for logo */}
               <th>Created</th>
               <th>Updated</th>
               <th>Actions</th>
@@ -149,6 +165,15 @@ function Airline() {
                 <td>{item.airlineName}</td>
                 <td>{item.country}</td>
                 <td>{item.isLowCost ? "Yes" : "No"}</td>
+                <td>
+                  {/* Add the logo image */}
+                  <img
+                    src={item.logoUrl}
+                    alt={item.airlineName}
+                    width="50"
+                    height="50"
+                  />
+                </td>
                 <td>{new Date(item.createdAt).toLocaleString()}</td>
                 <td>{new Date(item.updatedAt).toLocaleString()}</td>
                 <td>
@@ -161,7 +186,7 @@ function Airline() {
                     </button>
                     <button
                       className="icon-button delete"
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => openDeleteConfirm(item._id)}
                     >
                       <FaTrash />
                     </button>
@@ -172,14 +197,19 @@ function Airline() {
           </tbody>
         </table>
 
+        {/* Delete confirmation popup */}
+        {showDeletePopup && (
+          <ConfirmationPopup
+            message="Are you sure you want to delete this airline?"
+            onConfirm={handleDelete}
+            onCancel={closeDeleteConfirm}
+          />
+        )}
+
         {editingAirline && (
           <div className="modal-overlay">
             <div className="modal">
-              <h3>
-                {editingAirline._id
-                  ? "Edit Airline Class"
-                  : "Add Airline Class"}
-              </h3>
+              <h3>{editingAirline._id ? "Edit Airline " : "Add Airline "}</h3>
               <div className="modal-form">
                 <input
                   value={editingAirline.carrierCode}

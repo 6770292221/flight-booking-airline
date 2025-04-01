@@ -1,11 +1,11 @@
 import axios from "axios";
 
 
-const cabinAPI = axios.create({
+const aircraftAPI = axios.create({
     baseURL: "http://localhost:3001/api/v1/aircraft-core-api",
 });
 
-cabinAPI.interceptors.request.use((config) => {
+aircraftAPI.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -13,4 +13,4 @@ cabinAPI.interceptors.request.use((config) => {
     return config;
 });
 
-export default cabinAPI;
+export default aircraftAPI;

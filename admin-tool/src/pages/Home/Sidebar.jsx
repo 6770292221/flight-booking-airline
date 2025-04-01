@@ -45,7 +45,7 @@ function Sidebar() {
         >
           <FaBars />
         </button>
-        {!collapsed && <h3>✈️ Menu</h3>}
+        {!collapsed && <h3>Menu</h3>}
       </div>
 
       <ul>

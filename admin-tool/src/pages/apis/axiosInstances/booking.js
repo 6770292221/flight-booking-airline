@@ -1,11 +1,10 @@
 import axios from "axios";
 
-
-const airlineAPI = axios.create({
-    baseURL: "http://localhost:3001/api/v1/airline-core-api",
+const bookingAPI = axios.create({
+    baseURL: "http://localhost:3001/api/v1/booking-core-api",
 });
 
-airlineAPI.interceptors.request.use((config) => {
+bookingAPI.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -13,4 +12,4 @@ airlineAPI.interceptors.request.use((config) => {
     return config;
 });
 
-export default airlineAPI;
+export default bookingAPI;

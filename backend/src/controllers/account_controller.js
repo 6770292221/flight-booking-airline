@@ -12,7 +12,6 @@ import qrcode from "qrcode";
 import jwt from "jsonwebtoken";
 import { sendVerifyRegisterEmail } from "../email/emailService.js";
 import logger from "../utils/logger_utils.js";
-import { VerifyRegisterState } from "../state/mailing_concrete.js";
 import { validateBody } from "../middleware/validate.js";
 
 

@@ -15,7 +15,6 @@ import { AccountMongooseModel } from "../models/account_models.js";
 import axios from "axios";
 import { issueTicketing } from "./airlines_controller.js";
 
-import { BookingPendingPaymentState } from "../state/mailing_concrete.js";
 export async function createBooking(req, res) {
   try {
     if (!req.user || !req.user.userId) {

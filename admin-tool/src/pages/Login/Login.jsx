@@ -1,4 +1,3 @@
-// src/pages/Login/Login.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, verifyOTP } from "../apis/auth";
@@ -7,8 +6,8 @@ import "./Login.css";
 import OtpPopup from "./OtpPopup";
 
 function Login() {
-  const [email, setEmail] = useState("maicomsci54@gmail.com");
-  const [password, setPassword] = useState("4Xnnj2Q)");
+  const [email, setEmail] = useState("maicomsci55@gmail.com");
+  const [password, setPassword] = useState("wFn*E5#r7jJ");
   const [userData, setUserData] = useState(null);
   const [showOtp, setShowOtp] = useState(false);
   const navigate = useNavigate();

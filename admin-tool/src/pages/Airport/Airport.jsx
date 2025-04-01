@@ -7,12 +7,15 @@ import {
   updateAirport,
   deleteAirport,
 } from "../apis/airport";
-import "./Airport.css";
+import ConfirmationPopup from "../components/ConfirmationPopup";
 import { showErrorPopup } from "../components/ErrorPopup";
+import "./Airport.css";
 
 function Airports() {
   const [airportList, setAirportList] = useState([]);
   const [editingAirport, setEditingAirport] = useState(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [airportToDelete, setAirportToDelete] = useState(null);
 
   useEffect(() => {
     fetchAirports();
@@ -36,14 +39,27 @@ function Airports() {
       setEditingAirport(null);
       fetchAirports();
     } catch (err) {
-      console.error("Add failed", err);
+      console.error("Add failed:", err);
+      if (err.response) {
+        const code = err.response.data.code || "UNKNOWN";
+        const message =
+          err.response.data.message ||
+          "An error occurred while adding the airport.";
+        showErrorPopup(code, message);
+      } else {
+        showErrorPopup(
+          "NETWORK_ERROR",
+          "Network error. Please try again later."
+        );
+      }
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure to delete this airport?")) return;
+  const handleDelete = async () => {
+    if (!airportToDelete) return;
     try {
-      await deleteAirport(id);
+      await deleteAirport(airportToDelete);
+      setShowConfirmPopup(false);
       fetchAirports();
     } catch (err) {
       console.error("Delete failed", err);
@@ -56,8 +72,40 @@ function Airports() {
       setEditingAirport(null);
       fetchAirports();
     } catch (err) {
-      console.error("Update failed", err);
+      console.error("Update failed:", err);
+      if (err.response) {
+        const code = err.response.data.code || "UNKNOWN";
+        const message =
+          err.response.data.message ||
+          "An error occurred while updating the airport.";
+        showErrorPopup(code, message);
+      } else {
+        showErrorPopup(
+          "NETWORK_ERROR",
+          "Network error. Please try again later."
+        );
+      }
     }
+  };
+
+  const openDeleteConfirm = (id) => {
+    setAirportToDelete(id);
+    setShowConfirmPopup(true);
+  };
+
+  const closeDeleteConfirm = () => {
+    setShowConfirmPopup(false);
+    setAirportToDelete(null);
+  };
+
+  const openEditConfirm = (item) => {
+    setEditingAirport(item);
+    setShowEditConfirm(true);
+  };
+
+  const closeEditConfirm = () => {
+    setShowEditConfirm(false);
+    setEditingAirport(null);
   };
 
   const openEditModal = (item) => {
@@ -117,7 +165,7 @@ function Airports() {
                     </button>
                     <button
                       className="icon-button delete"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => openDeleteConfirm(item.id)}
                     >
                       <FaTrash />
                     </button>
@@ -200,6 +248,15 @@ function Airports() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Show the confirmation popup for deletion */}
+        {showConfirmPopup && (
+          <ConfirmationPopup
+            message="Are you sure you want to delete this airport?"
+            onConfirm={handleDelete}
+            onCancel={closeDeleteConfirm}
+          />
         )}
       </div>
     </div>

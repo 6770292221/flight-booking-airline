@@ -39,8 +39,8 @@ export async function getAirlines(req, res) {
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
-      data: null,
     });
   }
 }
@@ -70,6 +70,7 @@ export async function getAirlineById(req, res) {
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
     });
   }
@@ -134,6 +135,7 @@ export async function createAirline(req, res) {
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
     });
   }
@@ -170,6 +172,7 @@ export async function updateAirline(req, res) {
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
     });
   }
@@ -202,6 +205,7 @@ export async function deleteAirline(req, res) {
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
     });
   }
@@ -212,32 +216,32 @@ export async function issueTicketing(req, res) {
     const { airlineId, bookingId } = req.body;
     //Thai air asia
     if (airlineId == "VZ") {
-        return res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
-            code: Codes.TKT_1003,
-            message: Messages.TKT_1003
-        })
+      return res.status(StatusCodes.OK).json({
+        status: StatusMessages.SUCCESS,
+        code: Codes.TKT_1003,
+        message: Messages.TKT_1003,
+      });
       //Nok air
     } else if (airlineId == "FD") {
-        return res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
-            code: Codes.TKT_1003,
-            message: Messages.TKT_1003
-        })
+      return res.status(StatusCodes.OK).json({
+        status: StatusMessages.SUCCESS,
+        code: Codes.TKT_1003,
+        message: Messages.TKT_1003,
+      });
       //Thai lion air
     } else if (airlineId == "SL") {
-        return res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
-            code: Codes.TKT_1003,
-            message: Messages.TKT_1003
-        })
+      return res.status(StatusCodes.OK).json({
+        status: StatusMessages.SUCCESS,
+        code: Codes.TKT_1003,
+        message: Messages.TKT_1003,
+      });
       //Thai vietjet
     } else if (airlineId == "VZ") {
-        return res.status(StatusCodes.OK).json({
-            status: StatusMessages.SUCCESS,
-            code: Codes.TKT_1004,
-            message: Messages.TKT_1004
-        })
+      return res.status(StatusCodes.OK).json({
+        status: StatusMessages.SUCCESS,
+        code: Codes.TKT_1004,
+        message: Messages.TKT_1004,
+      });
     } else {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -251,6 +255,7 @@ export async function issueTicketing(req, res) {
   } catch (err) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
       message: StatusMessages.SERVER_ERROR,
     });
   }
