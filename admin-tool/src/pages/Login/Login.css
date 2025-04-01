@@ -1,0 +1,96 @@
+/* src/pages/Login/Login.css */
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg, #e0f7ff 0%, #f8fbff 100%);
+}
+
+.login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-box {
+  background-color: #ffffff;
+  padding: 48px 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 30px;
+}
+
+.login-input {
+  width: 90%;
+  padding: 16px 18px;
+  margin-bottom: 22px;
+  font-size: 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  transition: all 0.3s ease-in-out;
+  color: #111827;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px;
+  background-color: #10b981;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #059669;
+}
+
+.login-error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: -12px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid #22c55e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
