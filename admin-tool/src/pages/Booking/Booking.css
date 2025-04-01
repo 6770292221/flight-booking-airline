@@ -1,0 +1,188 @@
+/* Booking Container */
+.booking-container {
+  padding: 32px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Booking Table */
+.booking-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  font-size: 14px;
+}
+
+.booking-table thead th {
+  text-align: left;
+  background-color: #f1f5f9;
+  color: #334155;
+  padding: 12px 16px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.booking-table tbody td {
+  background-color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  vertical-align: middle;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Row hover effect */
+.booking-table tbody tr:hover td {
+  background-color: #f9fafb;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-button {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button.edit {
+  background-color: #3b82f6;
+}
+
+.icon-button.edit:hover {
+  background-color: #2563eb;
+}
+
+.icon-button.delete {
+  background-color: #ef4444;
+}
+
+.icon-button.delete:hover {
+  background-color: #dc2626;
+}
+
+/* Passengers Details */
+.passenger-details {
+  display: none; /* Initially hidden */
+  padding: 20px;
+  margin-top: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+}
+
+/* Show when expanded */
+.passenger-details.open {
+  display: block;
+}
+
+/* Title Styling */
+.passenger-details h3 {
+  font-size: 18px;
+  color: #334155;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* Expand/Collapse Button */
+.expand-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.expand-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Add styling for the ticket details */
+.ticket-info {
+  background-color: #ffffff;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.ticket-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.ticket-status {
+  margin-top: 12px;
+}
+
+.ticket-status.success {
+  color: #22c55e; /* Green for success */
+}
+
+.ticket-status.failed {
+  color: #ef4444; /* Red for failure */
+}
+
+/* Search Bar */
+.search-bar {
+  margin-bottom: 16px;
+}
+
+.search-bar input {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Expand/Collapse Button */
+.expand-btn {
+  background-color: #1bbb59; /* Default color for 'See Details' */
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.expand-btn:hover {
+  background-color: #21ed6f;
+}
+
+/* Style for 'Hide Details' button (when expanded) */
+.expand-btn.hide {
+  background-color: #ea6fbd; /* Color for 'Hide Details' */
+}
+
+.expand-btn.hide:hover {
+  background-color: #ea6fbd;
+}
+
+/* Styling for Status Button (Ticket Status) */
+.ticket-status {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  color: white; /* White text color for contrast */
+}
