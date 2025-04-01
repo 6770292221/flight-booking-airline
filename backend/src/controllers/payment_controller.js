@@ -1,11 +1,17 @@
 import { PaymentMongooseModel } from "../models/payment_models.js";
 import { BookingMongooseModel } from "../models/booking_models.js";
+import { AccountMongooseModel } from "../models/account_models.js";
 import {
   StatusCodes,
   StatusMessages,
   Codes,
   Messages,
 } from "../enums/enums.js";
+import {
+  sendPaymentSuccessEmail,
+  sendPaymentFailedEmail,
+  sendRefundsTemplate,
+} from "../email/emailService.js";
 
 export async function initiatePayment(req, res) {
   try {
@@ -74,27 +80,86 @@ export async function initiatePayment(req, res) {
 
 export async function webhookHandler(req, res) {
   try {
-    const { event, paymentRef, transactionId, method, paidAt } = req.body;
+    const {
+      event,
+      paymentRef,
+      paymentStatus,
+      paymentTransactionId,
+      paymentProvider,
+      paymentMethod,
+      paidAt,
+      amount,
+      currency
+    } = req.body;
 
-    // Centralized mapping for event logic
+    const payment = await PaymentMongooseModel.findOne({ paymentRef });
+    if (!payment) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1003,
+        message: Messages.PAY_1003,
+        data: {},
+      });
+    }
+
+    const booking = await BookingMongooseModel.findOne({
+      _id: payment.bookingId,
+    });
+    if (!booking) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1004,
+        message: Messages.PAY_1004,
+        data: {},
+      });
+    }
+
+    const user = await AccountMongooseModel.findOne({ _id: booking.userId });
+
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1005,
+        message: Messages.PAY_1005,
+        data: {},
+      });
+    }
     const eventMap = {
       SUCCESS_PAID: {
         paymentStatus: "SUCCESS",
         bookingStatus: "PAID",
         bookingEventStatus: "SUCCESS",
         message: "Payment issued successfully.",
+        sendEmail: sendPaymentSuccessEmail,
+        // sendEmail:  sendPaymentSuccessEmail({
+        //   bookingResponse: booking,
+        //   reqUser: user,
+        // }),
       },
       FAILED_PAID: {
         paymentStatus: "FAILED",
         bookingStatus: "FAILED",
         bookingEventStatus: "FAILED",
         message: "Payment issued failed.",
+        sendEmail: sendPaymentFailedEmail,
+        // sendEmail:  sendPaymentFailedEmail({
+        //   bookingResponse: booking,
+        //   reqUser: user,
+        // }),
       },
       REFUNDED_SUCCESS: {
         paymentStatus: "REFUNDED",
         bookingStatus: "REFUNDED",
         bookingEventStatus: "SUCCESS",
         message: "Refunded issued successfully.",
+        sendEmail: sendRefundsTemplate,
+        // sendEmail:  sendRefundsTemplate({
+        //   bookingResponse: booking,
+        //   reqUser: user,
+        //   refundTxnId: payment.paymentRef,
+        //   refundAmount: payment.refund.refundAmount,
+        //   reason:   "Ticket issuance failed.",
+        // }),
       },
     };
 
@@ -109,22 +174,12 @@ export async function webhookHandler(req, res) {
       });
     }
 
-    // Fetch payment by reference
-    const payment = await PaymentMongooseModel.findOne({ paymentRef });
-    if (!payment) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1003,
-        message: "Payment not found",
-        data: {},
-      });
-    }
-
     // Update payment details
     payment.paymentStatus = eventData.paymentStatus;
     payment.paidAt = paidAt;
-    payment.paymentMethod = method;
+    payment.paymentMethod = paymentMethod;
     payment.updatedAt = new Date();
+    payment.paymentProvider = paymentProvider;
     payment.events.push({
       type: "PAYMENT_ISSUED",
       status: eventData.paymentStatus,
@@ -136,19 +191,6 @@ export async function webhookHandler(req, res) {
       },
     });
 
-    // Fetch and update booking
-    const booking = await BookingMongooseModel.findOne({
-      _id: payment.bookingId,
-    });
-    if (!booking) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1004,
-        message: "Booking not found",
-        data: {},
-      });
-    }
-
     booking.status = eventData.bookingStatus;
     booking.events.push({
       type: "PAYMENT_ISSUED",
@@ -157,7 +199,7 @@ export async function webhookHandler(req, res) {
       message: eventData.message,
       payload: {
         paymentRef,
-        transactionId,
+        paymentTransactionId,
         reason: eventData.message,
       },
     });
@@ -165,13 +207,32 @@ export async function webhookHandler(req, res) {
     // Save both documents
     await payment.save();
     await booking.save();
+    booking.payments = [
+      {
+        paymentRef: paymentRef,
+        paymentStatus: paymentStatus,
+        paymentTransactionId: paymentTransactionId,
+        paymentMethod: paymentMethod,
+        paymentProvider: paymentProvider,
+        amount: amount,
+        currency: currency,
+        paidAt: paidAt,
+      },
+    ];
+    eventData.sendEmail({
+      bookingResponse: booking,
+      reqUser: user,
+      refundTxnId: payment.paymentRef,
+      refundAmount: payment.refund.refundAmount,
+      reason:   "Ticket issuance failed.",
+    });
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PAY_1001,
-      message: Messages.PAY_1001,
-      data: booking,
-    });
+      code: Codes.PAY_1006,
+      message: Messages.PAY_1006,
+      data: {},
+    })
   } catch (err) {
     console.error(err);
     return res.status(StatusCodes.SERVER_ERROR).json({

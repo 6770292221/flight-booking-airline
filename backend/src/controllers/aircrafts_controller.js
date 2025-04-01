@@ -115,7 +115,7 @@ export async function updateAircraft(req, res) {
     const updateData = req.body;
 
     try {
-        const updatedAircraft = await AircraftMongooseModel.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedAircraft = await AircraftMongooseModel.findByIdAndUpdate(id, updateData);
 
         if (!updatedAircraft) {
             return res.status(StatusCodes.NOT_FOUND).json({
