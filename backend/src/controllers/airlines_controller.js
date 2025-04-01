@@ -5,6 +5,7 @@ import {
   StatusMessages,
   Messages,
 } from "../enums/enums.js";
+import {getStrategy} from "../models/third_party_response_models.js";
 
 export async function getAirlines(req, res) {
   try {
@@ -213,45 +214,13 @@ export async function deleteAirline(req, res) {
 
 export async function issueTicketing(req, res) {
   try {
-    const { airlineId, bookingId } = req.body;
-    //Thai air asia
-    if (airlineId == "VZ") {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.TKT_1003,
-        message: Messages.TKT_1003,
-      });
-      //Nok air
-    } else if (airlineId == "FD") {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.TKT_1003,
-        message: Messages.TKT_1003,
-      });
-      //Thai lion air
-    } else if (airlineId == "SL") {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.TKT_1003,
-        message: Messages.TKT_1003,
-      });
-      //Thai vietjet
-    } else if (airlineId == "VZ") {
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.TKT_1004,
-        message: Messages.TKT_1004,
-      });
-    } else {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        error: {
-          statusCode: StatusCodes.BAD_REQUEST,
-          code: Codes.AIR_1002,
-          message: "Not found airlines",
-        },
-      });
-    }
+    const { airlineId, passengers, flight } = req.body;
+    const strategy = getStrategy(airlineId);
+    const response = strategy.issue(flight, passengers )
+    console.log(response.data)
+    return res.status(StatusCodes.OK).json({
+      response
+    })
   } catch (err) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
@@ -260,3 +229,4 @@ export async function issueTicketing(req, res) {
     });
   }
 }
+
