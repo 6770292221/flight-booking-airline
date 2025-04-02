@@ -6,7 +6,7 @@ import {
   addAirport,
   updateAirport,
   deleteAirport,
-} from "../apis/airport";
+} from "../../apis/airport";
 import ConfirmationPopup from "../components/ConfirmationPopup";
 import { showErrorPopup } from "../components/ErrorPopup";
 import "./Airport.css";

@@ -1,5 +1,5 @@
 import axios from "axios";
-import config from "../../../config";
+import config from "../config";
 
 const aircraftAPI = axios.create({
     baseURL: `${config.BASE_URL}/aircraft-core-api`,

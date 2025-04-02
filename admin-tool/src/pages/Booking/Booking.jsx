@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import Sidebar from "../Home/Sidebar";
-import { getAllBookings } from "../apis/booking";
+import { getAllBookings } from "../../apis/booking";
 import "./Booking.css";
 import React from "react";
 
@@ -134,7 +134,7 @@ function Bookings() {
                           "en-US",
                           { timeZone: "Asia/Bangkok" }
                         )}
-                        -> Arrival:{" "}
+                        - Arrival:{" "}
                         {new Date(flight.arrival.time).toLocaleString("en-US", {
                           timeZone: "Asia/Bangkok",
                         })}

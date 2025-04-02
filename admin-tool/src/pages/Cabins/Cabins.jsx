@@ -6,7 +6,7 @@ import {
   deleteCabinClass,
   addCabinClass,
   updateCabinClass,
-} from "../apis/cabin";
+} from "../../apis/cabin";
 import { showErrorPopup } from "../components/ErrorPopup";
 import ConfirmationPopup from "../components/ConfirmationPopup";
 import "./Cabins.css";

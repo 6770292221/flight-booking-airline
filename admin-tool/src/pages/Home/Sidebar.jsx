@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import "./Sidebar.css";
 import { MdAirlineSeatReclineExtra, MdOutlinePayment } from "react-icons/md";
-import { logout } from "../apis/auth";
+import { logout } from "../../apis/auth";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);

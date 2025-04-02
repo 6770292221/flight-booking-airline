@@ -1,4 +1,3 @@
-// src/pages/VerifyOTP/VerifyOTP.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { verifyOTP } from "@/apis/auth";
@@ -14,13 +13,13 @@ function VerifyOTP({ user }) {
     setMessage("");
 
     try {
-      const res = await verifyOTP(user.userId, otp); // ✅ เรียก API จริง
+      const res = await verifyOTP(user.userId, otp);
       const token = res.data.data.token;
-      localStorage.setItem("token", token); // ✅ เก็บ token
-      setMessage("✅ OTP verified successfully!");
-      navigate("/home"); // ✅ ไปหน้า Home
+      localStorage.setItem("token", token);
+      setMessage("OTP verified successfully!");
+      navigate("/home");
     } catch (err) {
-      setMessage("❌ Invalid OTP. Please try again.");
+      setMessage("Invalid OTP. Please try again.");
     }
   };
 

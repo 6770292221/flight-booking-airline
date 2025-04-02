@@ -6,7 +6,7 @@ import {
   getAllAirlines,
   updateAirline,
   deleteAirline,
-} from "../apis/airline";
+} from "../../apis/airline";
 import "./Airline.css";
 import { showErrorPopup } from "../components/ErrorPopup";
 import ConfirmationPopup from "../components/ConfirmationPopup"; // Import the ConfirmationPopup

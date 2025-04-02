@@ -6,7 +6,7 @@ import {
   getAllAircrafts,
   updateAircraft,
   deleteAircraft,
-} from "../apis/aircraft";
+} from "../../apis/aircraft";
 import "./Aircraft.css";
 import { showErrorPopup } from "../components/ErrorPopup";
 import ConfirmationPopup from "../components/ConfirmationPopup"; // นำเข้า ConfirmationPopup
