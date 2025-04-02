@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login, verifyOTP } from "../apis/auth";
+import { login, verifyOTP } from "../../apis/auth";
 import { showErrorPopup } from "../components/ErrorPopup";
 import "./Login.css";
 import OtpPopup from "./OtpPopup";

@@ -6,16 +6,16 @@ import {
   getAllAircrafts,
   updateAircraft,
   deleteAircraft,
-} from "../apis/aircraft";
+} from "../../apis/aircraft";
 import "./Aircraft.css";
 import { showErrorPopup } from "../components/ErrorPopup";
-import ConfirmationPopup from "../components/ConfirmationPopup"; // นำเข้า ConfirmationPopup
+import ConfirmationPopup from "../components/ConfirmationPopup"; 
 
 function Aircraft() {
   const [aircraftList, setAircraftList] = useState([]);
   const [editingAircraft, setEditingAircraft] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [aircraftToDelete, setAircraftToDelete] = useState(null); // Store aircraft to delete
+  const [aircraftToDelete, setAircraftToDelete] = useState(null); 
 
   useEffect(() => {
     fetchAircrafts();

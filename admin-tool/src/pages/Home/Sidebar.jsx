@@ -11,8 +11,8 @@ import {
   FaBars,
 } from "react-icons/fa";
 import "./Sidebar.css";
-import { MdAirlineSeatReclineExtra } from "react-icons/md";
-import { logout } from "../apis/auth";
+import { MdAirlineSeatReclineExtra, MdOutlinePayment } from "react-icons/md";
+import { logout } from "../../apis/auth";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -21,12 +21,12 @@ function Sidebar() {
     operation: true,
   });
 
-  const navigate = useNavigate(); // ✅ ย้ายออกมา
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       await logout();
       localStorage.removeItem("token");
-      navigate("/"); // กลับหน้า login
+      navigate("/"); 
     } catch (err) {
       console.error("Logout failed", err);
     }
@@ -100,15 +100,18 @@ function Sidebar() {
                 <FaTicketAlt /> {!collapsed && "Booking"}
               </Link>
             </li>
+            <li>
+              <Link to="/payments">
+                <MdOutlinePayment /> {!collapsed && "Payment"}
+              </Link>
+            </li>
           </>
         )}
 
         <li>
-          <li>
-            <button onClick={handleLogout} className="logout-button">
-              <FaPowerOff /> {!collapsed && "Logout"}
-            </button>
-          </li>
+          <button onClick={handleLogout} className="logout-button">
+            <FaPowerOff /> {!collapsed && "Logout"}
+          </button>
         </li>
       </ul>
     </div>
