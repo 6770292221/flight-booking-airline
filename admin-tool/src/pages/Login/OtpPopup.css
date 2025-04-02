@@ -1,12 +1,10 @@
-/* src/pages/Login/OtpPopup.css */
-
 .otp-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* มืดพื้นหลัง */
+  background: rgba(0, 0, 0, 0.5); /* เพิ่มมืดพื้นหลังให้สมดุล */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,29 +13,40 @@
 
 .otp-box {
   background: #ffffff;
-  padding: 32px 28px;
+  padding: 40px;
   border-radius: 16px;
   width: 100%;
-  max-width: 360px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  max-width: 480px; /* ปรับขนาดให้ดูดี */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* ให้แสงเงานุ่มขึ้น */
   text-align: center;
+  transition: transform 0.3s ease-in-out;
 }
 
 .otp-box h3 {
-  margin-bottom: 20px;
-  font-size: 22px;
-  color: #1f2937;
+  margin-bottom: 24px;
+  font-size: 26px; /* ขยายขนาดฟอนต์ */
+  font-weight: 700;
+  color: #1f2937; /* สีตัวหนังสือเข้มขึ้น */
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px; /* ระยะห่างระหว่างช่องกรอก */
+  margin-bottom: 24px;
 }
 
 .otp-input {
-  width: 90%;
-  padding: 14px 16px;
-  font-size: 16px;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 10px;
+  width: 47px; /* ปรับให้แคบลงเล็กน้อย */
+  height: 46px; /* เพิ่มความสูงเล็กน้อย */
+  padding: 10px;
+  font-size: 22px; /* ขยายขนาดฟอนต์ให้เหมาะสม */
+  font-weight: bold;
+  text-align: center;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
   background-color: #f9fafb;
-  margin-bottom: 24px;
-  transition: all 0.3s;
+  transition: all 0.3s ease-in-out;
 }
 
 .otp-input:focus {
@@ -49,27 +58,30 @@
 
 .otp-buttons {
   display: flex;
-  justify-content: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .otp-buttons button {
-  padding: 10px 20px;
-  font-size: 15px;
+  padding: 14px 30px;
+  font-size: 18px;
   font-weight: 500;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 48%;
+  letter-spacing: 1px; /* เพิ่มระยะห่างระหว่างตัวอักษร */
 }
 
 .otp-buttons button[type="submit"] {
-  background-color: #10b981;
+  background-color: #10b981; /* สีเขียวเข้ม */
   color: white;
 }
 
 .otp-buttons button[type="submit"]:hover {
-  background-color: #059669;
+  background-color: #059669; /* สีเขียวเข้มเมื่อ hover */
+  transform: translateY(-2px);
 }
 
 .otp-buttons button[type="button"] {
@@ -79,13 +91,14 @@
 
 .otp-buttons button[type="button"]:hover {
   background-color: #e5e7eb;
+  transform: translateY(-2px);
 }
 
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #fff;
-  border-top: 2px solid #10b981;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #fff;
+  border-top: 3px solid #10b981;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   margin: 0 auto;

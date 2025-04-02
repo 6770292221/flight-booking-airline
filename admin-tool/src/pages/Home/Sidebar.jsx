@@ -21,12 +21,12 @@ function Sidebar() {
     operation: true,
   });
 
-  const navigate = useNavigate(); // ✅ ย้ายออกมา
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       await logout();
       localStorage.removeItem("token");
-      navigate("/"); // กลับหน้า login
+      navigate("/"); // ไปที่หน้า login
     } catch (err) {
       console.error("Logout failed", err);
     }
@@ -109,11 +109,9 @@ function Sidebar() {
         )}
 
         <li>
-          <li>
-            <button onClick={handleLogout} className="logout-button">
-              <FaPowerOff /> {!collapsed && "Logout"}
-            </button>
-          </li>
+          <button onClick={handleLogout} className="logout-button">
+            <FaPowerOff /> {!collapsed && "Logout"}
+          </button>
         </li>
       </ul>
     </div>
