@@ -1,8 +1,8 @@
 import axios from "axios";
-
+import config from "../../../config";
 
 const aircraftAPI = axios.create({
-    baseURL: "http://localhost:3001/api/v1/aircraft-core-api",
+    baseURL: `${config.BASE_URL}/aircraft-core-api`,
 });
 
 aircraftAPI.interceptors.request.use((config) => {

@@ -186,3 +186,97 @@
   display: inline-block;
   color: white; /* White text color for contrast */
 }
+
+/* Status Filter */
+.status-filter {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.status-filter label {
+  font-weight: 600;
+}
+
+.status-filter select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.status-filter select:focus {
+  outline: none;
+  border-color: #22c55e; /* Green color on focus */
+}
+
+/* Add hover effect */
+.status-filter select:hover {
+  border-color: #16a34a;
+} /* Status Colors */
+.status-pending {
+  background-color: #ffbb33; /* Yellow for PENDING */
+  color: rgb(217, 169, 9);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-cancelled {
+  background-color: #ef4444; /* Red for CANCELLED */
+  color: rgb(232, 6, 6);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-paid {
+  background-color: #22c55e; /* Green for PAID */
+  color: rgb(11, 113, 26);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-failed_paid {
+  background-color: #f97316; /* Orange for FAILED_PAID */
+  color: rgb(232, 6, 6);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-ticketing {
+  background-color: #3b82f6; /* Blue for TICKETING */
+  color: rgb(217, 169, 9);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-issued {
+  background-color: #4ade80; /* Light green for ISSUED */
+  color: rgb(11, 113, 26);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-failed_issue {
+  background-color: #9ca3af; /* Gray for FAILED_ISSUE */
+  color: rgb(232, 6, 6);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

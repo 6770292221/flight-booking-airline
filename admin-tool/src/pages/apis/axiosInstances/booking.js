@@ -1,7 +1,8 @@
 import axios from "axios";
+import config from "../../../config";
 
 const bookingAPI = axios.create({
-    baseURL: "http://localhost:3001/api/v1/booking-core-api",
+    baseURL: `${config.BASE_URL}/booking-core-api`,
 });
 
 bookingAPI.interceptors.request.use((config) => {

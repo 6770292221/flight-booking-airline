@@ -1,7 +1,9 @@
 import axios from "axios";
+import config from "../../../config";
+
 
 const cabinAPI = axios.create({
-    baseURL: "http://localhost:3001/api/v1/cabin-core-api",
+    baseURL: `${config.BASE_URL}/cabin-core-api`,
 });
 
 cabinAPI.interceptors.request.use((config) => {

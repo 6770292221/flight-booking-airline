@@ -1,8 +1,9 @@
 import axios from "axios";
+import config from "../../../config";
 
 
 const airlineAPI = axios.create({
-    baseURL: "http://localhost:3001/api/v1/airline-core-api",
+    baseURL: `${config.BASE_URL}/airline-core-api`,
 });
 
 airlineAPI.interceptors.request.use((config) => {

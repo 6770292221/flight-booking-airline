@@ -11,7 +11,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import "./Sidebar.css";
-import { MdAirlineSeatReclineExtra } from "react-icons/md";
+import { MdAirlineSeatReclineExtra, MdOutlinePayment } from "react-icons/md";
 import { logout } from "../apis/auth";
 
 function Sidebar() {
@@ -98,6 +98,11 @@ function Sidebar() {
             <li>
               <Link to="/bookings">
                 <FaTicketAlt /> {!collapsed && "Booking"}
+              </Link>
+            </li>
+            <li>
+              <Link to="/payments">
+                <MdOutlinePayment /> {!collapsed && "Payment"}
               </Link>
             </li>
           </>

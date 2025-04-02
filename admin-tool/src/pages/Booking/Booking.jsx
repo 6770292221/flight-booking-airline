@@ -9,6 +9,7 @@ function Bookings() {
   const [bookingList, setBookingList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBookings, setExpandedBookings] = useState({});
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   useEffect(() => {
     fetchBookings();
@@ -30,12 +31,39 @@ function Bookings() {
     }));
   };
 
+  // Search and filter function
   const filteredBookings = bookingList.filter((item) => {
-    return (
+    const matchesSearchQuery =
       item.bookingNubmer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.status.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+      item.status.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatusFilter =
+      selectedStatus === "" || item.status === selectedStatus;
+
+    return matchesSearchQuery && matchesStatusFilter;
   });
+
+  // Function to get the status class based on the status value
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "status-pending";
+      case "CANCELLED":
+        return "status-cancelled";
+      case "PAID":
+        return "status-paid";
+      case "FAILED_PAID":
+        return "status-failed_paid";
+      case "TICKETING":
+        return "status-ticketing";
+      case "ISSUED":
+        return "status-issued";
+      case "FAILED_ISSUE":
+        return "status-failed_issue";
+      default:
+        return "";
+    }
+  };
 
   return (
     <div className="home-wrapper">
@@ -51,6 +79,25 @@ function Bookings() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+
+        {/* Status Filter Dropdown */}
+        <div className="status-filter">
+          <label htmlFor="status">Filter by Status: </label>
+          <select
+            id="status"
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="PENDING">PENDING</option>
+            <option value="CANCELLED">CANCELLED</option>
+            <option value="PAID">PAID</option>
+            <option value="FAILED_PAID">FAILED_PAID</option>
+            <option value="TICKETING">TICKETING</option>
+            <option value="ISSUED">ISSUED</option>
+            <option value="FAILED_ISSUE">FAILED_ISSUE</option>
+          </select>
         </div>
 
         <table className="booking-table">
@@ -94,7 +141,7 @@ function Bookings() {
                       </div>
                     ))}
                   </td>
-                  <td>{item.status}</td>
+                  <td className={getStatusClass(item.status)}>{item.status}</td>
                   <td>{new Date(item.createdAt).toLocaleString()}</td>
                   <td>{new Date(item.updatedAt).toLocaleString()}</td>
                   <td>
