@@ -117,6 +117,13 @@ export const Codes = Object.freeze({
   PMT_1009: "PMT_1009",
   PMT_1010: "PMT_1010",
   PMT_1011: "PMT_1011",
+  PMT_1012: "PMT_1012",
+  PMT_1013: "PMT_1013",
+  PMT_1014: "PMT_1014",
+  PMT_1015: "PMT_1015",
+  PMT_1016: "PMT_1016",
+
+  
 
   //General
   GNR_1001: "GNR_1001",
@@ -258,6 +265,11 @@ export const Messages = Object.freeze({
   PMT_1009: "Failed to update booking status",
   PMT_1010: "Bank payment is not success",
   PMT_1011: "Bank name, Account number, Transaction reference and Transfer datetime are required",
+  PMT_1012: "Payment not found",
+  PMT_1013: "Payment fetched successfully",
+  PMT_1014: "Page and limit must be positive number",
+  PMT_1015: "Invalid filter",
+  PMT_1016: "User must be the owner of the payment",
 
   // Logout Messages
   LOT_5001: "Logout successful",
