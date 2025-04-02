@@ -562,9 +562,49 @@ export async function cancelMyBooking(req, res) {
     });
   }
 }
+function _delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function _sendTicketRequest(flight, passengers, bookingNubmer) {
+  const { airline } = flight;
+  console.log(`❤️ bookingNubmer started: ${bookingNubmer}`)
+  if (airline === "VZ") {
+    console.log('delay VZ 10 seconds')
+    await _delay(10000);
+  } else if (airline === "FD") {
+    console.log('delay FD 20 seconds')
+    await _delay(20000);
+  } else if (airline === "SL") {
+    console.log('delay SK 30 seconds')
+    await _delay(30000);
+  }else if (airline === "TG") {
+    console.log('delay TG 40 seconds')
+    await _delay(40000);
+  }
+
+  const response = await axios.post(
+    "http://localhost:3001/api/v1/airline-core-api/airlines/ticketing",
+    {
+      airlineId: airline,
+      passengers: passengers,
+      flight: flight,
+      bookingNubmer: bookingNubmer
+    }
+  );
+  console.log(`❤️ airline finished: ${airline}`)
+
+  return {
+    airline,
+    flight,
+    response
+  };
+}
+
 export async function requestTicketIssued(req, res) {
   try {
     const { id } = req.params;
+    const { passengers } = req.body;
     const booking = await BookingMongooseModel.findOne({ bookingNubmer: id });
 
     if (!booking) {
@@ -583,64 +623,54 @@ export async function requestTicketIssued(req, res) {
       });
     }
 
-    for (const flight of booking.flights) {
-      try {
-        const response = await axios.post(
-          "http://localhost:3001/api/v1/airline-core-api/airlines/ticketing",
-          {
-            airlineId: flight.airline,
-            bookingId: booking.bookingNubmer,
-          }
-        );
+    const allRequests = booking.flights.map(async (flight) =>  {
+      const result = await _sendTicketRequest(flight, passengers, booking.bookingNubmer)
+      return result
+    }
+    );
 
-        const isSuccess = response.status === 200;
+    let firstFinished;
+    try {
+      firstFinished = await Promise.any(allRequests);
+    } catch (err) {
+      console.error("❌ All requests failed:", err);
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.TKT_1006,
+        message: "All airline ticketing requests failed."
+      });
+    }
+    const isSuccess = firstFinished.response.status === 200;
+    booking.status = "TICKETING"
+    await booking.save()
+    console.log(`status >>>> ${booking.status}`)
 
-        booking.events.push({
-          type: "TICKETING",
-          status: isSuccess ? "PENDING" : "FAILED",
-          source: "SYSTEM",
-          message: "Ticketing Requested",
-          payload: {
-            flightNumber: flight.flightNumber,
-            direction: flight.direction,
-            message: JSON.stringify(response.data),
-          },
-        });
+    booking.events.push({
+      type: "TICKETING",
+      status: isSuccess ? "PENDING" : "FAILED",
+      source: "SYSTEM",
+      message: isSuccess ? "Ticketing Requested" : "Ticketing Failed",
+      payload: {
+        flightNumber: firstFinished.flight.flightNumber,
+        direction: firstFinished.flight.direction,
+        message: JSON.stringify(firstFinished.response.data)
+      },
+    });
 
-        if (!isSuccess) {
-          await booking.save();
-          return res.status(StatusCodes.BAD_REQUEST).json({
-            status: StatusMessages.FAILED,
-            code: Codes.TKT_1004,
-            message: Messages.TKT_1004,
-          });
-        }
-      } catch (error) {
-        // Handle internal error (e.g. network or unexpected error)
-        booking.events.push({
-          type: "TICKETING",
-          status: "FAILED",
-          source: "SYSTEM",
-          message: "Ticketing Request Failed",
-          payload: {
-            flightNumber: flight.flightNumber,
-            direction: flight.direction,
-            message: error.message,
-          },
-        });
-
-        await booking.save();
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          status: StatusMessages.FAILED,
-          code: Codes.TKT_1005,
-          message: "Ticketing request failed due to internal error",
-        });
-      }
+    if (!isSuccess) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.TKT_1004,
+        message: Messages.TKT_1004,
+      });
     }
 
-    booking.status = "TICKETING";
-    await booking.save();
+    await Promise.allSettled(allRequests).then(results => {
+      console.log("All requests finished:", results.length);
+    });
 
+
+    console.log('return response to user')
     return res.status(StatusCodes.ACCEPTED).json({
       status: StatusMessages.ACCEPTED,
       code: Codes.TKT_1003,
@@ -648,11 +678,12 @@ export async function requestTicketIssued(req, res) {
       data: booking,
     });
   } catch (err) {
-    console.error(err);
+    console.log(err.message)
     return res.status(StatusCodes.SERVER_ERROR).json({
-      status: "failed",
-      code: "PAY_5000",
-      message: "Internal Server Error",
+      status: StatusMessages.FAILED,
+      code: Codes.GNR_1001,
+      message: StatusMessages.SERVER_ERROR,
     });
   }
 }
+

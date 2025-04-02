@@ -12,6 +12,7 @@ import {
   sendPaymentFailedEmail,
   sendRefundsTemplate,
 } from "../email/emailService.js";
+import axios from "axios";
 
 export async function initiatePayment(req, res) {
   try {
@@ -219,13 +220,19 @@ export async function webhookHandler(req, res) {
         paidAt: paidAt,
       },
     ];
-    eventData.sendEmail({
-      bookingResponse: booking,
-      reqUser: user,
-      refundTxnId: payment.paymentRef,
-      refundAmount: payment.refund.refundAmount,
-      reason:   "Ticket issuance failed.",
-    });
+
+    // //! หน้าทำ state design pattern
+    // await eventData.sendEmail({
+    //   bookingResponse: booking,
+    //   reqUser: user,
+    //   refundTxnId: payment.paymentRef,
+    //   refundAmount: payment.refund.refundAmount,
+    //   reason:   "Ticket issuance failed.",
+    // });
+
+    await axios.post(`http://localhost:3001/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
+      passengers: booking.passengers
+    })
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
@@ -234,7 +241,7 @@ export async function webhookHandler(req, res) {
       data: {},
     })
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: "failed",
       code: "PAY_5000",

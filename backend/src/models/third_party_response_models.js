@@ -8,100 +8,123 @@ export class TicketStrategy {
   }
 }
 
-export class NokAirStrategy extends TicketStrategy {
-  mapRequest(flight, passengers) {
-    return {
-      status: "SUCCESS",
-      message: "Nok Air ticket issued successfully.",
-      data: {
-        passengerInfo: passengers.map((p) => ({
-          name: {
-            first: p.firstName,
-            last: p.lastName,
-            passportNumber: p.passportNumber,
-          },
-          seatAssignment:
-            p.addons.find((a) => a.flightNumber === flight.flightNumber)
-              ?.seat ?? "",
-          mealOption:
-            p.addons.find((a) => a.flightNumber === flight.flightNumber)
-              ?.meal ?? "",
-          airline: flight.airlineName,
-          airlineCode: flight.airline,
-          flightNumber: flight.flightNumber,
-          ticketNo: `${flight.airline}${generateRandom9DigitNumber()}`,
-        })),
-        ticketIssuedAt: new Date(),
-      },
-    };
-  }
+// export class NokAirStrategy extends TicketStrategy {
+//   mapRequest(flight, passengers, bookingNubmer) {
+//     return {
+//       status: "SUCCESS",
+//       message: "Nok Air ticket issued successfully.",
+//       data: {
+//         passengerInfo: passengers.map((p) => ({
+//           name: {
+//             first: p.firstName,
+//             last: p.lastName,
+//             passportNumber: p.passportNumber,
+//           },
+//           seatAssignment:
+//             p.addons.find((a) => a.flightNumber === flight.flightNumber)
+//               ?.seat ?? "",
+//           mealOption:
+//             p.addons.find((a) => a.flightNumber === flight.flightNumber)
+//               ?.meal ?? "",
+//           airline: flight.airlineName,
+//           airlineCode: flight.airline,
+//           flightNumber: flight.flightNumber,
+//           ticketNo: `${flight.airline}${generateRandom9DigitNumber()}`,
+//         })),
+//         ticketIssuedAt: new Date(),
+//       },
+//     };
+//   }
 
-  issue(flight, passengers) {
-    const safePassengers = Array.isArray(passengers)
-      ? passengers
-      : [passengers];
-    return this.mapRequest(flight, safePassengers);
-  }
-}
+//   issue(flight, passengers, bookingNubmer) {
+//     const safePassengers = Array.isArray(passengers)
+//       ? passengers
+//       : [passengers];
+//     return this.mapRequest(flight, safePassengers, bookingNubmer);
+//   }
+// }
 
-export class ThaiLionStrategy extends TicketStrategy {
-  mapRequest(flight, passengers) {
-    return {
-      status: "SUCCESS",
-      message: "Thai Lion Air booking confirmed.",
-      data: {
-        traveler: passengers.map((p) => ({
-          name: {
-            first: p.firstName,
-            last: p.lastName,
-            passportNumber: p.passportNumber,
-          },
-          seatAssignment: p.seat ?? "",
-          mealOption: p.meal ?? "",
-          carrier: flight.airlineName,
-          carrierCode: flight.airline,
-          flightId: flight.flightNumber,
-          eTicketNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
-        })),
+// export class ThaiLionStrategy extends TicketStrategy {
+//   mapRequest(flight, passengers, bookingNubmer) {
+//     return {
+//       status: "SUCCESS",
+//       message: "Thai Lion Air booking confirmed.",
+//       data: {
+//         traveler: passengers.map((p) => ({
+//           name: {
+//             first: p.firstName,
+//             last: p.lastName,
+//             passportNumber: p.passportNumber,
+//           },
+//           seatAssignment: p.seat ?? "",
+//           mealOption: p.meal ?? "",
+//           carrier: flight.airlineName,
+//           carrierCode: flight.airline,
+//           flightId: flight.flightNumber,
+//           eTicketNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+//         })),
 
-        issuedOn: new Date(),
-      },
-      data: {
-        guests: passengers.map((p) => ({
-          name: {
-            first: p.firstName,
-            last: p.lastName,
-            passportNumber: p.passportNumber,
-          },
-          seatAssignment:
-            p.addons.find((a) => a.flightNumber === flight.flightNumber)
-              ?.seat ?? "",
-          mealOption:
-            p.addons.find((a) => a.flightNumber === flight.flightNumber)
-              ?.meal ?? "",
-          referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
-          provider: flight.airlineName,
-          providerCode: flight.airline,
-          flightCode: flight.flightNumber,
-        })),
-        bookingDate: new Date(),
-      },
-    };
-  }
+//         issuedOn: new Date(),
+//       },
+//       data: {
+//         guests: passengers.map((p) => ({
+//           name: {
+//             first: p.firstName,
+//             last: p.lastName,
+//             passportNumber: p.passportNumber,
+//           },
+//           seatAssignment:
+//             p.addons.find((a) => a.flightNumber === flight.flightNumber)
+//               ?.seat ?? "",
+//           mealOption:
+//             p.addons.find((a) => a.flightNumber === flight.flightNumber)
+//               ?.meal ?? "",
+//           referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+//           provider: flight.airlineName,
+//           providerCode: flight.airline,
+//           flightCode: flight.flightNumber,
+//         })),
+//         bookingDate: new Date(),
+//       },
+//     };
+//   }
 
-  issue(flight, passengers) {
-    const safePassengers = Array.isArray(passengers)
-      ? passengers
-      : [passengers];
-    return this.mapRequest(flight, safePassengers);
-  }
-}
+//   issue(flight, passengers, bookingNubmer) {
+//     const safePassengers = Array.isArray(passengers)
+//       ? passengers
+//       : [passengers];
+//     return this.mapRequest(flight, safePassengers, bookingNubmer);
+//   }
+// }
+
+// export class VietJetStrategy extends TicketStrategy {
+//   mapRequest(flight, passengers, bookingNubmer) {
+//     return {
+//       status: "SUCCESS",
+//       message: `Ticket issued successfully for ${flight.airline}.`,
+//       data: {
+//         flight,
+//         passengers: passengers.map((p) => ({
+//           ...p,
+//           referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+//         })),
+//       },
+//     };
+//   }
+
+//   issue(flight, passengers, bookingNubmer) {
+//     const safePassengers = Array.isArray(passengers)
+//       ? passengers
+//       : [passengers];
+//     return this.mapRequest(flight, safePassengers, bookingNubmer);
+//   }
+// }
 
 export class AirAsiaStrategy extends TicketStrategy {
-  mapRequest(flight, passengers) {
+  mapRequest(flight, passengers, bookingNubmer) {
     return {
-      status: "SUCCESS",
-      message: "Flight booking successful with Thai AirAsia.",
+      bookingNubmer: bookingNubmer,
+      ticketStatus: "SUCCESS",
       data: {
         guests: passengers.map((p) => ({
           name: {
@@ -125,35 +148,123 @@ export class AirAsiaStrategy extends TicketStrategy {
     };
   }
 
-  issue(flight, passengers) {
+  issue(flight, passengers, bookingNubmer) {
     const safePassengers = Array.isArray(passengers)
       ? passengers
       : [passengers];
 
-    return this.mapRequest(flight, safePassengers);
+    return this.mapRequest(flight, safePassengers, bookingNubmer);
   }
 }
 
 export class VietJetStrategy extends TicketStrategy {
-  mapRequest(flight, passengers) {
+  mapRequest(flight, passengers, bookingNubmer) {
     return {
-      status: "SUCCESS",
-      message: `Ticket issued successfully for ${flight.airline}.`,
+      bookingNubmer: bookingNubmer,
+      ticketStatus: "SUCCESS",
       data: {
-        flight,
-        passengers: passengers.map((p) => ({
-          ...p,
+        guests: passengers.map((p) => ({
+          name: {
+            first: p.firstName,
+            last: p.lastName,
+            passportNumber: p.passportNumber,
+          },
+          seatAssignment:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.seat ?? "",
+          mealOption:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.meal ?? "",
           referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+          provider: flight.airlineName,
+          providerCode: flight.airline,
+          flightCode: flight.flightNumber,
         })),
+        bookingDate: new Date(),
       },
     };
   }
 
-  issue(flight, passengers) {
+  issue(flight, passengers, bookingNubmer) {
     const safePassengers = Array.isArray(passengers)
       ? passengers
       : [passengers];
-    return this.mapRequest(flight, safePassengers);
+
+    return this.mapRequest(flight, safePassengers, bookingNubmer);
+  }
+}
+
+export class NokAirStrategy extends TicketStrategy {
+  mapRequest(flight, passengers, bookingNubmer) {
+    return {
+      bookingNubmer: bookingNubmer,
+      ticketStatus: "SUCCESS",
+      data: {
+        guests: passengers.map((p) => ({
+          name: {
+            first: p.firstName,
+            last: p.lastName,
+            passportNumber: p.passportNumber,
+          },
+          seatAssignment:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.seat ?? "",
+          mealOption:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.meal ?? "",
+          referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+          provider: flight.airlineName,
+          providerCode: flight.airline,
+          flightCode: flight.flightNumber,
+        })),
+        bookingDate: new Date(),
+      },
+    };
+  }
+
+  issue(flight, passengers, bookingNubmer) {
+    const safePassengers = Array.isArray(passengers)
+      ? passengers
+      : [passengers];
+
+    return this.mapRequest(flight, safePassengers, bookingNubmer);
+  }
+}
+
+export class ThaiLionStrategy extends TicketStrategy {
+  mapRequest(flight, passengers, bookingNubmer) {
+    return {
+      bookingNubmer: bookingNubmer,
+      ticketStatus: "SUCCESS",
+      data: {
+        guests: passengers.map((p) => ({
+          name: {
+            first: p.firstName,
+            last: p.lastName,
+            passportNumber: p.passportNumber,
+          },
+          seatAssignment:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.seat ?? "",
+          mealOption:
+            p.addons.find((a) => a.flightNumber === flight.flightNumber)
+              ?.meal ?? "",
+          referenceNumber: `${flight.airline}${generateRandom9DigitNumber()}`,
+          provider: flight.airlineName,
+          providerCode: flight.airline,
+          flightCode: flight.flightNumber,
+        })),
+        bookingDate: new Date(),
+      },
+    };
+  }
+
+  issue(flight, passengers, bookingNubmer) {
+    const safePassengers = Array.isArray(passengers)
+      ? passengers
+      : [passengers];
+
+    return this.mapRequest(flight, safePassengers, bookingNubmer);
   }
 }
 

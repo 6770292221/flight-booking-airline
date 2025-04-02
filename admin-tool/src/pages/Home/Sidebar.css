@@ -1,0 +1,99 @@
+.sidebar {
+  background-color: #1f2937;
+  color: #cbd5e1;
+  width: 300px;
+  height: 100vh;
+  padding: 24px 32px;
+  transition: width 0.3s ease; 
+  overflow: auto;
+}
+
+.sidebar.collapsed {
+  width: 80px; 
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.sidebar-header h3 {
+  font-size: 24px; 
+  color: white;
+  margin-left: 16px;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 16px;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 20px; 
+  padding: 12px 18px;
+  font-size: 18px; 
+  text-decoration: none;
+  color: #cbd5e1;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar a:hover {
+  background-color: #334155;
+  color: white;
+}
+
+.submenu-toggle {
+  cursor: pointer;
+  font-size: 18px; 
+  font-weight: bold;
+  color: #94a3b8;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+}
+.logout-button {
+  background: none;
+  border: none; 
+  color: #cbd5e1; 
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px; 
+  padding: 12px 20px; 
+  text-decoration: none;
+  border-radius: 8px; 
+  font-size: 16px; 
+  transition: all 0.3s ease; 
+  width: 100%;
+}
+
+.logout-button:hover {
+  background-color: #334155;
+  color: white; 
+  transform: scale(1.05); 
+}
+
+.logout-button svg {
+  font-size: 20px; 
+  flex-shrink: 0;
+}

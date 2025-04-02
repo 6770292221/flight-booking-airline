@@ -25,7 +25,7 @@ routerBooking.get("/my/booking", verifyToken, getMyBookings);
 routerBooking.get("/admin/booking", verifyAdmin, getAllBookingsByAdmin);
 routerBooking.patch('/bookings/cancel-expired', cancelExpiredBookings);
 routerBooking.patch('/booking/:_id/cancel', verifyToken, cancelMyBooking);
-routerBooking.get('/bookings/:id/request-ticket-issued', requestTicketIssued);
+routerBooking.post('/bookings/:id/request-ticket-issued', requestTicketIssued);
 
 
 

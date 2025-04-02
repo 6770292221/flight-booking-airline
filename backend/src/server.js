@@ -42,9 +42,9 @@ app.listen(port, () => {
   logger.info(`server started on port ${port}`);
 });
 
-cron.schedule("*/1 * * * *", async () => {
-  console.log(`[Scheduler] Calling cancelBooking API...`);
-  await cancelBooking();
-});
+// cron.schedule("*/1 * * * *", async () => {
+//   console.log(`[Scheduler] Calling cancelBooking API...`);
+//   await cancelBooking();
+// });
 
 export default app;

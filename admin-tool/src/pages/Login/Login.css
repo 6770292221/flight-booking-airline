@@ -1,0 +1,129 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg, #e0f7ff 0%, #f8fbff 100%);
+  overflow: hidden; 
+}
+
+/* Container ที่อยู่กลางหน้าจอ */
+.login-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box; /* ป้องกันไม่ให้ padding ไปเพิ่มขนาด container */
+}
+
+/* กล่อง Login */
+.login-box {
+  background-color: #ffffff;
+  padding: 60px 50px; 
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ปรับขนาดของ Title */
+.login-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 30px;
+}
+
+/* ปรับช่องกรอกข้อมูล */
+.login-input {
+  width: 100%; 
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  font-size: 18px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  transition: all 0.3s ease-in-out;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+/* ปรับฟอนต์และสไตล์ให้สวยขึ้น */
+.login-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+}
+
+/* ปรับปุ่ม Login */
+.login-button {
+  width: 100%; 
+  padding: 18px;
+  background-color: #10b981;
+  color: #ffffff;
+  font-size: 20px; 
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: #059669;
+}
+
+/* ปรับ error message */
+.login-error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: -12px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 4px solid #fff;
+  border-top: 4px solid #22c55e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* สำหรับหน้าจอใหญ่ขึ้น เช่น Mac */
+@media (min-width: 1200px) {
+  .login-container {
+    padding: 0 100px; 
+  }
+
+  .login-box {
+    padding: 60px 50px;
+    max-width: 600px;
+  }
+
+  .login-title {
+    font-size: 40px;
+  }
+
+  .login-input {
+    font-size: 20px;
+  }
+
+  .login-button {
+    font-size: 20px;
+  }
+}

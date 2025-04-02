@@ -214,10 +214,10 @@ export async function deleteAirline(req, res) {
 
 export async function issueTicketing(req, res) {
   try {
-    const { airlineId, passengers, flight } = req.body;
+    const { airlineId, passengers, flight, bookingNubmer } = req.body;
     const strategy = getStrategy(airlineId);
-    const response = strategy.issue(flight, passengers )
-    console.log(response.data)
+    const response = strategy.issue(flight, passengers , bookingNubmer)
+    // console.log(response.data)
     return res.status(StatusCodes.OK).json({
       response
     })
