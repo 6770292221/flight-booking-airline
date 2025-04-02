@@ -9,13 +9,13 @@ import {
 } from "../../apis/airline";
 import "./Airline.css";
 import { showErrorPopup } from "../components/ErrorPopup";
-import ConfirmationPopup from "../components/ConfirmationPopup"; // Import the ConfirmationPopup
+import ConfirmationPopup from "../components/ConfirmationPopup"; 
 
 function Airline() {
   const [airlineList, setAirlineList] = useState([]);
   const [editingAirline, setEditingAirline] = useState(null);
-  const [showDeletePopup, setShowDeletePopup] = useState(false); // State for controlling the delete popup visibility
-  const [airlineToDelete, setAirlineToDelete] = useState(null); // Store the airline to be deleted
+  const [showDeletePopup, setShowDeletePopup] = useState(false); 
+  const [airlineToDelete, setAirlineToDelete] = useState(null); 
 
   useEffect(() => {
     fetchAirlines();

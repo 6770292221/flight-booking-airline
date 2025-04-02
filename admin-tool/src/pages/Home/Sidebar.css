@@ -1,20 +1,17 @@
-/* Sidebar */
 .sidebar {
   background-color: #1f2937;
   color: #cbd5e1;
-  width: 300px; /* เพิ่มความกว้าง */
+  width: 300px;
   height: 100vh;
-  padding: 24px 32px; /* เพิ่ม padding ให้ดูห่างขึ้น */
-  transition: width 0.3s ease; /* ปรับเวลาในการยุบ */
+  padding: 24px 32px;
+  transition: width 0.3s ease; 
   overflow: auto;
 }
 
-/* สำหรับยุบแถบซ้าย */
 .sidebar.collapsed {
-  width: 80px; /* เมื่อยุบแถบจะเหลือแค่ 80px */
+  width: 80px; 
 }
 
-/* เพิ่มห่างระหว่างเมนู */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -23,52 +20,48 @@
 }
 
 .sidebar-header h3 {
-  font-size: 24px; /* เพิ่มขนาดฟอนต์ */
+  font-size: 24px; 
   color: white;
   margin-left: 16px;
 }
 
-/* ปุ่มเมนู Toggle */
 .menu-toggle {
   background: none;
   border: none;
   color: white;
-  font-size: 24px; /* เพิ่มขนาดไอคอน */
+  font-size: 24px;
   cursor: pointer;
 }
 
-/* ปรับปรุงลิสต์ของเมนู */
 .sidebar ul {
   list-style: none;
   padding: 0;
 }
 
 .sidebar li {
-  margin-bottom: 16px; /* เพิ่มระยะห่าง */
+  margin-bottom: 16px;
 }
 
 .sidebar a {
   display: flex;
   align-items: center;
-  gap: 20px; /* เพิ่มระยะห่างระหว่างไอคอนกับข้อความ */
+  gap: 20px; 
   padding: 12px 18px;
-  font-size: 18px; /* เพิ่มขนาดฟอนต์ */
+  font-size: 18px; 
   text-decoration: none;
   color: #cbd5e1;
   border-radius: 10px;
   transition: background-color 0.3s ease;
 }
 
-/* เพิ่มการเปลี่ยนสีเมื่อ hover */
 .sidebar a:hover {
   background-color: #334155;
   color: white;
 }
 
-/* ปรับปรุงการแสดง submenu */
 .submenu-toggle {
   cursor: pointer;
-  font-size: 18px; /* ขนาดฟอนต์ใหญ่ขึ้น */
+  font-size: 18px; 
   font-weight: bold;
   color: #94a3b8;
   margin: 16px 0;
@@ -77,33 +70,30 @@
   justify-content: space-between;
   padding: 10px 16px;
 }
-/* ปรับปรุงปุ่ม Logout */
 .logout-button {
-  background: none; /* ไม่มีสีพื้นหลัง */
-  border: none; /* ไม่มีขอบ */
-  color: #cbd5e1; /* ข้อความสีอ่อนให้เข้ากับเมนู */
+  background: none;
+  border: none; 
+  color: #cbd5e1; 
   font: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 16px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
-  padding: 12px 20px; /* เพิ่มขนาดของปุ่ม */
+  gap: 16px; 
+  padding: 12px 20px; 
   text-decoration: none;
-  border-radius: 8px; /* มุมโค้ง */
-  font-size: 16px; /* ขนาดฟอนต์ใหญ่ขึ้น */
-  transition: all 0.3s ease; /* เอฟเฟกต์การเปลี่ยนแปลง */
-  width: 100%; /* ให้ปุ่มกว้างเต็มขนาด */
+  border-radius: 8px; 
+  font-size: 16px; 
+  transition: all 0.3s ease; 
+  width: 100%;
 }
 
-/* เปลี่ยนสีเมื่อ hover */
 .logout-button:hover {
-  background-color: #334155; /* สีพื้นหลังเมื่อ hover เข้ากับสีเมนู */
-  color: white; /* ข้อความเป็นสีขาวเมื่อ hover */
-  transform: scale(1.05); /* เพิ่มขนาดปุ่มเล็กน้อยเมื่อ hover */
+  background-color: #334155;
+  color: white; 
+  transform: scale(1.05); 
 }
 
-/* ไอคอนในปุ่ม */
 .logout-button svg {
-  font-size: 20px; /* ขนาดของไอคอน */
+  font-size: 20px; 
   flex-shrink: 0;
 }

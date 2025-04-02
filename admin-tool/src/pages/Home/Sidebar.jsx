@@ -26,7 +26,7 @@ function Sidebar() {
     try {
       await logout();
       localStorage.removeItem("token");
-      navigate("/"); // ไปที่หน้า login
+      navigate("/"); 
     } catch (err) {
       console.error("Logout failed", err);
     }

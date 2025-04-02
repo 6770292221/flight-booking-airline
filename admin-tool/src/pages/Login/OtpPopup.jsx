@@ -3,48 +3,47 @@ import "./OtpPopup.css";
 
 function OtpPopup({ onClose, onVerify, user }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [isLoading, setIsLoading] = useState(false); // สถานะสำหรับ loading
-  const [error, setError] = useState(""); // สำหรับข้อความแสดงข้อผิดพลาด
+  const [isLoading, setIsLoading] = useState(false); 
+  const [error, setError] = useState(""); 
 
   const handleChange = (e, index) => {
     const value = e.target.value;
-    if (/[^0-9]/.test(value)) return; // ห้ามกรอกเป็นตัวอักษร
+    if (/[^0-9]/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
     if (value && index < 5) {
-      document.getElementById(`otp-input-${index + 1}`).focus(); // ไปช่องถัดไป
+      document.getElementById(`otp-input-${index + 1}`).focus(); 
     }
   };
 
-  // ฟังก์ชันเพื่อรองรับการวาง (paste) ของ OTP ทั้งหมดในครั้งเดียว
   const handlePaste = (e) => {
-    const pastedValue = e.clipboardData.getData("text").slice(0, 6); // ได้ข้อมูลที่วางลงมาจาก clipboard และจำกัดเป็น 6 ตัว
+    const pastedValue = e.clipboardData.getData("text").slice(0, 6); 
     const newOtp = [...otp];
     for (let i = 0; i < pastedValue.length; i++) {
-      newOtp[i] = pastedValue[i]; // กรอกแต่ละตัวลงในช่อง
+      newOtp[i] = pastedValue[i]; 
     }
     setOtp(newOtp);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // ตั้งค่าให้เริ่ม loading
-    setError(""); // รีเซ็ตข้อความผิดพลาดเมื่อเริ่มส่งข้อมูล
+    setIsLoading(true); 
+    setError(""); 
     try {
-      const otpCode = otp.join(""); // รวม OTP เป็นรหัสเดียว
-      const isValid = await onVerify(user.userId, otpCode); // ตรวจสอบ OTP ที่กรอก
+      const otpCode = otp.join("");
+      const isValid = await onVerify(user.userId, otpCode); 
       if (!isValid) {
-        setError("Invalid OTP! Please try again."); // ถ้า OTP ผิดให้แสดงข้อความผิดพลาด
-        setOtp(["", "", "", "", "", ""]); // รีเซ็ตช่อง OTP
+        setError("Invalid OTP! Please try again."); 
+        setOtp(["", "", "", "", "", ""]); 
       }
     } catch (error) {
       console.error("Error during OTP verification:", error);
-      setError("Something went wrong. Please try again."); // กรณีเกิดข้อผิดพลาดจากเซิร์ฟเวอร์
+      setError("Something went wrong. Please try again."); 
     } finally {
-      setIsLoading(false); // หยุด loading เมื่อเสร็จสิ้น
+      setIsLoading(false); 
     }
   };
 
@@ -64,9 +63,9 @@ function OtpPopup({ onClose, onVerify, user }) {
                 value={digit}
                 maxLength={1}
                 onChange={(e) => handleChange(e, index)}
-                onPaste={handlePaste} // เพิ่มการรองรับการวางข้อมูล
+                onPaste={handlePaste} 
                 className="otp-input"
-                autoFocus={index === 0} // ให้ช่องแรกมีการ focus โดยอัตโนมัติ
+                autoFocus={index === 0} 
               />
             ))}
           </div>
@@ -75,7 +74,7 @@ function OtpPopup({ onClose, onVerify, user }) {
               {" "}
               {/* ปิดปุ่มขณะกำลังโหลด */}
               {isLoading ? (
-                <div className="spinner"></div> // แสดง spinner ที่ปุ่ม
+                <div className="spinner"></div> 
               ) : (
                 "Verify"
               )}

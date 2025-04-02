@@ -1,4 +1,3 @@
-/* ปรับค่าให้ไม่สามารถเลื่อนได้ */
 body,
 html {
   margin: 0;
@@ -6,7 +5,7 @@ html {
   height: 100%;
   font-family: "Inter", sans-serif;
   background: linear-gradient(135deg, #e0f7ff 0%, #f8fbff 100%);
-  overflow: hidden; /* ป้องกันไม่ให้หน้าเลื่อนได้ */
+  overflow: hidden; 
 }
 
 /* Container ที่อยู่กลางหน้าจอ */
@@ -23,11 +22,11 @@ html {
 /* กล่อง Login */
 .login-box {
   background-color: #ffffff;
-  padding: 60px 50px; /* ปรับขนาด padding */
+  padding: 60px 50px; 
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
   width: 100%;
-  max-width: 600px; /* ขนาด box จำกัดที่ 600px */
+  max-width: 600px;
   text-align: center;
   box-sizing: border-box;
 }
@@ -42,7 +41,7 @@ html {
 
 /* ปรับช่องกรอกข้อมูล */
 .login-input {
-  width: 100%; /* ขยายกล่องให้เต็ม */
+  width: 100%; 
   padding: 18px 20px;
   margin-bottom: 22px;
   font-size: 18px;
@@ -64,11 +63,11 @@ html {
 
 /* ปรับปุ่ม Login */
 .login-button {
-  width: 100%; /* ให้ปุ่มเต็มกว้าง */
+  width: 100%; 
   padding: 18px;
   background-color: #10b981;
   color: #ffffff;
-  font-size: 20px; /* ขนาดฟอนต์ใหญ่ขึ้น */
+  font-size: 20px; 
   font-weight: 600;
   border: none;
   border-radius: 12px;
@@ -108,7 +107,7 @@ html {
 /* สำหรับหน้าจอใหญ่ขึ้น เช่น Mac */
 @media (min-width: 1200px) {
   .login-container {
-    padding: 0 100px; /* เพิ่ม padding ให้กว้างขึ้นสำหรับหน้าจอขนาดใหญ่ */
+    padding: 0 100px; 
   }
 
   .login-box {
