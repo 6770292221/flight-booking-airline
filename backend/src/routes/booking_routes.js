@@ -9,7 +9,6 @@ import {
     getAllBookingsByAdmin,
     cancelExpiredBookings,
     cancelMyBooking,
-    requestTicketIssued
 } from "../controllers/booking_controller.js";
 
 import { verifyToken, verifyAdmin } from "../middleware/auth.js";
