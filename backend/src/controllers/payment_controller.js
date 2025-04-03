@@ -163,7 +163,7 @@ export async function webhookHandler(req, res) {
 
     // Skip flow if already refunded and failed issued
     if (payment.paymentStatus === "REFUNDED" && booking.status === "FAILED_ISSUED") {
-      console.log("🍺 Finished flow payment");
+      console.log("Finished flow payment");
       return res.status(StatusCodes.OK).json({
         status: StatusMessages.SUCCESS,
         code: Codes.PAY_1006,
@@ -284,7 +284,7 @@ export async function webhookHandler(req, res) {
 
     // Call ticket issuance API in background
     if (payment.paymentStatus !== "REFUNDED") {
-      axios.post(`http://localhost:3001/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
+      axios.post(`http://localhost:${process.env.PORT}/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
         passengers: booking.passengers,
       }).then(() => {
         console.log("Ticket issuance requested.");
