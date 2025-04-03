@@ -4,8 +4,8 @@ import { AirportMongooseModel } from "../models/airport_models.js";
 import { CabinClassMongooseModel } from "../models/cabin_models.js";
 import { HeaderInterceptor } from "../utils/header_interceptor.js";
 import { MapUtils } from "../utils/map_utils.js";
-import {FlightSearchContext} from "../state/flight_search_context.js"
-import {OnewayState,RoundtripState } from "../state/flight_search_state.js"
+import { FlightSearchContext } from "../state/flight_search_context.js"
+import { OnewayState, RoundtripState } from "../state/flight_search_state.js"
 import axios from "axios";
 
 export const postFlightsOffer = async (req, res) => {
@@ -37,7 +37,7 @@ export const postFlightsOffer = async (req, res) => {
       domestic
     });
 
-      res.status(200).json(response)
+    res.status(200).json(response)
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -314,11 +314,11 @@ function mergeWebhookResults(results) {
             // Set once
             if (!merged.bookingId) {
                 merged.bookingId = bookingId;
-                merged.reason = reason;
             }
 
             if (merged.ticketStatus != "FAILED") {
                 merged.ticketStatus = ticketStatus == "FAILED" ? "FAILED" : "SUCCESS";
+                merged.reason = reason;
             }
             for (const passenger of passengers) {
                 const { passportNumber, tickets } = passenger;

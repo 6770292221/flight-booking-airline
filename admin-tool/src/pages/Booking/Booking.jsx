@@ -58,7 +58,7 @@ function Bookings() {
         return "status-ticketing";
       case "ISSUED":
         return "status-issued";
-      case "FAILED_ISSUE":
+      case "FAILED_ISSUED":
         return "status-failed_issue";
       default:
         return "";
