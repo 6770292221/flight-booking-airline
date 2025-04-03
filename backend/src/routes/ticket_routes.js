@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { webhookUpdateTickets } from '../controllers/ticket_controller.js';
+import { webhookUpdateTickets, requestTicketIssued } from '../controllers/ticket_controller.js';
 
 
 const routerTicket = Router();
 
 routerTicket.post("/webhooks/update-tickets/:_id", webhookUpdateTickets);
+routerTicket.post('/ticket/:id/request-ticket-issued', requestTicketIssued);
 
 
 export default routerTicket;
