@@ -236,17 +236,17 @@ export async function webhookHandler(req, res) {
     });
 
     booking.status = eventData.bookingStatus;
-    booking.events.push({
-      type: "PAYMENT_ISSUED",
-      status: eventData.bookingEventStatus,
-      source: "WEBHOOK",
-      message: eventData.message,
-      payload: {
-        paymentRef,
-        paymentTransactionId,
-        reason: eventData.message,
-      },
-    });
+    // booking.events.push({
+    //   type: "PAYMENT_ISSUED",
+    //   status: eventData.bookingEventStatus,
+    //   source: "WEBHOOK",
+    //   message: eventData.message,
+    //   payload: {
+    //     paymentRef,
+    //     paymentTransactionId,
+    //     reason: eventData.message,
+    //   },
+    // });
 
     // Save both documents
     await payment.save();
