@@ -163,6 +163,13 @@ export const Codes = Object.freeze({
   PAY_1005: "PAY_1005",
   PAY_1006: "PAY_1006",
   PAY_1007: "PAY_1007",
+  PAY_1008: "PAY_1008",
+  PAY_1009: "PAY_1009",
+  PAY_1010: "PAY_1010",
+  PAY_1011: "PAY_1010",
+  PAY_1012: "PAY_1010",
+  PAY_1013: "PAY_1013",
+
 
   //TICKETING
   TKT_1001: "TKT_1001",
@@ -312,7 +319,15 @@ export const Messages = Object.freeze({
   PAY_1004: "Booking not found",
   PAY_1005: "User not found",
   PAY_1006: "Update event and send email to user successfully",
-  PAY_1006: "Transaction already refunded",
+  PAY_1007: "Transaction already refunded",
+  PAY_1008: "Payment successful.",
+  PAY_1009: "Invalid payment method. Supported: CREDIT_CARD, BANK_TRANSFER",
+  PAY_1010: "This payment is already marked as successful. You cannot update it again.",
+  PAY_1011: "Payment has not been made. Cannot mark the transaction as failed again.",
+  PAY_1012: "Refund not allowed. The payment has not been completed.",
+  PAY_1013: "We couldn’t process the payment because the amount doesn’t match our records.",
+
+
 
 
   //TICKETING

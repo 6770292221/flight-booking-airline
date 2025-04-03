@@ -93,6 +93,16 @@ export async function webhookHandler(req, res) {
       currency
     } = req.body;
 
+    const validPaymentMethods = ["CREDIT_CARD", "BANK_TRANSFER"];
+    if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1009,
+        message: Messages.PAY_1009,
+        data: {},
+      });
+    }
+
     const payment = await PaymentMongooseModel.findOne({ paymentRef });
     if (!payment) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -103,23 +113,45 @@ export async function webhookHandler(req, res) {
       });
     }
 
-    const booking = await BookingMongooseModel.findOne({
-      _id: payment.bookingId,
-    });
-    console.log('🍺' + payment.paymentStatus)
 
-
-    if(payment.paymentStatus == "REFUNDED" && booking.status == "FAILED_ISSUED"){
-      
-      console.log('🍺finished flow payment')
-      return
-      // return res.status(StatusCodes.NOT_FOUND).json({
-      //   status: StatusMessages.FAILED,
-      //   code: Codes.PAY_1007,
-      //   message: Messages.PAY_1007,
-      //   data: {message: "Transaction already refunded"},
-      // });
+    // Validate current paymentStatus
+    if (event === "SUCCESS_PAID" && !["FAILED", "PENDING"].includes(payment.paymentStatus)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1010,
+        message: Messages.PAY_1010,
+        data: {},
+      });
     }
+
+    if (event === "FAILED_PAID" && payment.paymentStatus !== "FAILED") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1011,
+        message: Messages.PAY_1011,
+        data: {},
+      });
+    }
+
+    if (event === "REFUNDED_SUCCESS" && payment.paymentStatus !== "SUCCESS") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1012,
+        message: Messages.PAY_1012,
+        data: {},
+      });
+    }
+
+    if (amount !== payment.amount) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1013,
+        message: Messages.PAY_1013,
+        data: {},
+      });
+    }
+
+    const booking = await BookingMongooseModel.findById(payment.bookingId);
     if (!booking) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
@@ -130,6 +162,16 @@ export async function webhookHandler(req, res) {
     }
 
     const user = await AccountMongooseModel.findOne({ _id: booking.userId });
+    // Skip flow if already refunded and failed issued
+    if (payment.paymentStatus === "REFUNDED" && booking.status === "FAILED_ISSUED") {
+      console.log("Finished flow payment");
+      return res.status(StatusCodes.OK).json({
+        status: StatusMessages.SUCCESS,
+        code: Codes.PAY_1006,
+        message: "Transaction already refunded",
+        data: {},
+      });
+    }
 
     if (!user) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -233,15 +275,20 @@ export async function webhookHandler(req, res) {
 
      res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PAY_1006,
-      message: Messages.PAY_1006,
+      code: Codes.PAY_1008,
+      message: Messages.PAY_1008,
       data: {},
-    })
-    console.log('post ticket >>>>')
-    if(payment.paymentStatus != "REFUNDED") {
-      await axios.post(`http://localhost:3001/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
-       passengers: booking.passengers
-     })
+    });
+
+    // Call ticket issuance API in background
+    if (payment.paymentStatus !== "REFUNDED") {
+      axios.post(`http://localhost:${process.env.PORT}/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
+        passengers: booking.passengers,
+      }).then(() => {
+        console.log("Ticket issuance requested.");
+      }).catch((error) => {
+        console.error("Failed to issue ticket:", error.message);
+      });
     }
   } catch (err) {
     console.log(err)
