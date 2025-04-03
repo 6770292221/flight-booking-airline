@@ -35,7 +35,7 @@ function Bookings() {
   const filteredBookings = bookingList.filter((item) => {
     const matchesSearchQuery =
       item.bookingNubmer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.status.toLowerCase().includes(searchQuery.toLowerCase());
+      item.bookingNumber?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatusFilter =
       selectedStatus === "" || item.status === selectedStatus;
@@ -72,32 +72,32 @@ function Bookings() {
         <h2>Bookings</h2>
 
         {/* Search Bar */}
-        <div className="search-bar">
+        <div className="booking-controls">
           <input
+            className="search-input"
             type="text"
             placeholder="Search by Booking Number or Status"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-        </div>
 
-        {/* Status Filter Dropdown */}
-        <div className="status-filter">
-          <label htmlFor="status">Filter by Status: </label>
-          <select
-            id="status"
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="PENDING">PENDING</option>
-            <option value="CANCELLED">CANCELLED</option>
-            <option value="PAID">PAID</option>
-            <option value="FAILED_PAID">FAILED_PAID</option>
-            <option value="TICKETING">TICKETING</option>
-            <option value="ISSUED">ISSUED</option>
-            <option value="FAILED_ISSUE">FAILED_ISSUE</option>
-          </select>
+          <div className="status-wrapper">
+            <label htmlFor="status">Filter by Status:</label>
+            <select
+              id="status"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="PENDING">PENDING</option>
+              <option value="CANCELLED">CANCELLED</option>
+              <option value="PAID">PAID</option>
+              <option value="FAILED_PAID">FAILED_PAID</option>
+              <option value="TICKETING">TICKETING</option>
+              <option value="ISSUED">ISSUED</option>
+              <option value="FAILED_ISSUE">FAILED_ISSUE</option>
+            </select>
+          </div>
         </div>
 
         <table className="booking-table">

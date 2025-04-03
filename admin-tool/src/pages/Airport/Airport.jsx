@@ -16,6 +16,7 @@ function Airports() {
   const [editingAirport, setEditingAirport] = useState(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [airportToDelete, setAirportToDelete] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchAirports();
@@ -98,25 +99,25 @@ function Airports() {
     setAirportToDelete(null);
   };
 
-  const openEditConfirm = (item) => {
-    setEditingAirport(item);
-    setShowEditConfirm(true);
-  };
-
-  const closeEditConfirm = () => {
-    setShowEditConfirm(false);
-    setEditingAirport(null);
-  };
-
   const openEditModal = (item) => {
     setEditingAirport(item);
   };
+
+  // ✅ Filtered list with search
+  const filteredAirports = airportList.filter((airport) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      airport.iataCode?.toLowerCase().includes(query) ||
+      airport.airportName?.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div className="home-wrapper">
       <Sidebar />
       <div className="airports-container">
         <h2>Airports</h2>
+
         <button
           className="btn-add"
           onClick={() =>
@@ -131,7 +132,15 @@ function Airports() {
         >
           + Add Airport
         </button>
-
+        {/* ✅ Search input */}
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by IATA Code or Airport Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         <table className="airport-table">
           <thead>
             <tr>
@@ -146,7 +155,7 @@ function Airports() {
             </tr>
           </thead>
           <tbody>
-            {airportList.map((item) => (
+            {filteredAirports.map((item) => (
               <tr key={item.id}>
                 <td>{item.iataCode}</td>
                 <td>{item.airportName}</td>
@@ -176,6 +185,7 @@ function Airports() {
           </tbody>
         </table>
 
+        {/* Modal for Add/Edit Airport */}
         {editingAirport && (
           <div className="modal-overlay">
             <div className="modal">
@@ -250,7 +260,7 @@ function Airports() {
           </div>
         )}
 
-        {/* Show the confirmation popup for deletion */}
+        {/* Delete Confirmation Popup */}
         {showConfirmPopup && (
           <ConfirmationPopup
             message="Are you sure you want to delete this airport?"

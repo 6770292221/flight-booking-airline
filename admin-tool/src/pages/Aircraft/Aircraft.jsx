@@ -9,13 +9,14 @@ import {
 } from "../../apis/aircraft";
 import "./Aircraft.css";
 import { showErrorPopup } from "../components/ErrorPopup";
-import ConfirmationPopup from "../components/ConfirmationPopup"; 
+import ConfirmationPopup from "../components/ConfirmationPopup";
 
 function Aircraft() {
   const [aircraftList, setAircraftList] = useState([]);
   const [editingAircraft, setEditingAircraft] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [aircraftToDelete, setAircraftToDelete] = useState(null); 
+  const [aircraftToDelete, setAircraftToDelete] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchAircrafts();
@@ -45,7 +46,7 @@ function Aircraft() {
         const code = err.response.data.code || "UNKNOWN";
         const message =
           err.response.data.message ||
-          "An error occurred while updating the cabin class.";
+          "An error occurred while updating the aircraft.";
         showErrorPopup(code, message);
       } else {
         showErrorPopup(
@@ -59,9 +60,9 @@ function Aircraft() {
   const handleDelete = async () => {
     try {
       if (aircraftToDelete) {
-        await deleteAircraft(aircraftToDelete); // Delete the selected aircraft
-        setShowDeletePopup(false); // Hide the confirmation popup
-        fetchAircrafts(); // Refresh the list
+        await deleteAircraft(aircraftToDelete);
+        setShowDeletePopup(false);
+        fetchAircrafts();
       }
     } catch (err) {
       console.error("Delete failed", err);
@@ -87,7 +88,7 @@ function Aircraft() {
         const code = err.response.data.code || "UNKNOWN";
         const message =
           err.response.data.message ||
-          "An error occurred while updating the cabin class.";
+          "An error occurred while updating the aircraft.";
         showErrorPopup(code, message);
       } else {
         showErrorPopup(
@@ -112,11 +113,21 @@ function Aircraft() {
     setEditingAircraft(item);
   };
 
+  //Filter aircrafts based on search query
+  const filteredAircrafts = aircraftList.filter((item) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      item.aircraftCode?.toLowerCase().includes(query) ||
+      item.name?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="home-wrapper">
       <Sidebar />
       <div className="aircraft-container">
         <h2>Aircrafts</h2>
+
         <button
           className="btn-add"
           onClick={() =>
@@ -132,6 +143,16 @@ function Aircraft() {
           + Add Aircraft
         </button>
 
+        {/*Search input */}
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by Aircraft Code or Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         <table className="aircraft-table">
           <thead>
             <tr>
@@ -146,7 +167,7 @@ function Aircraft() {
             </tr>
           </thead>
           <tbody>
-            {aircraftList.map((item) => (
+            {filteredAircrafts.map((item) => (
               <tr key={item.id}>
                 <td>{item.aircraftCode}</td>
                 <td>{item.name}</td>

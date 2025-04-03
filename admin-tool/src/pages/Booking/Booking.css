@@ -1,8 +1,9 @@
 /* Booking Container */
 .booking-container {
+  height: 100vh; /* ฟิกความสูงเท่าจอ */
+  overflow-y: auto; /* เปิดให้เลื่อนได้ */
   padding: 32px;
   background-color: #f8fafc;
-  min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
 }
@@ -279,4 +280,39 @@
   border-radius: 8px;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.booking-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 260px;
+}
+
+.status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-wrapper label {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-wrapper select {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 120px;
 }
