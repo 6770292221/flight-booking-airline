@@ -93,12 +93,50 @@ export async function webhookHandler(req, res) {
       currency,
     } = req.body;
 
+    const validPaymentMethods = ["CREDIT_CARD", "BANK_TRANSFER"];
+    if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: "PAY_1007",
+        message: "Invalid payment method. Supported: CREDIT_CARD, BANK_TRANSFER",
+        data: {},
+      });
+    }
+
     const payment = await PaymentMongooseModel.findOne({ paymentRef });
     if (!payment) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
         code: Codes.PAY_1003,
         message: Messages.PAY_1003,
+        data: {},
+      });
+    }
+
+    // Validate current paymentStatus
+    if (event === "SUCCESS_PAID" && !["FAILED", "PENDING"].includes(payment.paymentStatus)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: "PAY_1008",
+        message: "This transaction has already been marked as successful. No further updates are allowed.",
+        data: {},
+      });
+    }
+
+    if (event === "FAILED_PAID" && payment.paymentStatus !== "FAILED") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: "PAY_1009",
+        message: "Payment has not been made. Cannot mark the transaction as failed again.",
+        data: {},
+      });
+    }
+
+    if (event === "REFUNDED_SUCCESS" && payment.paymentStatus !== "SUCCESS") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: "PAY_1010",
+        message: "Refund not allowed. The payment has not been completed.",
         data: {},
       });
     }
@@ -229,8 +267,8 @@ export async function webhookHandler(req, res) {
     // Respond to client immediately
     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PAY_1006,
-      message: Messages.PAY_1006,
+      code: Codes.PAY_1008,
+      message: Messages.PAY_1008,
       data: {},
     });
 
