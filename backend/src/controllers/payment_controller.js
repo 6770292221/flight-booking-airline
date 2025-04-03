@@ -97,8 +97,8 @@ export async function webhookHandler(req, res) {
     if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: "PAY_1007",
-        message: "Invalid payment method. Supported: CREDIT_CARD, BANK_TRANSFER",
+        code: Codes.PAY_1009,
+        message: Messages.PAY_1009,
         data: {},
       });
     }
@@ -113,12 +113,13 @@ export async function webhookHandler(req, res) {
       });
     }
 
+
     // Validate current paymentStatus
     if (event === "SUCCESS_PAID" && !["FAILED", "PENDING"].includes(payment.paymentStatus)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: "PAY_1008",
-        message: "This transaction has already been marked as successful. No further updates are allowed.",
+        code: Codes.PAY_1010,
+        message: Messages.PAY_1010,
         data: {},
       });
     }
@@ -126,8 +127,8 @@ export async function webhookHandler(req, res) {
     if (event === "FAILED_PAID" && payment.paymentStatus !== "FAILED") {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: "PAY_1009",
-        message: "Payment has not been made. Cannot mark the transaction as failed again.",
+        code: Codes.PAY_1011,
+        message: Messages.PAY_1011,
         data: {},
       });
     }
@@ -135,8 +136,17 @@ export async function webhookHandler(req, res) {
     if (event === "REFUNDED_SUCCESS" && payment.paymentStatus !== "SUCCESS") {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: "PAY_1010",
-        message: "Refund not allowed. The payment has not been completed.",
+        code: Codes.PAY_1012,
+        message: Messages.PAY_1012,
+        data: {},
+      });
+    }
+
+    if (amount !== payment.amount) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1013,
+        message: Messages.PAY_1013,
         data: {},
       });
     }
