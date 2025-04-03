@@ -66,9 +66,9 @@ const bookingSchema = new mongoose.Schema({
     },
     events: [
         {
-            type: { type: String, required: true },
-            status: { type: String, enum: ["SUCCESS", "FAILED", "PENDING"], required: true },
-            source: { type: String, enum: ["SYSTEM", "USER", "WEBHOOK"], required: true },
+            type: { type: String },
+            status: { type: String, enum: ["SUCCESS", "FAILED", "PENDING"] },
+            source: { type: String, enum: ["SYSTEM", "USER", "WEBHOOK"] },
             message: { type: String },
             payload: { type: mongoose.Schema.Types.Mixed },
             createdAt: { type: Date, default: Date.now }

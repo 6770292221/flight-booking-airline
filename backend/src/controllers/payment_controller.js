@@ -186,7 +186,7 @@ export async function webhookHandler(req, res) {
       });
     } else if (event === "REFUNDED_SUCCESS") {
       paymentStatusUpdate = "REFUNDED";
-      // bookingStatusUpdate = "REFUNDED";
+      bookingStatusUpdate = "FAILED_ISSUE";
       await sendRefundsTemplate({
         bookingResponse: booking.toObject(),
         reqUser: user.toObject(),

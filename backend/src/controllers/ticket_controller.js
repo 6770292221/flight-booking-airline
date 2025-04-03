@@ -75,11 +75,11 @@ export async function webhookUpdateTickets(req, res) {
         }
       }
 
-      // booking.status = "ISSUED";
+      booking.status = "ISSUED";
 
-      // booking.events.push({
-      //   payload: {passengers} ,
-      // });
+      booking.events.push({
+        payload: {passengers} ,
+      });
 
       // passengers.forEach((p) => {
       //   booking.passengers.find((v) => {
@@ -146,19 +146,11 @@ export async function webhookUpdateTickets(req, res) {
           bookingResponse: booking.toObject(),
           reqUser: user,
           refundAmount: payment.amount ?? 0,
-          reason: reason || "Ticket issuance failed.",
+          reason:  "Ticket issuance failed.",
         });
       }
 
       if (user) {
-        // await sendRefundsTemplate({
-        //     bookingResponse: booking.toObject(),
-        //     reqUser: user,
-        //     refundTxnId: payment.paymentRef,
-        //     refundAmount: payment.refund.refundAmount,
-        //     reason: reason || "Ticket issuance failed."
-        // });
-
  
         await axios.post(
           "http://localhost:3001/api/v1/payment-core-api/payments/webhook",
