@@ -14,6 +14,7 @@ export async function webhookUpdateTickets(req, res) {
   
       const booking = await BookingMongooseModel.findById(bookingId);
       if (!booking) {
+        return
         return res.status(StatusCodes.NOT_FOUND).json({
           status: StatusMessages.FAILED,
           code: Codes.RSV_3011,
@@ -25,6 +26,7 @@ export async function webhookUpdateTickets(req, res) {
   
       if (ticketStatus === "SUCCESS" && booking.status === "TICKETING") {
         if (!Array.isArray(passengers)) {
+            return
           return res.status(StatusCodes.BAD_REQUEST).json({
             status: StatusMessages.FAILED,
             code: Codes.RSV_3014,
@@ -39,6 +41,7 @@ export async function webhookUpdateTickets(req, res) {
           );
   
           if (!existingPassenger) {
+            return 
             return res.status(StatusCodes.BAD_REQUEST).json({
               status: StatusMessages.FAILED,
               code: Codes.RSV_3008,
@@ -72,6 +75,7 @@ export async function webhookUpdateTickets(req, res) {
         const validationError = booking.validateSync();
         if (validationError) {
           console.error("❌ Booking validation error:", validationError);
+          return 
           return res.status(StatusCodes.BAD_REQUEST).json({
             status: StatusMessages.FAILED,
             code: Codes.VAL_4004,
@@ -87,7 +91,7 @@ export async function webhookUpdateTickets(req, res) {
             reqUser: user,
           });
         }
-  
+        return 
         return res.status(StatusCodes.OK).json({
           status: StatusMessages.SUCCESS,
           code: Codes.RSV_3007,
@@ -133,7 +137,7 @@ export async function webhookUpdateTickets(req, res) {
             currency: payment.currency,
           });
         }
-  
+        return 
         return res.status(StatusCodes.OK).json({
           status: StatusMessages.FAILED,
           code: Codes.RSV_3016,
@@ -143,6 +147,7 @@ export async function webhookUpdateTickets(req, res) {
       }
   
       console.log("🟡 No matching status flow. Finishing.");
+      return 
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.RSV_3017,
@@ -150,6 +155,7 @@ export async function webhookUpdateTickets(req, res) {
       });
     } catch (error) {
       console.error("🔥 webhookUpdateTickets error:", error.message);
+      return 
       return res.status(StatusCodes.SERVER_ERROR).json({
         status: StatusMessages.FAILED,
         code: Codes.GNR_1001,
