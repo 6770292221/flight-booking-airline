@@ -226,9 +226,9 @@ export async function webhookHandler(req, res) {
     await eventData.sendEmail({
       bookingResponse: booking,
       reqUser: user,
-      refundTxnId: payment.paymentRef,
-      refundAmount: payment.refund.refundAmount,
-      reason:   "Ticket issuance failed.",
+      refundTxnId: payment?.paymentRef ?? "",
+      refundAmount: payment?.refund?.refundAmount ?? "",
+      reason:   eventData.message ?? "",
     });
 
      res.status(StatusCodes.OK).json({
@@ -244,6 +244,7 @@ export async function webhookHandler(req, res) {
      })
     }
   } catch (err) {
+    console.log(err)
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: "failed",
       code: "PAY_5000",

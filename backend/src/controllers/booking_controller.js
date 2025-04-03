@@ -599,7 +599,6 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
     flight,
     response
   }
-
   
 }
 
@@ -633,11 +632,6 @@ export async function requestTicketIssued(req, res) {
       return result
     }
     );
-
-  
-
-
-
 
     const results = await Promise.allSettled(allRequests);
 
