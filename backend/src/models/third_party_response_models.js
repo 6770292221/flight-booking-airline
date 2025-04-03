@@ -120,9 +120,9 @@ export function getStrategy(airlineId) {
     case "FD":
       return new AirAsiaStrategy();
     case "SL":
-      return new NokAirStrategy();
-    case "TG":
       return new ThaiLionStrategy();
+    case "DD":
+      return new NokAirStrategy();
   }
 }
 

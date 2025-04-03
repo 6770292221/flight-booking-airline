@@ -205,9 +205,9 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
     console.log("delay FD 5 seconds");
     await _delay(5000);
   } else if (airline === "SL") {
-    console.log("delay SK 30 seconds");
+    console.log("delay SL 30 seconds");
     await _delay(30000);
-  } else if (airline === "TG") {
+  } else if (airline === "DD") {
     console.log("delay TG 40 seconds");
     await _delay(40000);
   }
