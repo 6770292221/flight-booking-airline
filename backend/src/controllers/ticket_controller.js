@@ -31,7 +31,7 @@ export async function webhookUpdateTickets(req, res) {
     }
 
     if (ticketStatus === "SUCCESS") {
-      console.log("-1-1-1-1-1-1");
+
       if (!passengers || !Array.isArray(passengers)) {
         // return
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -74,7 +74,7 @@ export async function webhookUpdateTickets(req, res) {
           });
         }
       }
-      console.log("-2-2-2-2-2");
+
       booking.status = "ISSUED";
 
       booking.events.push({
@@ -84,6 +84,13 @@ export async function webhookUpdateTickets(req, res) {
         message: "Tickets issued successfully.",
         payload: { passengers },
       });
+
+      // passengers.forEach((p) => {
+      //   booking.passengers.find((v) => {
+      //     v.passportNumber === p.passportNumber;
+      //     v.tickets = p.tickets;
+      //   });
+      // });
 
       booking.updatedAt = new Date();
 
@@ -115,7 +122,7 @@ export async function webhookUpdateTickets(req, res) {
         reqUser: user,
       });
       // return
-      console.log("-3-3-3-3-3-3");
+
       return res.status(StatusCodes.OK).json({
         status: StatusMessages.SUCCESS,
         code: Codes.RSV_3007,
@@ -159,7 +166,6 @@ export async function webhookUpdateTickets(req, res) {
         //     refundAmount: payment.refund.refundAmount,
         //     reason: reason || "Ticket issuance failed."
         // });
-        console.log(payment.paymentRef);
         await axios.post(
           "http://localhost:3001/api/v1/payment-core-api/payments/webhook",
           {
@@ -262,37 +268,25 @@ export async function requestTicketIssued(req, res) {
     }
 
     let results = [];
-    const allRequests = booking.flights.map(async (flight) => {
+
+    for (let i = 0; i < booking.flights.length; i++) {
+      const flight = booking.flights[i];
       const result = await _sendTicketRequest(
         flight,
         passengers,
         booking.bookingNubmer
       );
       booking.status = "TICKETING";
+      results.push(result.response.data);
       await booking.save();
-      return results.push(result);
-    });
-
-    await Promise.allSettled(allRequests);
-    console.log(results[0].response.data.response.ticketStatus);
-
-    const failedResults = results.filter(
-      (r) => r.response.data.response.ticketStatus === "FAILED"
-    );
-
-    if (failedResults.length > 0) {
-        await axios.post(
-          `http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`,
-          failedResults[0].response.data.response
-        );
-    } else {
-      for (let i = 0; i < results.length; i++) {
-        const rr = await axios.post(
-          `http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`,
-          results[i].response.data.response
-        );
-      }
     }
+
+    const reArrange = mergeWebhookResults(results);
+
+
+      await axios.post(
+        `http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`,
+        reArrange)
 
     console.log("All requests finished:", results.length);
 
@@ -309,4 +303,61 @@ export async function requestTicketIssued(req, res) {
       message: StatusMessages.SERVER_ERROR,
     });
   }
+}
+
+function mergeWebhookResults(results) {
+  const merged = {
+    bookingId: null,
+    ticketStatus: null,
+    reason: null,
+    passengers: [],
+  };
+
+  const passengerMap = new Map(); // Map by passportNumber
+
+  for (const result of results) {
+    const { bookingId, ticketStatus, reason, passengers } = result.response;
+
+    // Set once
+    if (!merged.bookingId) {
+      merged.bookingId = bookingId;
+      merged.reason = reason;
+    }
+
+    if (merged.ticketStatus != "FAILED") {
+      merged.ticketStatus = ticketStatus == "FAILED" ? "FAILED" : "SUCCESS";
+    }
+    for (const passenger of passengers) {
+      const { passportNumber, tickets } = passenger;
+
+      // Ensure tickets is an array
+      const normalizedTickets = Array.isArray(tickets) ? tickets : [tickets];
+
+      if (!passengerMap.has(passportNumber)) {
+        passengerMap.set(passportNumber, {
+          passportNumber,
+          tickets: [...normalizedTickets],
+        });
+      } else {
+        // Merge tickets
+        const existing = passengerMap.get(passportNumber);
+        for (const ticket of normalizedTickets) {
+          const isDuplicate = existing.tickets.some(
+            (t) =>
+              t.flightNumber === ticket.flightNumber &&
+              t.ticketNumber === ticket.ticketNumber
+          );
+
+          if (!isDuplicate) {
+            existing.tickets.push(ticket);
+          }
+        }
+      }
+    }
+  }
+
+  merged.passengers = Array.from(passengerMap.values());
+  console.log(merged.ticketStatus);
+  console.log(merged.passengers[0].tickets);
+  return merged;
 }

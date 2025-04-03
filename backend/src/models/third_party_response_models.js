@@ -40,12 +40,12 @@ export class VietJetStrategy extends TicketStrategy {
     return {
       bookingId: bookingNumber,
       ticketStatus: "FAILED",
-      reason: "Tickets issued successfully",
+      reason: "No available seats",
       passengers: passengers.map((p) => ({
         passportNumber: p.passportNumber,
         tickets: {
           flightNumber: flights.flightNumber,
-          ticketNumber: `${flights.airline}${generateRandom9DigitNumber()}`,
+          ticketNumber: "FAILED" ? "" : `${flights.airline}${generateRandom9DigitNumber()}`,
         },
       })),
       issuedAt: new Date().toISOString(),
