@@ -282,7 +282,7 @@ export async function webhookHandler(req, res) {
 
     // Call ticket issuance API in background
     if (payment.paymentStatus !== "REFUNDED") {
-      axios.post(`http://localhost:${process.env.PORT}/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
+      axios.post(`http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`, {
         passengers: booking.passengers,
       }).then(() => {
         console.log("Ticket issuance requested.");
