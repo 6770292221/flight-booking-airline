@@ -41,13 +41,17 @@ export async function createBooking(req, res) {
 
     await newBooking.save();
 
+    let paymentRef = null;
+
     try {
-      await axios.post(
+      const response = await axios.post(
         `http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`,
         {
           bookingId: newBooking._id.toString(),
         }
       );
+      paymentRef = response?.data?.data?.paymentRef || null;
+
     } catch (err) {
       console.error(
         "Error calling /payments/initiate:",
@@ -64,7 +68,11 @@ export async function createBooking(req, res) {
       status: StatusMessages.SUCCESS,
       code: Codes.RSV_3009,
       message: Messages.RSV_3009,
-      data: newBooking,
+      data: {
+        booking: newBooking,
+        paymentRef,
+      },
+
     });
   } catch (error) {
     console.error("Error in createBooking:", error);
@@ -578,7 +586,7 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
   } else if (airline === "SL") {
     console.log('delay SK 30 seconds')
     await _delay(30000);
-  }else if (airline === "TG") {
+  } else if (airline === "TG") {
     console.log('delay TG 40 seconds')
     await _delay(40000);
   }
@@ -599,7 +607,7 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
     flight,
     response
   }
-  
+
 }
 
 export async function requestTicketIssued(req, res) {
@@ -625,7 +633,7 @@ export async function requestTicketIssued(req, res) {
       });
     }
 
-    const allRequests = booking.flights.map(async (flight) =>  {
+    const allRequests = booking.flights.map(async (flight) => {
       const result = await _sendTicketRequest(flight, passengers, booking.bookingNubmer)
       booking.status = "TICKETING"
       await booking.save()
@@ -635,7 +643,7 @@ export async function requestTicketIssued(req, res) {
 
     const results = await Promise.allSettled(allRequests);
 
-    for ( let i = 0 ; i < results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
       await axios.post(`http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`, results[i].value.response.data.response)
       // console.log(results[i].value.response.data.response)
       // console.log(results[i].value.response.data.response.passengers)
@@ -653,7 +661,7 @@ export async function requestTicketIssued(req, res) {
     }
 
     console.log("All requests finished:", results.length);
-    
+
     return res.status(StatusCodes.ACCEPTED).json({
       status: StatusMessages.ACCEPTED,
       code: Codes.TKT_1003,
