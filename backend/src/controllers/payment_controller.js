@@ -238,3 +238,84 @@ export async function webhookHandler(req, res) {
     });
   }
 }
+
+export async function getPaymentById(req, res) {
+  try {
+    const { id } = req.params;
+    const user = req.user
+    if (!id) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1012, 
+        message: Messages.PMT_1012,
+      });
+    }
+    const payment = await PaymentMongooseModel.findById(id);
+    if (!payment) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1012, 
+        message: Messages.PMT_1012,
+      });
+    }
+    const booking = await BookingMongooseModel.findById(payment.bookingId);
+    if (!booking) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1003,
+        message: Messages.PAY_1003,
+      });
+    }
+
+    const userIsNotOwnerOfThePayment = booking.userId.toString() !== user.userId
+
+    if (userIsNotOwnerOfThePayment) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1016,
+        message: Messages.PMT_1016,
+      });
+    }
+    return res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.PMT_1013, 
+      message: Messages.PMT_1013,
+      data: payment,
+    });
+  } catch (error) {
+    return res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      code: StatusCodes.SERVER_ERROR, 
+      message: Messages.GNR_1001,
+    });
+  }
+}
+
+export async function getAllPayments(req, res) {
+  const user = req.user
+  if (!user.isAdmin) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      status: StatusMessages.FAILED,
+      code: Codes.TKN_6003,
+      message: Messages.TKN_6003,
+    })
+  }
+  try {
+    const payments = await PaymentMongooseModel.find({})
+    return res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.PMT_1013, 
+      message: Messages.PMT_1013,
+      data: payments,
+      meta: {
+        itemCount: payments.length,
+      },
+    });
+  } catch (error) {
+    return res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      code: StatusCodes.SERVER_ERROR,
+      message: StatusMessages.SERVER_ERROR,
+    });
+  }
+}
