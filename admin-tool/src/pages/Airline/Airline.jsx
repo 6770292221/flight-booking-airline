@@ -9,13 +9,14 @@ import {
 } from "../../apis/airline";
 import "./Airline.css";
 import { showErrorPopup } from "../components/ErrorPopup";
-import ConfirmationPopup from "../components/ConfirmationPopup"; 
+import ConfirmationPopup from "../components/ConfirmationPopup";
 
 function Airline() {
   const [airlineList, setAirlineList] = useState([]);
   const [editingAirline, setEditingAirline] = useState(null);
-  const [showDeletePopup, setShowDeletePopup] = useState(false); 
-  const [airlineToDelete, setAirlineToDelete] = useState(null); 
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [airlineToDelete, setAirlineToDelete] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchAirlines();
@@ -70,8 +71,8 @@ function Airline() {
     try {
       if (airlineToDelete) {
         await deleteAirline(airlineToDelete);
-        setShowDeletePopup(false); // Close the delete confirmation popup
-        fetchAirlines(); // Refresh the airline list
+        setShowDeletePopup(false);
+        fetchAirlines();
       }
     } catch (err) {
       console.error("Delete failed", err);
@@ -116,20 +117,31 @@ function Airline() {
   };
 
   const openDeleteConfirm = (id) => {
-    setAirlineToDelete(id); // Set the airline to be deleted
-    setShowDeletePopup(true); // Show the confirmation popup
+    setAirlineToDelete(id);
+    setShowDeletePopup(true);
   };
 
   const closeDeleteConfirm = () => {
-    setShowDeletePopup(false); // Hide the confirmation popup
-    setAirlineToDelete(null); // Clear the airline to be deleted
+    setShowDeletePopup(false);
+    setAirlineToDelete(null);
   };
+
+  // ✅ Filter list by code or name
+  const filteredAirlines = airlineList.filter((airline) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      airline.carrierCode?.toLowerCase().includes(query) ||
+      airline.airlineName?.toLowerCase().includes(query)
+    );
+  });
 
   return (
     <div className="home-wrapper">
       <Sidebar />
       <div className="airline-container">
         <h2>Airline</h2>
+
+        {/* Add Airline Button */}
         <button
           className="btn-add"
           onClick={() =>
@@ -145,6 +157,17 @@ function Airline() {
           + Add Airline
         </button>
 
+        {/*Search Bar */}
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by Code or Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {/* Airline Table */}
         <table className="airline-table">
           <thead>
             <tr>
@@ -152,21 +175,20 @@ function Airline() {
               <th>Name</th>
               <th>Country</th>
               <th>Low Cost</th>
-              <th>Logo</th> {/* Add new column for logo */}
+              <th>Logo</th>
               <th>Created</th>
               <th>Updated</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {airlineList.map((item) => (
+            {filteredAirlines.map((item) => (
               <tr key={item._id}>
                 <td>{item.carrierCode}</td>
                 <td>{item.airlineName}</td>
                 <td>{item.country}</td>
                 <td>{item.isLowCost ? "Yes" : "No"}</td>
                 <td>
-                  {/* Add the logo image */}
                   <img
                     src={item.logoUrl}
                     alt={item.airlineName}
@@ -197,7 +219,7 @@ function Airline() {
           </tbody>
         </table>
 
-        {/* Delete confirmation popup */}
+        {/* Delete Confirmation */}
         {showDeletePopup && (
           <ConfirmationPopup
             message="Are you sure you want to delete this airline?"
@@ -206,6 +228,7 @@ function Airline() {
           />
         )}
 
+        {/* Add/Edit Modal */}
         {editingAirline && (
           <div className="modal-overlay">
             <div className="modal">

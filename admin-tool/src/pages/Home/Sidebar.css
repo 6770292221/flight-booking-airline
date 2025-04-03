@@ -1,15 +1,21 @@
 .sidebar {
+  display: flex;
+  flex-direction: column;
   background-color: #1f2937;
   color: #cbd5e1;
   width: 300px;
   height: 100vh;
   padding: 24px 32px;
-  transition: width 0.3s ease; 
-  overflow: auto;
+  transition: width 0.3s ease;
+}
+
+.sidebar ul {
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .sidebar.collapsed {
-  width: 80px; 
+  width: 80px;
 }
 
 .sidebar-header {
@@ -20,7 +26,7 @@
 }
 
 .sidebar-header h3 {
-  font-size: 24px; 
+  font-size: 24px;
   color: white;
   margin-left: 16px;
 }
@@ -45,9 +51,9 @@
 .sidebar a {
   display: flex;
   align-items: center;
-  gap: 20px; 
+  gap: 20px;
   padding: 12px 18px;
-  font-size: 18px; 
+  font-size: 18px;
   text-decoration: none;
   color: #cbd5e1;
   border-radius: 10px;
@@ -61,7 +67,7 @@
 
 .submenu-toggle {
   cursor: pointer;
-  font-size: 18px; 
+  font-size: 18px;
   font-weight: bold;
   color: #94a3b8;
   margin: 16px 0;
@@ -72,28 +78,28 @@
 }
 .logout-button {
   background: none;
-  border: none; 
-  color: #cbd5e1; 
+  border: none;
+  color: #cbd5e1;
   font: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 16px; 
-  padding: 12px 20px; 
+  gap: 16px;
+  padding: 12px 20px;
   text-decoration: none;
-  border-radius: 8px; 
-  font-size: 16px; 
-  transition: all 0.3s ease; 
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
   width: 100%;
 }
 
 .logout-button:hover {
   background-color: #334155;
-  color: white; 
-  transform: scale(1.05); 
+  color: white;
+  transform: scale(1.05);
 }
 
 .logout-button svg {
-  font-size: 20px; 
+  font-size: 20px;
   flex-shrink: 0;
 }

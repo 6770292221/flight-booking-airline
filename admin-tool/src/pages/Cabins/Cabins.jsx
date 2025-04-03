@@ -16,6 +16,7 @@ function Cabins() {
   const [editingCabin, setEditingCabin] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [cabinToDelete, setCabinToDelete] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchCabinClasses();
@@ -126,11 +127,21 @@ function Cabins() {
     setCabinToDelete(null);
   };
 
+  // Filter cabin list with searchQuery
+  const filteredCabins = cabinList.filter((cabin) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      cabin.code?.toLowerCase().includes(query) ||
+      cabin.name?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="home-wrapper">
       <Sidebar />
       <div className="cabins-container">
         <h2>Cabin Classes</h2>
+
         <button
           className="btn-add"
           onClick={() =>
@@ -139,6 +150,16 @@ function Cabins() {
         >
           + Add Cabin Class
         </button>
+
+        {/* ✅ Search input */}
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by Code or Name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
         <table className="cabin-table">
           <thead>
@@ -153,14 +174,14 @@ function Cabins() {
             </tr>
           </thead>
           <tbody>
-            {cabinList.map((item) => (
+            {filteredCabins.map((item) => (
               <tr key={item._id}>
                 <td>{item.code}</td>
                 <td>{item.name}</td>
                 <td>{item.checked}</td>
                 <td>{item.carryOn}</td>
-                <td>{new Date(item.createdAt).toLocaleString()}</td>
-                <td>{new Date(item.updatedAt).toLocaleString()}</td>
+                <td>{formatDate(item.createdAt)}</td>
+                <td>{formatDate(item.updatedAt)}</td>
                 <td>
                   <div className="action-buttons">
                     <button
@@ -182,7 +203,7 @@ function Cabins() {
           </tbody>
         </table>
 
-        {/* Show delete confirmation popup */}
+        {/* Delete confirmation popup */}
         {showDeletePopup && (
           <ConfirmationPopup
             message="Are you sure you want to delete this cabin?"
@@ -191,6 +212,7 @@ function Cabins() {
           />
         )}
 
+        {/* Modal form for Add/Edit */}
         {editingCabin && (
           <div className="modal-overlay">
             <div className="modal">
