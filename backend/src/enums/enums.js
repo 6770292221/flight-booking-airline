@@ -124,7 +124,7 @@ export const Codes = Object.freeze({
   PMT_1015: "PMT_1015",
   PMT_1016: "PMT_1016",
 
-  
+
 
   //General
   GNR_1001: "GNR_1001",
@@ -177,6 +177,8 @@ export const Codes = Object.freeze({
   PAY_1011: "PAY_1010",
   PAY_1012: "PAY_1010",
   PAY_1013: "PAY_1013",
+  PAY_1014: "PAY_1014",
+
 
 
   //TICKETING
@@ -340,6 +342,7 @@ export const Messages = Object.freeze({
   PAY_1011: "Payment has not been made. Cannot mark the transaction as failed again.",
   PAY_1012: "Refund not allowed. The payment has not been completed.",
   PAY_1013: "We couldn’t process the payment because the amount doesn’t match our records.",
+  PAY_1014: "Duplicate paymentTransactionId found.",
 
 
 

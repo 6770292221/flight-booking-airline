@@ -6,7 +6,6 @@ const eventSchema = new mongoose.Schema({
 }, { _id: false });
 
 const refundSchema = new mongoose.Schema({
-    isRefunded: { type: Boolean, default: false },
     refundAmount: { type: Number },
     refundStatus: { type: String, enum: ["PENDING", "SUCCESS", "FAILED", "REFUNDED"], default: null },
     refundTransactionId: { type: String },
@@ -28,6 +27,7 @@ const paymentSchema = new mongoose.Schema({
     paymentMethod: { type: String, enum: ["CREDIT_CARD", "BANK_TRANSFER"] },
     paymentProvider: { type: String },
     paymentTransactionId: { type: String },
+    cardType: { type: String, enum: ['VISA', 'MASTERCARD', 'JCB'] },
     amount: { type: Number, required: true },
     currency: { type: String, default: "THB" },
     paidAt: { type: Date },

@@ -79,15 +79,22 @@ export async function initiatePayment(req, res) {
   }
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 export async function webhookHandler(req, res) {
   try {
     const {
       event,
       paymentRef,
-      paymentStatus,
       paymentTransactionId,
+      refundTransactionId,
+      refundedAt,
       paymentProvider,
       paymentMethod,
+      cardType,
       paidAt,
       amount,
       currency,
@@ -102,6 +109,7 @@ export async function webhookHandler(req, res) {
         data: {},
       });
     }
+
 
     const booking = await BookingMongooseModel.findById(payment.bookingId);
     if (!booking) {
@@ -165,6 +173,23 @@ export async function webhookHandler(req, res) {
       });
     }
 
+    if (paymentTransactionId) {
+      const existingPayment = await PaymentMongooseModel.findOne({
+        paymentTransactionId,
+        _id: { $ne: payment._id },
+      });
+
+      if (existingPayment) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          status: StatusMessages.FAILED,
+          code: Codes.PAY_1014,
+          message: Messages.PAY_1014,
+          data: {},
+        });
+      }
+    }
+
+
     let paymentStatusUpdate;
     let bookingStatusUpdate;
 
@@ -185,13 +210,28 @@ export async function webhookHandler(req, res) {
         payment: payment,
       });
     } else if (event === "REFUNDED_SUCCESS") {
+      if (!paymentRef || !refundTransactionId || !amount || !refundedAt) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          status: StatusMessages.FAILED,
+          code: Codes.VAL_4001,
+          message: Messages.VAL_4001,
+          data: {},
+        });
+      }
       paymentStatusUpdate = "REFUNDED";
-      bookingStatusUpdate = "FAILED_ISSUE";
+
+      payment.refund = {
+        refundAmount: amount,
+        refundStatus: "SUCCESS",
+        refundTransactionId: refundTransactionId,
+        refundedAt: refundedAt,
+      };
+
       await sendRefundsTemplate({
         bookingResponse: booking.toObject(),
         reqUser: user.toObject(),
         reason: "Payment refunded",
-        refundTxnId: paymentTransactionId,
+        refundTxnId: refundTransactionId,
         refundAmount: amount,
         payment: payment,
       });
@@ -201,6 +241,7 @@ export async function webhookHandler(req, res) {
     payment.paymentTransactionId = paymentTransactionId;
     payment.paymentMethod = paymentMethod;
     payment.paymentProvider = paymentProvider;
+    payment.cardType = cardType;
     payment.paidAt = paidAt;
     payment.amount = amount;
     payment.currency = currency;
@@ -224,6 +265,7 @@ export async function webhookHandler(req, res) {
       data: {},
     });
 
+    await delay(5000);
     if (event === "SUCCESS_PAID") {
       axios.get(
         `http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`
@@ -246,7 +288,7 @@ export async function getPaymentById(req, res) {
     if (!id) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: Codes.PMT_1012, 
+        code: Codes.PMT_1012,
         message: Messages.PMT_1012,
       });
     }
@@ -254,7 +296,7 @@ export async function getPaymentById(req, res) {
     if (!payment) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
-        code: Codes.PMT_1012, 
+        code: Codes.PMT_1012,
         message: Messages.PMT_1012,
       });
     }
@@ -278,14 +320,14 @@ export async function getPaymentById(req, res) {
     }
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PMT_1013, 
+      code: Codes.PMT_1013,
       message: Messages.PMT_1013,
       data: payment,
     });
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
-      code: StatusCodes.SERVER_ERROR, 
+      code: StatusCodes.SERVER_ERROR,
       message: Messages.GNR_1001,
     });
   }
@@ -304,7 +346,7 @@ export async function getAllPayments(req, res) {
     const payments = await PaymentMongooseModel.find({})
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PMT_1013, 
+      code: Codes.PMT_1013,
       message: Messages.PMT_1013,
       data: payments,
       meta: {
