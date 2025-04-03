@@ -562,45 +562,39 @@ export async function cancelMyBooking(req, res) {
     });
   }
 }
-function _delay(ms) {
+function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function _sendTicketRequest(flight, passengers, bookingNubmer) {
-  const { airline } = flight;
-  console.log(`❤️ bookingNubmer started: ${bookingNubmer}`)
-  if (airline === "VZ") {
-    console.log('delay VZ 10 seconds')
-    await _delay(10000);
-  } else if (airline === "FD") {
-    console.log('delay FD 20 seconds')
-    await _delay(20000);
-  } else if (airline === "SL") {
-    console.log('delay SK 30 seconds')
-    await _delay(30000);
-  }else if (airline === "TG") {
-    console.log('delay TG 40 seconds')
-    await _delay(40000);
+async function sendTicketRequest(flight, passengers, bookingNubmer) {
+  const delayMap = {
+    VZ: 10000,
+    FD: 20000,
+    SL: 30000,
+    TG: 40000,
+  };
+
+  const delayTime = delayMap[flight.airline] || 0;
+  if (delayTime > 0) {
+    console.log(`⏳ Delay ${flight.airline} for ${delayTime / 1000} seconds`);
+    await delay(delayTime);
   }
+
+  console.log(`🎟️ Sending ticket request for airline: ${flight.airline}`);
 
   const response = await axios.post(
     "http://localhost:3001/api/v1/airline-core-api/airlines/ticketing",
     {
-      airlineId: airline,
-      passengers: passengers,
-      flight: flight,
-      bookingNubmer: bookingNubmer
+      airlineId: flight.airline,
+      passengers,
+      flight,
+      bookingNubmer,
     }
   );
-  console.log(`❤️ airline finished: ${airline}`)
 
-  return {
-    airline,
-    flight,
-    response
-  }
+  console.log(`✅ Ticket request finished for airline: ${flight.airline}`);
 
-  
+  return { airline: flight.airline, flight, response };
 }
 
 export async function requestTicketIssued(req, res) {
@@ -617,8 +611,7 @@ export async function requestTicketIssued(req, res) {
       });
     }
 
-    if (booking.status !== "PAID" && booking.status == "TICKETING") {
-      console.log(booking.status)
+    if (booking.status !== "PAID") {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.TKT_1002,
@@ -626,40 +619,42 @@ export async function requestTicketIssued(req, res) {
       });
     }
 
-    const allRequests = booking.flights.map(async (flight) =>  {
-      const result = await _sendTicketRequest(flight, passengers, booking.bookingNubmer)
-      booking.status = "TICKETING"
-      await booking.save()
-      return result
-    }
+    booking.status = "TICKETING";
+    await booking.save();
+
+    const allRequests = booking.flights.map(flight =>
+      sendTicketRequest(flight, passengers, booking.bookingNubmer)
     );
-
-  
-
-
-
 
     const results = await Promise.allSettled(allRequests);
 
-    for ( let i = 0 ; i < results.length; i++) {
-      await axios.post(`http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`, results[i].value.response.data.response)
-      // console.log(results[i].value.response.data.response)
-      // console.log(results[i].value.response.data.response.passengers)
-      // booking.events.push({
-      //   type: "TICKETING",
-      //   status: (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "PENDING" : (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "SUCCESS" : "FAILED",
-      //   source: "SYSTEM",
-      //   message: (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "Ticketing request" : (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "Ticket issued" : "Ticketing failed",
-      //   payload: {
-      //     flightNumber: results[i].value.response.data.response.f,
-      //     direction: firstFinished.flight.direction,
-      //     message: JSON.stringify(firstFinished.response.data)
-      //   },
-      // });
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        const ticketData = result.value.response.data.response;
+
+        await axios.post(
+          `http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`,
+          ticketData
+        );
+
+        // Optional: add event logging for each flight
+        // booking.events.push({
+        //   type: "TICKETING",
+        //   status: ticketData.ticketStatus,
+        //   source: "SYSTEM",
+        //   message: "Ticket processing completed",
+        //   payload: {
+        //     flightNumber: ticketData.flightCode,
+        //     passengers: ticketData.passengers,
+        //   },
+        // });
+      } else {
+        console.error("❌ Ticket request failed:", result.reason);
+      }
     }
 
-    console.log("All requests finished:", results.length);
-    
+    console.log("✅ All ticket requests processed:", results.length);
+
     return res.status(StatusCodes.ACCEPTED).json({
       status: StatusMessages.ACCEPTED,
       code: Codes.TKT_1003,
@@ -667,7 +662,8 @@ export async function requestTicketIssued(req, res) {
       data: booking,
     });
   } catch (err) {
-    console.log(err.message)
+    console.error("🔥 Error in requestTicketIssued:", err.message);
+
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -675,4 +671,5 @@ export async function requestTicketIssued(req, res) {
     });
   }
 }
+
 
