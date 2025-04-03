@@ -41,13 +41,17 @@ export async function createBooking(req, res) {
 
     await newBooking.save();
 
+    let paymentRef = null;
+
     try {
-      await axios.post(
+      const response = await axios.post(
         `http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`,
         {
           bookingId: newBooking._id.toString(),
         }
       );
+      paymentRef = response?.data?.data?.paymentRef || null;
+
     } catch (err) {
       console.error(
         "Error calling /payments/initiate:",
@@ -64,7 +68,11 @@ export async function createBooking(req, res) {
       status: StatusMessages.SUCCESS,
       code: Codes.RSV_3009,
       message: Messages.RSV_3009,
-      data: newBooking,
+      data: {
+        booking: newBooking,
+        paymentRef,
+      },
+
     });
   } catch (error) {
     console.error("Error in createBooking:", error);
@@ -562,4 +570,3 @@ export async function cancelMyBooking(req, res) {
     });
   }
 }
-

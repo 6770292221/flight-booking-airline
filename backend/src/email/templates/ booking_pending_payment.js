@@ -15,7 +15,7 @@ export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser
 
   const totalPrice = (flightTotalPrice + addonsTotalPrice).toFixed(2);
 
-  const subject = `Booking Pending Payment - ${bookingResponse.bookingId}`;
+  const subject = `Booking Pending Payment - ${bookingResponse.bookingNubmer}`;
 
 
   const html = `
@@ -35,7 +35,7 @@ export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser
             <tr>
               <td>
                 <p style="font-size: 16px; color: #333;">Dear ${reqUser.firstName} ${reqUser.lastName || ""},</p>
-                <p style="font-size: 16px; color: #333;">Thank you for booking with us! Your booking ID is <strong>${bookingResponse.bookingId}</strong>.</p>
+                <p style="font-size: 16px; color: #333;">Thank you for booking with us! Your booking ID is <strong>${bookingResponse.bookingNubmer}</strong>.</p>
               </td>
             </tr>
   
