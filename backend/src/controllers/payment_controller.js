@@ -98,6 +98,7 @@ export async function webhookHandler(req, res) {
       currency,
     } = req.body;
 
+
     const payment = await PaymentMongooseModel.findOne({ paymentRef });
     if (!payment) {
       return res.status(StatusCodes.NOT_FOUND).json({

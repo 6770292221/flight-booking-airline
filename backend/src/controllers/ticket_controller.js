@@ -158,10 +158,10 @@ export async function webhookUpdateTickets(req, res) {
             event: "REFUNDED_SUCCESS",
             paymentRef: payment.paymentRef,
             paymentStatus: "REFUNDED",
-            paymentTransactionId: '"GB1234567890"',
+            refundTransactionId: `RFND-${Date.now()}`,
             paymentProvider: payment.paymentProvider,
             paymentMethod: payment.paymentMethod,
-            paidAt: Date.now(),
+            refundedAt: Date.now(),
             amount: payment.amount ?? 0,
             currency: payment.currency,
           }
