@@ -45,7 +45,7 @@ class MailService {
 
         try {
             const info = this.transporter.sendMail(mailOptions);
-            console.log('Email sent successfully:', info.response);
+            // console.log('Email sent successfully:', info.response);
             return info;
         } catch (error) {
             console.error('Error sending email:', error);

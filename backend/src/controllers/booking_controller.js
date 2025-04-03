@@ -598,7 +598,9 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
     airline,
     flight,
     response
-  };
+  }
+
+  
 }
 
 export async function requestTicketIssued(req, res) {
@@ -615,7 +617,8 @@ export async function requestTicketIssued(req, res) {
       });
     }
 
-    if (booking.status !== "PAID") {
+    if (booking.status !== "PAID" && booking.status == "TICKETING") {
+      console.log(booking.status)
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.TKT_1002,
@@ -625,52 +628,38 @@ export async function requestTicketIssued(req, res) {
 
     const allRequests = booking.flights.map(async (flight) =>  {
       const result = await _sendTicketRequest(flight, passengers, booking.bookingNubmer)
+      booking.status = "TICKETING"
+      await booking.save()
       return result
     }
     );
 
-    let firstFinished;
-    try {
-      firstFinished = await Promise.any(allRequests);
-    } catch (err) {
-      console.error("❌ All requests failed:", err);
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.TKT_1006,
-        message: "All airline ticketing requests failed."
-      });
-    }
-    const isSuccess = firstFinished.response.status === 200;
-    booking.status = "TICKETING"
-    await booking.save()
-    console.log(`status >>>> ${booking.status}`)
+  
 
-    booking.events.push({
-      type: "TICKETING",
-      status: isSuccess ? "PENDING" : "FAILED",
-      source: "SYSTEM",
-      message: isSuccess ? "Ticketing Requested" : "Ticketing Failed",
-      payload: {
-        flightNumber: firstFinished.flight.flightNumber,
-        direction: firstFinished.flight.direction,
-        message: JSON.stringify(firstFinished.response.data)
-      },
-    });
 
-    if (!isSuccess) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.TKT_1004,
-        message: Messages.TKT_1004,
-      });
+
+
+    const results = await Promise.allSettled(allRequests);
+
+    for ( let i = 0 ; i < results.length; i++) {
+      await axios.post(`http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`, results[i].value.response.data.response)
+      // console.log(results[i].value.response.data.response)
+      // console.log(results[i].value.response.data.response.passengers)
+      // booking.events.push({
+      //   type: "TICKETING",
+      //   status: (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "PENDING" : (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "SUCCESS" : "FAILED",
+      //   source: "SYSTEM",
+      //   message: (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "Ticketing request" : (results[i].value.response.data.response.ticketStatus == "SUCCESS" && i < results.length) ? "Ticket issued" : "Ticketing failed",
+      //   payload: {
+      //     flightNumber: results[i].value.response.data.response.f,
+      //     direction: firstFinished.flight.direction,
+      //     message: JSON.stringify(firstFinished.response.data)
+      //   },
+      // });
     }
 
-    await Promise.allSettled(allRequests).then(results => {
-      console.log("All requests finished:", results.length);
-    });
-
-
-    console.log('return response to user')
+    console.log("All requests finished:", results.length);
+    
     return res.status(StatusCodes.ACCEPTED).json({
       status: StatusMessages.ACCEPTED,
       code: Codes.TKT_1003,

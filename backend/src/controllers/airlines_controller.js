@@ -217,7 +217,6 @@ export async function issueTicketing(req, res) {
     const { airlineId, passengers, flight, bookingNubmer } = req.body;
     const strategy = getStrategy(airlineId);
     const response = strategy.issue(flight, passengers , bookingNubmer)
-    // console.log(response.data)
     return res.status(StatusCodes.OK).json({
       response
     })

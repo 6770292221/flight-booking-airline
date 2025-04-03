@@ -106,6 +106,20 @@ export async function webhookHandler(req, res) {
     const booking = await BookingMongooseModel.findOne({
       _id: payment.bookingId,
     });
+    console.log('🍺' + payment.paymentStatus)
+
+
+    if(payment.paymentStatus == "REFUNDED" && booking.status == "FAILED_ISSUED"){
+      
+      console.log('🍺finished flow payment')
+      return
+      // return res.status(StatusCodes.NOT_FOUND).json({
+      //   status: StatusMessages.FAILED,
+      //   code: Codes.PAY_1007,
+      //   message: Messages.PAY_1007,
+      //   data: {message: "Transaction already refunded"},
+      // });
+    }
     if (!booking) {
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
@@ -118,7 +132,7 @@ export async function webhookHandler(req, res) {
     const user = await AccountMongooseModel.findOne({ _id: booking.userId });
 
     if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.PAY_1005,
         message: Messages.PAY_1005,
@@ -132,10 +146,6 @@ export async function webhookHandler(req, res) {
         bookingEventStatus: "SUCCESS",
         message: "Payment issued successfully.",
         sendEmail: sendPaymentSuccessEmail,
-        // sendEmail:  sendPaymentSuccessEmail({
-        //   bookingResponse: booking,
-        //   reqUser: user,
-        // }),
       },
       FAILED_PAID: {
         paymentStatus: "FAILED",
@@ -143,10 +153,6 @@ export async function webhookHandler(req, res) {
         bookingEventStatus: "FAILED",
         message: "Payment issued failed.",
         sendEmail: sendPaymentFailedEmail,
-        // sendEmail:  sendPaymentFailedEmail({
-        //   bookingResponse: booking,
-        //   reqUser: user,
-        // }),
       },
       REFUNDED_SUCCESS: {
         paymentStatus: "REFUNDED",
@@ -154,13 +160,6 @@ export async function webhookHandler(req, res) {
         bookingEventStatus: "SUCCESS",
         message: "Refunded issued successfully.",
         sendEmail: sendRefundsTemplate,
-        // sendEmail:  sendRefundsTemplate({
-        //   bookingResponse: booking,
-        //   reqUser: user,
-        //   refundTxnId: payment.paymentRef,
-        //   refundAmount: payment.refund.refundAmount,
-        //   reason:   "Ticket issuance failed.",
-        // }),
       },
     };
 
@@ -174,6 +173,8 @@ export async function webhookHandler(req, res) {
         data: {},
       });
     }
+
+
 
     // Update payment details
     payment.paymentStatus = eventData.paymentStatus;
@@ -222,26 +223,27 @@ export async function webhookHandler(req, res) {
     ];
 
     // //! หน้าทำ state design pattern
-    // await eventData.sendEmail({
-    //   bookingResponse: booking,
-    //   reqUser: user,
-    //   refundTxnId: payment.paymentRef,
-    //   refundAmount: payment.refund.refundAmount,
-    //   reason:   "Ticket issuance failed.",
-    // });
+    await eventData.sendEmail({
+      bookingResponse: booking,
+      reqUser: user,
+      refundTxnId: payment.paymentRef,
+      refundAmount: payment.refund.refundAmount,
+      reason:   "Ticket issuance failed.",
+    });
 
-    await axios.post(`http://localhost:3001/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
-      passengers: booking.passengers
-    })
-
-    return res.status(StatusCodes.OK).json({
+     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.PAY_1006,
       message: Messages.PAY_1006,
       data: {},
     })
+    console.log('post ticket >>>>')
+    if(payment.paymentStatus != "REFUNDED") {
+      await axios.post(`http://localhost:3001/api/v1/booking-core-api/bookings/${booking.bookingNubmer}/request-ticket-issued`, {
+       passengers: booking.passengers
+     })
+    }
   } catch (err) {
-    // console.error(err);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: "failed",
       code: "PAY_5000",

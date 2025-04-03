@@ -3,16 +3,15 @@ import { StatusCodes, StatusMessages, Codes, Messages } from "../enums/enums.js"
 import { AccountMongooseModel } from '../models/account_models.js';
 import { sendETicketsIssuedEmail, sendETicketsFailedTemplate, sendRefundsTemplate } from '../email/emailService.js';
 import { PaymentMongooseModel } from "../models/payment_models.js";
-
+import axios from "axios";
 
 export async function webhookUpdateTickets(req, res) {
     try {
         const bookingId = req.params._id;
         const { passengers, ticketStatus, reason } = req.body;
 
-
+        console.log("ticket >>>> " + ticketStatus)
         const booking = await BookingMongooseModel.findById(bookingId);
-
         if (!booking) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 status: StatusMessages.FAILED,
@@ -21,7 +20,7 @@ export async function webhookUpdateTickets(req, res) {
             });
         }
 
-        if (ticketStatus === "SUCCESS") {
+        if (ticketStatus === "SUCCESS" && booking.status == "TICKETING") {
             if (!passengers || !Array.isArray(passengers)) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     status: StatusMessages.FAILED,
@@ -105,7 +104,7 @@ export async function webhookUpdateTickets(req, res) {
                 data: booking,
             });
 
-        } else if (ticketStatus === "FAILED") {
+        } else if (ticketStatus === "FAILED" && booking.status == "TICKETING") {
 
             booking.status = "FAILED_ISSUED";
 
@@ -122,31 +121,7 @@ export async function webhookUpdateTickets(req, res) {
             await booking.save();
 
             const payment = await PaymentMongooseModel.findOne({ bookingId: booking._id });
-            if (payment && payment.paymentStatus !== "REFUNDED") {
-                const refundTxnId = `RFND${Date.now()}`;
-
-                payment.paymentStatus = "REFUNDED";
-                payment.refund = payment.refund || {};
-                payment.refund.isRefunded = true;
-                payment.refund.refundedAt = new Date();
-                payment.refund.refundStatus = "SUCCESS";
-                payment.refund.refundAmount = payment.amount;
-                payment.refund.refundTransactionId = refundTxnId;
-
-                payment.events = payment.events || [];
-                payment.events.push({
-                    type: "REFUND_ISSUED",
-                    status: "SUCCESS",
-                    source: "SYSTEM",
-                    message: "Refund processed due to ticket issuance failure.",
-                    payload: { bookingId, reason }
-                });
-
-                await payment.save();
-            }
-
-
-
+  
             const user = await AccountMongooseModel.findById(booking.userId).lean();
 
             if (user) {
@@ -162,13 +137,25 @@ export async function webhookUpdateTickets(req, res) {
 
             if (user) {
 
-                await sendRefundsTemplate({
-                    bookingResponse: booking.toObject(),
-                    reqUser: user,
-                    refundTxnId: payment.paymentRef,
-                    refundAmount: payment.refund.refundAmount,
-                    reason: reason || "Ticket issuance failed."
-                });
+                // await sendRefundsTemplate({
+                //     bookingResponse: booking.toObject(),
+                //     reqUser: user,
+                //     refundTxnId: payment.paymentRef,
+                //     refundAmount: payment.refund.refundAmount,
+                //     reason: reason || "Ticket issuance failed."
+                // });
+                console.log(payment.paymentRef)
+                await axios.post('http://localhost:3001/api/v1/payment-core-api/payments/webhook', {
+                    event: "REFUNDED_SUCCESS",
+                    paymentRef: payment.paymentRef,
+                    paymentStatus: "REFUNDED",
+                    paymentTransactionId: '"GB1234567890"',
+                    paymentProvider: payment.paymentProvider,
+                    paymentMethod: payment.paymentMethod,
+                    paidAt: Date.now(),
+                    amount: payment.refund.refundAmount,
+                    currency: payment.currency 
+                })
             }
 
             return res.status(StatusCodes.OK).json({
@@ -177,15 +164,19 @@ export async function webhookUpdateTickets(req, res) {
                 message: reason || "Ticket issuance failed.",
                 data: booking,
             });
+        
         } else {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                status: StatusMessages.FAILED,
-                code: Codes.RSV_3017,
-                message: "Invalid ticketStatus value.",
-            });
+            console.log("finish flow ticket")
+            return
+            // return res.status(StatusCodes.BAD_REQUEST).json({
+            //     status: StatusMessages.FAILED,
+            //     code: Codes.RSV_3017,
+            //     message: "Invalid ticketStatus value.",
+            // });
         }
 
     } catch (error) {
+        console.error(error)
         return res.status(StatusCodes.SERVER_ERROR).json({
             status: StatusMessages.FAILED,
         });
