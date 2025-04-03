@@ -176,7 +176,8 @@ export const Codes = Object.freeze({
   TKT_1001: "TKT_1001",
   TKT_1002: "TKT_1002",
   TKT_1003: "TKT_1003",
-  TKT_1004: "TKT_1004"
+  TKT_1004: "TKT_1004",
+  TKT_1005: "TKT_1005"
 });
 
 
@@ -336,6 +337,7 @@ export const Messages = Object.freeze({
   TKT_1002: "Booking status is not PAID",
   TKT_1003: "Ticketing successfully",
   TKT_1004: "Ticketing failed",
+  TKT_1005: "Ticket already issued",
 
 });
 

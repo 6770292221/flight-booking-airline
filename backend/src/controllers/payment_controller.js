@@ -90,18 +90,8 @@ export async function webhookHandler(req, res) {
       paymentMethod,
       paidAt,
       amount,
-      currency
+      currency,
     } = req.body;
-
-    const validPaymentMethods = ["CREDIT_CARD", "BANK_TRANSFER"];
-    if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1009,
-        message: Messages.PAY_1009,
-        data: {},
-      });
-    }
 
     const payment = await PaymentMongooseModel.findOne({ paymentRef });
     if (!payment) {
@@ -113,9 +103,30 @@ export async function webhookHandler(req, res) {
       });
     }
 
+    const booking = await BookingMongooseModel.findById(payment.bookingId);
+    if (!booking) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1004,
+        message: Messages.PAY_1004,
+        data: {},
+      });
+    }
 
-    // Validate current paymentStatus
-    if (event === "SUCCESS_PAID" && !["FAILED", "PENDING"].includes(payment.paymentStatus)) {
+    const user = await AccountMongooseModel.findById(booking.userId);
+    if (!user || !user.email) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1005,
+        message: Messages.PAY_1005,
+        data: {},
+      });
+    }
+
+    if (
+      event === "SUCCESS_PAID" &&
+      !["FAILED", "PENDING"].includes(payment.paymentStatus)
+    ) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.PAY_1010,
@@ -124,7 +135,10 @@ export async function webhookHandler(req, res) {
       });
     }
 
-    if (event === "FAILED_PAID" && payment.paymentStatus !== "FAILED") {
+    if (
+      event === "FAILED_PAID" &&
+      !["PENDING", "FAILED"].includes(payment.paymentStatus)
+    ) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.PAY_1011,
@@ -151,147 +165,72 @@ export async function webhookHandler(req, res) {
       });
     }
 
-    const booking = await BookingMongooseModel.findById(payment.bookingId);
-    if (!booking) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1004,
-        message: Messages.PAY_1004,
-        data: {},
+    let paymentStatusUpdate;
+    let bookingStatusUpdate;
+
+    if (event === "SUCCESS_PAID") {
+      paymentStatusUpdate = "SUCCESS";
+      bookingStatusUpdate = "PAID";
+      await sendPaymentSuccessEmail({
+        bookingResponse: booking.toObject(),
+        reqUser: user.toObject(),
+        payment: payment,
+      });
+    } else if (event === "FAILED_PAID") {
+      paymentStatusUpdate = "FAILED";
+      bookingStatusUpdate = "FAILED_PAID";
+      await sendPaymentFailedEmail({
+        bookingResponse: booking.toObject(),
+        reqUser: user.toObject(),
+        payment: payment,
+      });
+    } else if (event === "REFUNDED_SUCCESS") {
+      paymentStatusUpdate = "REFUNDED";
+      // bookingStatusUpdate = "REFUNDED";
+      await sendRefundsTemplate({
+        bookingResponse: booking.toObject(),
+        reqUser: user.toObject(),
+        reason: "Payment refunded",
+        refundTxnId: paymentTransactionId,
+        refundAmount: amount,
+        payment: payment,
       });
     }
 
-    const user = await AccountMongooseModel.findOne({ _id: booking.userId });
-    // Skip flow if already refunded and failed issued
-    if (payment.paymentStatus === "REFUNDED" && booking.status === "FAILED_ISSUED") {
-      console.log("Finished flow payment");
-      return res.status(StatusCodes.OK).json({
-        status: StatusMessages.SUCCESS,
-        code: Codes.PAY_1006,
-        message: "Transaction already refunded",
-        data: {},
-      });
-    }
-
-    if (!user) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1005,
-        message: Messages.PAY_1005,
-        data: {},
-      });
-    }
-    const eventMap = {
-      SUCCESS_PAID: {
-        paymentStatus: "SUCCESS",
-        bookingStatus: "PAID",
-        bookingEventStatus: "SUCCESS",
-        message: "Payment issued successfully.",
-        sendEmail: sendPaymentSuccessEmail,
-      },
-      FAILED_PAID: {
-        paymentStatus: "FAILED",
-        bookingStatus: "FAILED",
-        bookingEventStatus: "FAILED",
-        message: "Payment issued failed.",
-        sendEmail: sendPaymentFailedEmail,
-      },
-      REFUNDED_SUCCESS: {
-        paymentStatus: "REFUNDED",
-        bookingStatus: "REFUNDED",
-        bookingEventStatus: "SUCCESS",
-        message: "Refunded issued successfully.",
-        sendEmail: sendRefundsTemplate,
-      },
-    };
-
-    const eventData = eventMap[event];
-
-    if (!eventData) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.PAY_1002,
-        message: Messages.PAY_1002,
-        data: {},
-      });
-    }
-
-
-
-    // Update payment details
-    payment.paymentStatus = eventData.paymentStatus;
-    payment.paidAt = paidAt;
+    payment.paymentStatus = paymentStatusUpdate;
+    payment.paymentTransactionId = paymentTransactionId;
     payment.paymentMethod = paymentMethod;
-    payment.updatedAt = new Date();
     payment.paymentProvider = paymentProvider;
+    payment.paidAt = paidAt;
+    payment.amount = amount;
+    payment.currency = currency;
+
+    payment.updatedAt = new Date();
+
     payment.events.push({
-      type: "PAYMENT_ISSUED",
-      status: eventData.paymentStatus,
-      source: "WEBHOOK",
-      message: eventData.message,
-      payload: {
-        bookingId: payment.bookingId,
-        reason: eventData.message,
-      },
+      payload: req.body,
     });
 
-    booking.status = eventData.bookingStatus;
-    // booking.events.push({
-    //   type: "PAYMENT_ISSUED",
-    //   status: eventData.bookingEventStatus,
-    //   source: "WEBHOOK",
-    //   message: eventData.message,
-    //   payload: {
-    //     paymentRef,
-    //     paymentTransactionId,
-    //     reason: eventData.message,
-    //   },
-    // });
+    booking.status = bookingStatusUpdate;
+    booking.updatedAt = new Date();
 
-    // Save both documents
     await payment.save();
     await booking.save();
-    booking.payments = [
-      {
-        paymentRef: paymentRef,
-        paymentStatus: paymentStatus,
-        paymentTransactionId: paymentTransactionId,
-        paymentMethod: paymentMethod,
-        paymentProvider: paymentProvider,
-        amount: amount,
-        currency: currency,
-        paidAt: paidAt,
-      },
-    ];
 
-    // //! หน้าทำ state design pattern
-    await eventData.sendEmail({
-      bookingResponse: booking,
-      reqUser: user,
-      refundTxnId: payment?.paymentRef ?? "",
-      refundAmount: payment?.refund?.refundAmount ?? "",
-      reason:   eventData.message ?? "",
-    });
-
-     res.status(StatusCodes.OK).json({
+    res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.PAY_1008,
-      message: Messages.PAY_1008,
+      code: Codes.PAY_1006,
+      message: Messages.PAY_1006,
       data: {},
     });
 
-    // Call ticket issuance API in background
-    if (payment.paymentStatus !== "REFUNDED") {
-       axios.post(`http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`, {
-        passengers: booking.passengers,
-      }).then(() => {
-        console.log("Ticket issuance requested.");
-      }).catch((error) => {
-        console.error("Failed to issue ticket:", error.message);
-      });
+    if (event === "SUCCESS_PAID") {
+      axios.get(
+        `http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`
+      );
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: "failed",
       code: "PAY_5000",

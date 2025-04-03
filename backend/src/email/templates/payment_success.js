@@ -1,5 +1,4 @@
-export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
-  const payment = bookingResponse.payments[0];
+export default function paymentSuccessTemplate({ bookingResponse, reqUser, payment }) {
   const subject = `Payment Successful - Booking ID ${bookingResponse.bookingNubmer}`;
 
   const text = `
@@ -60,7 +59,7 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser }) {
         </td>
       </tr>
     </table>
-    `;
+  `;
 
   return { subject, text, html };
 }

@@ -5,7 +5,7 @@ import { webhookUpdateTickets, requestTicketIssued } from '../controllers/ticket
 const routerTicket = Router();
 
 routerTicket.post("/webhooks/update-tickets/:_id", webhookUpdateTickets);
-routerTicket.post('/ticket/:id/request-ticket-issued', requestTicketIssued);
+routerTicket.get('/ticket/:id/request-ticket-issued', requestTicketIssued);
 
 
 export default routerTicket;

@@ -39,8 +39,8 @@ export async function sendETicketsIssuedEmail({ bookingResponse, reqUser }) {
     }
 }
 
-export async function sendPaymentSuccessEmail({ bookingResponse, reqUser }) {
-    const { subject, text, html } = paymentSuccessTemplate({ bookingResponse, reqUser });
+export async function sendPaymentSuccessEmail({ bookingResponse, reqUser, payment }) {
+    const { subject, text, html } = paymentSuccessTemplate({ bookingResponse, reqUser, payment });
 
     try {
         const userEmail = reqUser.email;
@@ -52,8 +52,13 @@ export async function sendPaymentSuccessEmail({ bookingResponse, reqUser }) {
 }
 
 
-export async function sendPaymentFailedEmail({ bookingResponse, reqUser }) {
-    const { subject, text, html } = paymentFailedTemplate({ bookingResponse, reqUser });
+
+export async function sendPaymentFailedEmail({ bookingResponse, reqUser, payment }) {
+    const { subject, text, html } = paymentFailedTemplate({
+        bookingResponse: bookingResponse,
+        reqUser: reqUser,
+        payment: payment
+    });
 
     try {
         const userEmail = reqUser.email;
@@ -63,7 +68,6 @@ export async function sendPaymentFailedEmail({ bookingResponse, reqUser }) {
         console.error("Failed to send Payment Failed email:", error);
     }
 }
-
 
 export async function sendVerifyRegisterEmail(reqUser) {
     const { subject, text, html } = verifyRegisterTemplate({ reqUser });
