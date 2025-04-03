@@ -40,7 +40,7 @@ export class VietJetStrategy extends TicketStrategy {
     return {
       bookingId: bookingNumber,
       ticketStatus: "FAILED",
-      reason: "No available seats",
+      reason: "No available seats on the selected flight",
       passengers: passengers.map((p) => ({
         passportNumber: p.passportNumber,
         tickets: {
