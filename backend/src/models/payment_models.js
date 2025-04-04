@@ -21,7 +21,7 @@ const paymentSchema = new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ["SUCCESS", "PENDING", "REFUNDED", "FAILED"],
+        enum: ["SUCCESS", "PENDING", "REFUNDED", "FAILED", "REJECTED"],
         default: "PENDING"
     },
     paymentMethod: { type: String, enum: ["CREDIT_CARD", "BANK_TRANSFER"] },

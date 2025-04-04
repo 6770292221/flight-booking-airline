@@ -82,6 +82,7 @@ export async function initiatePayment(req, res) {
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 export async function webhookHandler(req, res) {
   try {
     const {
@@ -109,6 +110,15 @@ export async function webhookHandler(req, res) {
       });
     }
 
+    if (payment.paymentStatus === "REJECTED") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1015,
+        message: Messages.PAY_1015,
+        data: {},
+      });
+    }
+
     const booking = await BookingMongooseModel.findById(payment.bookingId);
     if (!booking) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -132,7 +142,7 @@ export async function webhookHandler(req, res) {
     // Validate status transitions
     if (
       event === "SUCCESS_PAID" &&
-      !["FAILED", "PENDING"].includes(payment.paymentStatus)
+      !["PENDING", "FAILED"].includes(payment.paymentStatus)
     ) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
@@ -277,7 +287,7 @@ export async function webhookHandler(req, res) {
         payment: payment,
       });
 
-      await delay(5000);
+      await delay(2000);
       await axios.get(
         `http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`
       );
@@ -298,7 +308,6 @@ export async function webhookHandler(req, res) {
     });
   }
 }
-
 
 export async function getPaymentById(req, res) {
   try {

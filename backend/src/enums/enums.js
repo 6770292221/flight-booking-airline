@@ -178,6 +178,7 @@ export const Codes = Object.freeze({
   PAY_1012: "PAY_1010",
   PAY_1013: "PAY_1013",
   PAY_1014: "PAY_1014",
+  PAY_1015: "PAY_1015",
 
 
 
@@ -343,6 +344,7 @@ export const Messages = Object.freeze({
   PAY_1012: "Refund not allowed. The payment has not been completed.",
   PAY_1013: "We couldn’t process the payment because the amount doesn’t match our records.",
   PAY_1014: "Duplicate paymentTransactionId found.",
+  PAY_1015: "Cannot process event on REJECTED payment status.",
 
 
 
