@@ -7,6 +7,7 @@ import verifyRegisterTemplate from './templates/verify_register.js';
 import eTicketsFailedTemplate from './templates/e_tickets_issued_failed.js'
 import refundEmailTemplate from './templates/refunds_success.js'
 import emailOtpTemplate from './templates/email_otp.js';
+import bookingCancelledTemplate from './templates/booking_cancelled.js';
 
 
 
@@ -99,8 +100,6 @@ export async function sendETicketsFailedTemplate({ bookingResponse, reqUser, rea
     }
 }
 
-
-
 export async function sendRefundsTemplate({ bookingResponse, reqUser, reason, refundTxnId, refundAmount }) {
     try {
         const { subject, text, html } = refundEmailTemplate({ bookingResponse, reqUser, reason, refundTxnId, refundAmount });
@@ -118,11 +117,27 @@ export async function sendRefundsTemplate({ bookingResponse, reqUser, reason, re
     }
 }
 
-
 export async function sendOtpEmail(reqUser, otp) {
     const { subject, html } = emailOtpTemplate({ reqUser, otp });
 
     const to = reqUser.email;
 
     await MailService.sendEmail(to, subject, null, html);
+}
+
+export async function sendBookingCancelledEmail({ bookingResponse, reqUser, reason }) {
+    try {
+        const { subject, text, html } = bookingCancelledTemplate({ bookingResponse, reqUser, reason });
+        const userEmail = reqUser?.email;
+
+        if (!userEmail) {
+            console.error("No recipient email found for Booking Cancelled email");
+            return;
+        }
+
+        await MailService.sendEmail(userEmail, subject, text, html);
+        console.log(`Booking Cancelled email sent to ${userEmail}`);
+    } catch (error) {
+        console.error("Failed to send Booking Cancelled email:", error);
+    }
 }

@@ -149,6 +149,8 @@ export async function verifyEmailOtp(req, res) {
       {
         userId: user._id,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
         name: user.name,
         isAdmin: user.isAdmin,
       },

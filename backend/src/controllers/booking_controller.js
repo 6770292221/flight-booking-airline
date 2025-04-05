@@ -1,4 +1,7 @@
 import { BookingMongooseModel } from "../models/booking_models.js";
+import { PaymentMongooseModel } from "../models/payment_models.js";
+import { AccountMongooseModel } from "../models/account_models.js";
+
 import {
   StatusCodes,
   StatusMessages,
@@ -6,14 +9,8 @@ import {
   Messages,
 } from "../enums/enums.js";
 import mongoose from "mongoose";
-import {
-  sendBookingPendingPaymentEmail,
-  sendPaymentSuccessEmail,
-  sendPaymentFailedEmail,
-} from "../email/emailService.js";
-import { AccountMongooseModel } from "../models/account_models.js";
+import { sendBookingPendingPaymentEmail, sendBookingCancelledEmail } from "../email/emailService.js";
 import axios from "axios";
-import { issueTicketing } from "./airlines_controller.js";
 
 export async function createBooking(req, res) {
   try {
@@ -24,7 +21,6 @@ export async function createBooking(req, res) {
         message: Messages.TKN_6001,
       });
     }
-
     const userId = req.user.userId;
     const bookingData = req.body;
     bookingData.userId = userId;
@@ -75,7 +71,6 @@ export async function createBooking(req, res) {
 
     });
   } catch (error) {
-    console.error("Error in createBooking:", error);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       message: StatusMessages.SERVER_ERROR,
@@ -290,86 +285,6 @@ export async function updateBooking(req, res) {
   }
 }
 
-export async function updatePayments(req, res) {
-  try {
-    const bookingNubmer = req.params._id;
-
-    const { payments, status } = req.body;
-
-    if (!payments || !Array.isArray(payments)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.RSV_3006,
-        message: Messages.RSV_3006,
-      });
-    }
-
-    const booking = await BookingMongooseModel.findById(bookingNubmer);
-
-    if (!booking) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        code: Codes.RSV_3011,
-        message: Messages.RSV_3011,
-      });
-    }
-
-    booking.payments = payments;
-
-    if (status) {
-      booking.status = status;
-    }
-
-    booking.updatedAt = new Date();
-
-    const user = await AccountMongooseModel.findById(booking.userId).lean();
-
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        status: StatusMessages.FAILED,
-        message: "User not found for this booking.",
-      });
-    }
-
-    if (status === "CONFIRM") {
-      await sendPaymentSuccessEmail({
-        bookingResponse: booking.toObject(),
-        reqUser: user,
-      });
-    }
-
-    if (status === "REJECTED") {
-      await sendPaymentFailedEmail({
-        bookingResponse: booking.toObject(),
-        reqUser: user,
-      });
-    }
-
-    const validationError = booking.validateSync();
-    if (validationError) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.VAL_4004,
-        message: Messages.VAL_4004,
-      });
-    }
-
-    await booking.save();
-
-    return res.status(StatusCodes.OK).json({
-      status: StatusMessages.SUCCESS,
-      code: Codes.RSV_3005,
-      message: Messages.RSV_3005,
-      data: booking,
-    });
-  } catch (error) {
-    return res.status(StatusCodes.SERVER_ERROR).json({
-      status: StatusMessages.FAILED,
-      message: StatusMessages.SERVER_ERROR,
-    });
-  }
-}
-
 export async function getMyBookings(req, res) {
   try {
     const userId = req.user.userId;
@@ -484,7 +399,7 @@ export async function cancelExpiredBookings(req, res) {
       });
     }
 
-    const bulkOps = expiredBookings.map((b) => ({
+    const bulkBookingOps = expiredBookings.map((b) => ({
       updateOne: {
         filter: { _id: b._id },
         update: {
@@ -496,7 +411,49 @@ export async function cancelExpiredBookings(req, res) {
       },
     }));
 
-    await BookingMongooseModel.bulkWrite(bulkOps);
+    const bookingIds = expiredBookings.map((b) => b._id);
+
+    const bulkPaymentOps = bookingIds.map((bookingId) => ({
+      updateOne: {
+        filter: { bookingId },
+        update: {
+          $set: {
+            paymentStatus: "REJECTED",
+            updatedAt: new Date(),
+          },
+        },
+      },
+    }));
+
+    await BookingMongooseModel.bulkWrite(bulkBookingOps);
+    await PaymentMongooseModel.bulkWrite(bulkPaymentOps);
+
+    // for (const booking of expiredBookings) {
+    //   const user = await AccountMongooseModel.findById(booking.userId);
+
+    //   if (user?.email) {
+    //     await sendBookingCancelledEmail({
+    //       bookingResponse: booking.toObject(),
+    //       reqUser: user.toObject(),
+    //       reason: "Booking expired and was automatically cancelled",
+    //     });
+    //   } else {
+    //     console.warn(`No email found for userId: ${booking.userId}`);
+    //   }
+    // }
+
+    await Promise.all(
+      expiredBookings.map(async (booking) => {
+        const user = await AccountMongooseModel.findById(booking.userId);
+        if (user?.email) {
+          await sendBookingCancelledEmail({
+            bookingResponse: booking.toObject(),
+            reqUser: user.toObject(),
+            reason: "Booking expired and was automatically cancelled",
+          });
+        }
+      })
+    );
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
@@ -523,9 +480,9 @@ export async function cancelMyBooking(req, res) {
     }
 
     const userId = req.user.userId;
-    const bookingNubmer = req.params._id;
+    const bookingId = req.params._id;
 
-    const booking = await BookingMongooseModel.findById(bookingNubmer);
+    const booking = await BookingMongooseModel.findById(bookingId);
 
     if (!booking) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -558,11 +515,28 @@ export async function cancelMyBooking(req, res) {
 
     await booking.save();
 
+    await PaymentMongooseModel.updateOne(
+      { bookingId: booking._id },
+      {
+        $set: {
+          paymentStatus: "REJECTED",
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    await sendBookingCancelledEmail({
+      bookingResponse: booking.toObject(),
+      reqUser: req.user,
+      reason: "User cancelled the booking",
+    });
+
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.RSV_3015,
       message: Messages.RSV_3015,
-    });
+    })
+
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
