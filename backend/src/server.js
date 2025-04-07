@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cron from 'node-cron';
-import connectDB from "./utils/mongo_utils.js";
+import mongoClient from "./utils/mongo_utils.js";
 import redisClient from './utils/redis_utils.js';
 import routerAccount from "./routes/account_routes.js";
 import routerAuth from './routes/auth_routes.js';
@@ -34,8 +34,8 @@ app.use('/api/v1/airport-core-api', routerAirports);
 app.use('/api/v1/ticket-core-api', routerTicket);
 app.use('/api/v1/aircraft-core-api', routerAircraft);
 
-connectDB(logger);
-redisClient.connect();
+await mongoClient
+await redisClient.connect();
 
 app.listen(port, () => {
   logger.info('Notification email sent successfully.');
