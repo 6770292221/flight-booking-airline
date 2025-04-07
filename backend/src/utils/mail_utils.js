@@ -12,7 +12,6 @@ class MailService {
         if (MailService.instance) {
             return MailService.instance;
         }
-        console.log(process.env.EMAIL_USER)
         this.transporter = nodemailer.createTransport({
             service: 'Gmail',
             host: 'smtp.gmail.com',
@@ -44,14 +43,14 @@ class MailService {
         };
 
         try {
-            const info = this.transporter.sendMail(mailOptions);
-            // console.log('Email sent successfully:', info.response);
+            const info = await this.transporter.sendMail(mailOptions);
             return info;
-        } catch (error) {
-            console.error('Error sending email:', error);
-            throw new Error('Email sending failed.');
+        } catch (err) {
+            console.error('Failed to send email:', err);
+            throw err;
         }
     }
+
 }
 
 

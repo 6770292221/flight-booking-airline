@@ -64,7 +64,7 @@ export async function createAccount(req, res) {
     } = req.body;
 
     if (!firstName || !lastName || !password || !email || !phoneNumber) {
-      logger.info(`Validation failed: Missing fields`, "error");
+      logger.error(`Validation failed: Missing fields`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.VAL_4001,
@@ -100,7 +100,7 @@ export async function createAccount(req, res) {
         `${Messages.REG_1003}: ${email}`
       );
     } catch (validationError) {
-      logger.info(`Validation error: ${validationError.message}`, "error");
+      logger.error(`Validation error: ${validationError.message}`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: validationError.code,
@@ -117,7 +117,7 @@ export async function createAccount(req, res) {
         Messages.REG_1005
       );
     } catch (accountError) {
-      logger.info(`Account already exists: ${email}`, "warn");
+      logger.error(`Account already exists: ${email}`, "warn");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: accountError.code,
@@ -145,7 +145,7 @@ export async function createAccount(req, res) {
     const user = await AccountMongooseModel.findOne({ email });
 
     if (!user) {
-      logger.info(`Account creation failed: ${email}`, "error");
+      logger.error(`Account creation failed: ${email}`, "error");
       return res.status(StatusCodes.UNAUTHORIZED).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2003,
@@ -186,7 +186,7 @@ export async function createAccount(req, res) {
       },
     });
   } catch (error) {
-    logger.info(`Unexpected error: ${error.message}`, "error");
+    logger.error(`Unexpected error: ${error.message}`, "error");
     res.status(StatusCodes.SERVER_ERROR).json(
       ResponseModel.create({
         status: StatusMessages.FAILED,
@@ -201,7 +201,7 @@ export async function verifyUserByEmail(req, res) {
     const { email } = req.params;
 
     if (!email) {
-      logger.info(`Email is missing from request`, "error");
+      logger.error(`Email is missing from request`, "error");
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.VAL_4001,
@@ -214,7 +214,7 @@ export async function verifyUserByEmail(req, res) {
     });
 
     if (!user) {
-      logger.info(`Account not found for email: ${email}`, "warn");
+      logger.error(`Account not found for email: ${email}`, "warn");
       return res.status(StatusCodes.NOT_FOUND).json({
         status: StatusMessages.FAILED,
         code: Codes.REG_1002,
@@ -236,17 +236,8 @@ export async function verifyUserByEmail(req, res) {
 
     logger.info(`Account verified successfully: ${email}`, "info");
     return res.redirect(`http://127.0.0.1:5500/frontend/src/pages/index.html`);
-    return res.status(StatusCodes.OK).json({
-      status: StatusMessages.SUCCESS,
-      code: Codes.REG_1008,
-      message: Messages.REG_1008,
-      data: {
-        email: user.email,
-        verified: user.verified,
-      },
-    });
   } catch (error) {
-    logger.info(`Unexpected error: ${error.message}`, "error");
+    logger.error(`Unexpected error: ${error.message}`, "error");
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       message: StatusMessages.SERVER_ERROR,

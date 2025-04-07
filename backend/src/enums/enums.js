@@ -129,6 +129,17 @@ export const Codes = Object.freeze({
   //General
   GNR_1001: "GNR_1001",
 
+  //Aircraft Codes
+  CRAFT_1001: "CRAFT_1001",
+  CRAFT_1002: "CRAFT_1002",
+  CRAFT_1003: "CRAFT_1003",
+  CRAFT_1004: "CRAFT_1004",
+  CRAFT_1005: "CRAFT_1005",
+  CRAFT_1006: "CRAFT_1006",
+  CRAFT_1007: "CRAFT_1007",
+  CRAFT_1008: "CRAFT_1008",
+  CRAFT_1009: "CRAFT_1009",
+
   //Airline Codes
   AIR_1001: "AIR_1001",
   AIR_1002: "AIR_1002",
@@ -295,6 +306,18 @@ export const Messages = Object.freeze({
   //General Messages
   GNR_1001: "Internal Server Error",
 
+  // Aircraft Messages
+  CRAFT_1001: "Aircraft created successfully.",
+  CRAFT_1002: "Missing required fields: carrierCode, aircraftName, logoUrl, country.",
+  CRAFT_1003: "Aircraft with this carrierCode already exists.",
+  CRAFT_1004: "Aircraft retrieved successfully.",
+  CRAFT_1005: "Aircraft not found.",
+  CRAFT_1006: "Aircraft updated successfully.",
+  CRAFT_1007: "Aircraft deleted successfully.",
+  CRAFT_1008: "Aircraft validation error. Please check your data.",
+  CRAFT_1009: "Aircraft updated successfully",
+  CRAFT_1011: "Aircraft retrieved by Id successfully.",
+
   // Airline Messages
   AIR_1001: "Airline created successfully.",
   AIR_1002: "Missing required fields: carrierCode, airlineName, logoUrl, country.",
@@ -304,6 +327,7 @@ export const Messages = Object.freeze({
   AIR_1006: "Airline updated successfully.",
   AIR_1007: "Airline deleted successfully.",
   AIR_1008: "Airline validation error. Please check your data.",
+  AIR_1011: "Airline retrieved by Id successfully.",
 
   // Cabin Class Messages
   CABIN_1001: "Cabin Class created successfully.",

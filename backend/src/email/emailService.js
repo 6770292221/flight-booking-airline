@@ -8,7 +8,7 @@ import eTicketsFailedTemplate from './templates/e_tickets_issued_failed.js'
 import refundEmailTemplate from './templates/refunds_success.js'
 import emailOtpTemplate from './templates/email_otp.js';
 import bookingCancelledTemplate from './templates/booking_cancelled.js';
-
+import logger from '../utils/logger_utils.js';
 
 
 export async function sendBookingPendingPaymentEmail({ bookingResponse, reqUser }) {
@@ -17,9 +17,9 @@ export async function sendBookingPendingPaymentEmail({ bookingResponse, reqUser 
     try {
         const userEmail = reqUser.email;
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Pending Payment email sent to ${userEmail}`);
+        logger.info(`Pending Payment email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send Pending Payment email:", error);
+        logger.error("Failed to send Pending Payment email:", error);
     }
 }
 
@@ -29,14 +29,14 @@ export async function sendETicketsIssuedEmail({ bookingResponse, reqUser }) {
         const userEmail = reqUser?.email;
 
         if (!userEmail) {
-            console.error("No recipient email found for E-Tickets issued email");
+            logger.error("No recipient email found for E-Tickets issued email");
             return;
         }
 
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`E-Tickets email sent to ${userEmail}`);
+        logger.info(`E-Tickets email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send E-Tickets email:", error);
+        logger.error("Failed to send E-Tickets email:", error);
     }
 }
 
@@ -46,9 +46,9 @@ export async function sendPaymentSuccessEmail({ bookingResponse, reqUser, paymen
     try {
         const userEmail = reqUser.email;
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Payment Success email sent to ${userEmail}`);
+        logger.info(`Payment Success email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send Payment Success email:", error);
+        logger.error("Failed to send Payment Success email:", error);
     }
 }
 
@@ -64,9 +64,9 @@ export async function sendPaymentFailedEmail({ bookingResponse, reqUser, payment
     try {
         const userEmail = reqUser.email;
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Payment Failed email sent to ${userEmail}`);
+        logger.info(`Payment Failed email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send Payment Failed email:", error);
+        logger.error("Failed to send Payment Failed email:", error);
     }
 }
 
@@ -75,10 +75,10 @@ export async function sendVerifyRegisterEmail(reqUser) {
     try {
         const userEmail = reqUser.email;
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Verify email sent to ${userEmail}`);
+        logger.info(`Verify email sent to ${userEmail}`);
 
     } catch (error) {
-        console.error("Failed to send Verify email:", error);
+        logger.error("Failed to send Verify email:" + JSON.stringify(error));
     }
 }
 
@@ -89,14 +89,14 @@ export async function sendETicketsFailedTemplate({ bookingResponse, reqUser, rea
         const userEmail = reqUser?.email;
 
         if (!userEmail) {
-            console.error("No recipient email found for E-Tickets issued email");
+            logger.error("No recipient email found for E-Tickets issued email");
             return;
         }
 
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`E-Tickets email sent to ${userEmail}`);
+        logger.info(`E-Tickets email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send E-Tickets email:", error);
+        logger.error("Failed to send E-Tickets email:", error);
     }
 }
 
@@ -106,14 +106,14 @@ export async function sendRefundsTemplate({ bookingResponse, reqUser, reason, re
         const userEmail = reqUser?.email;
 
         if (!userEmail) {
-            console.error("No recipient email found for Refunds email");
+            logger.error("No recipient email found for Refunds email");
             return;
         }
 
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Refunds email sent to ${userEmail}`);
+        logger.info(`Refunds email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send E-Tickets email:", error);
+        logger.error("Failed to send E-Tickets email:", error);
     }
 }
 
@@ -131,13 +131,13 @@ export async function sendBookingCancelledEmail({ bookingResponse, reqUser, reas
         const userEmail = reqUser?.email;
 
         if (!userEmail) {
-            console.error("No recipient email found for Booking Cancelled email");
+            logger.error("No recipient email found for Booking Cancelled email");
             return;
         }
 
         await MailService.sendEmail(userEmail, subject, text, html);
-        console.log(`Booking Cancelled email sent to ${userEmail}`);
+        logger.info(`Booking Cancelled email sent to ${userEmail}`);
     } catch (error) {
-        console.error("Failed to send Booking Cancelled email:", error);
+        logger.error("Failed to send Booking Cancelled email:", error);
     }
 }

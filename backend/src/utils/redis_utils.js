@@ -3,9 +3,6 @@ import dotenv from 'dotenv';
 import logger from '../utils/logger_utils.js';
 dotenv.config({ path: "./src/config/config.env" });
 
-const host = process.env.REDIS_HOST
-const port = process.env.REDIS_PORT
-const password = process.env.REDIS_PASSWORD
 
 const client = redis.createClient({
     socket: {
@@ -18,11 +15,11 @@ const client = redis.createClient({
 
 
 client.on('connect', () => {
-    console.log('Redis connected successfully');
+    logger.info('Redis connected successfully');
 });
 
 client.on('error', (err) => {
-    console.log('Redis connection failed:', "error");
+    logger.error('Redis connection failed:' + err);
 });
 
 
