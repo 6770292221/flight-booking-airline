@@ -10,7 +10,6 @@ import axios from "axios";
 
 export const postFlightsOffer = async (req, res) => {
   try {
-    await HeaderInterceptor.fetchToken();
     const airlines = await AirlineMongooseModel.find();
     const airports = await AirportMongooseModel.find();
     const domestic = airlines.map((value) => value.carrierCode).join(',')

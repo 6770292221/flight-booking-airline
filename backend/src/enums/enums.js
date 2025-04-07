@@ -147,7 +147,6 @@ export const Codes = Object.freeze({
   AIR_1004: "AIR_1004",
   AIR_1005: "AIR_1005",
   AIR_1006: "AIR_1006",
-  AIR_1007: "AIR_1007",
   AIR_1008: "AIR_1008",
 
   // Cabin Class Codes
@@ -161,7 +160,7 @@ export const Codes = Object.freeze({
 
   AIR_1004: "AIR_1004",
   AIR_1005: "AIR_1005",
-  AIR_1006: "AIR_1006",
+  // AIR_1006: "AIR_1006",
   AIR_1007: "AIR_1007",
   AIR_1008: "AIR_1008",
   AIR_1009: "AIR_1009",
@@ -340,8 +339,6 @@ export const Messages = Object.freeze({
 
   AIR_1004: "Airports retrieved successfully.",
   AIR_1005: "No airports found.",
-  AIR_1006: "Failed to retrieve airports.",
-  AIR_1007: "Airport created successfully",
   AIR_1008: "Airports with this code already exists.",
   AIR_1009: "Airport updated successfully",
   AIR_1010: "Airport deleted successfully",

@@ -5,7 +5,8 @@ import {
   StatusMessages,
   Messages,
 } from "../enums/enums.js";
-import {getStrategy} from "../models/third_party_response_models.js";
+import { getStrategy } from "../models/third_party_response_models.js";
+import logger from '../utils/logger_utils.js'
 
 export async function getAirlines(req, res) {
   try {
@@ -22,7 +23,7 @@ export async function getAirlines(req, res) {
       .sort({ updatedAt: -1 });
 
     const totalAirlines = await AirlineMongooseModel.countDocuments(query);
-
+    logger.info(Messages.AIR_1004)
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.AIR_1004,
@@ -38,6 +39,7 @@ export async function getAirlines(req, res) {
       },
     });
   } catch (error) {
+    logger.error(JSON.stringify(error))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -53,6 +55,7 @@ export async function getAirlineById(req, res) {
     const airline = await AirlineMongooseModel.findById(id);
 
     if (!airline) {
+      logger.error(Messages.AIR_1005)
       return res.status(StatusCodes.NOT_FOUND).json({
         error: {
           status: StatusMessages.FAILED,
@@ -61,7 +64,7 @@ export async function getAirlineById(req, res) {
         },
       });
     }
-
+    logger.info(Messages.AIR_1004)
     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.AIR_1004,
@@ -69,6 +72,7 @@ export async function getAirlineById(req, res) {
       data: airline,
     });
   } catch (error) {
+    logger.error(JSON.stringify(error))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -82,6 +86,7 @@ export async function createAirline(req, res) {
     const { carrierCode, airlineName, logoUrl, country, isLowCost } = req.body;
 
     if (!carrierCode || !airlineName || !logoUrl || !country) {
+      logger.error(Messages.AIR_1002)
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         error: {
@@ -94,6 +99,7 @@ export async function createAirline(req, res) {
 
     const existingAirline = await AirlineMongooseModel.findOne({ carrierCode });
     if (existingAirline) {
+      logger.error(Messages.AIR_1003)
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         error: {
@@ -114,6 +120,7 @@ export async function createAirline(req, res) {
 
     const validationError = newAirline.validateSync();
     if (validationError) {
+      logger.error(Messages.VAL_4004)
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         error: {
@@ -126,7 +133,7 @@ export async function createAirline(req, res) {
     }
 
     await newAirline.save();
-
+    logger.info(Messages.AIR_1001)
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
       code: Codes.AIR_1001,
@@ -134,6 +141,7 @@ export async function createAirline(req, res) {
       data: newAirline,
     });
   } catch (error) {
+    logger.error(JSON.stringify(error))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -154,6 +162,7 @@ export async function updateAirline(req, res) {
     );
 
     if (!updatedAirline) {
+      logger.error(Messages.AIR_1005)
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         error: {
@@ -164,6 +173,7 @@ export async function updateAirline(req, res) {
       });
     }
 
+    logger.info(Messages.AIR_1006)
     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.AIR_1006,
@@ -171,6 +181,7 @@ export async function updateAirline(req, res) {
       data: updatedAirline,
     });
   } catch (error) {
+    logger.error(JSON.stringify(error))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -186,6 +197,7 @@ export async function deleteAirline(req, res) {
     const deletedAirline = await AirlineMongooseModel.findByIdAndDelete(id);
 
     if (!deletedAirline) {
+      logger.error(Messages.AIR_1005)
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         error: {
@@ -195,7 +207,7 @@ export async function deleteAirline(req, res) {
         },
       });
     }
-
+    logger.info(Messages.AIR_1007)
     res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.AIR_1007,
@@ -204,6 +216,7 @@ export async function deleteAirline(req, res) {
       data: deletedAirline,
     });
   } catch (error) {
+    logger.error(JSON.stringify(error))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,
@@ -216,11 +229,13 @@ export async function issueTicketing(req, res) {
   try {
     const { airlineId, passengers, flight, bookingNubmer } = req.body;
     const strategy = getStrategy(airlineId);
-    const response = strategy.issue(flight, passengers , bookingNubmer)
+    const response = strategy.issue(flight, passengers, bookingNubmer)
+    logger.info(`issue ticketing: ${airlineId}: ${bookingNubmer}`)
     return res.status(StatusCodes.OK).json({
       response
     })
   } catch (err) {
+    logger.error(JSON.stringify(err))
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: Codes.GNR_1001,

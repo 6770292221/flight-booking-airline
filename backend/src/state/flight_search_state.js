@@ -2,65 +2,57 @@ import { HeaderInterceptor } from "../utils/header_interceptor.js";
 import axios from "axios";
 import { MapUtils } from "../utils/map_utils.js";
 import redisClient from "../utils/redis_utils.js";
-import { DirectFieldExpression, LookupExpression } from "../interpreter/expression.js";
-import {MappingInterpreter} from "../interpreter/expression_context.js"
+import {
+  DirectFieldExpression,
+  LookupExpression,
+} from "../interpreter/expression.js";
+import { MappingInterpreter } from "../interpreter/expression_context.js";
+import { RequestConfigBuilder } from "../utils/build_pattern.js";
+import logger from '../utils/logger_utils.js'
 
 export class FlightSearchState {
   constructor() {
-     this.expressions = [
+    this.expressions = [
       new DirectFieldExpression("direction", "flag"),
-      new DirectFieldExpression("flightNumber", "segment.carrierCode + segment.number"),
-      new LookupExpression("departure.cityName", "airports", "segment.departure.iataCode", "cityName"),
-      new LookupExpression("aircraft.name", "aircrafts", "segment.aircraft.code", "name"),
+      new DirectFieldExpression(
+        "flightNumber",
+        "segment.carrierCode + segment.number"
+      ),
+      new LookupExpression(
+        "departure.cityName",
+        "airports",
+        "segment.departure.iataCode",
+        "cityName"
+      ),
+      new LookupExpression(
+        "aircraft.name",
+        "aircrafts",
+        "segment.aircraft.code",
+        "name"
+      ),
     ];
   }
   async search(reqBody, sharedData) {
     throw new Error("search() must be implemented by subclass");
   }
 
-  // async getCache(key) {
-  //   const result = await redisClient.get(key);
-  //   return result ? JSON.parse(result) : null;
-  // }
-
-  // async setCache(key, value, ttlSeconds = 300) {
-  //   await redisClient.setEx(key, ttlSeconds, JSON.stringify(value));
-  // }
-
-  // buildCacheKey(reqBody, direction = OnewayState.name) {
-  //   const {
-  //     originLocationCode,
-  //     destinationLocationCode,
-  //     departureDate,
-  //     adults,
-  //     children,
-  //     infants,
-  //   } = reqBody;
-  //   return direction == OnewayState.name
-  //     ? `${originLocationCode}:${destinationLocationCode}:${departureDate}:${adults}:${children}:${infants}`
-  //     : `${destinationLocationCode}:${originLocationCode}:${departureDate}:${adults}:${children}:${infants}`;
-  // }
 }
 
 export class OnewayState extends FlightSearchState {
   async search(reqBody, sharedData) {
-  
-    // const cacheKey = this.buildCacheKey(reqBody, OnewayState.name);
-    // const cached = await this.getCache(cacheKey);
-    // if (cached) {
-    //   console.log("✅ Cache hit: ONEWAY");
-    //   return {
-    //     direction: "ONEWAY",
-    //     outbound: cached,
-    //   };
-    // }
-    const config = HeaderInterceptor.setConfigOffer(
+    const prepUrl = HeaderInterceptor.setConfigOffer(
       reqBody,
       sharedData.domestic,
       true
     );
-    const resp = await axios.request(config);
+    const token = await HeaderInterceptor.fetchToken()
+    const config = new RequestConfigBuilder("get")
+      .setAuth(token)
+      .setContentType("application/x-www-form-urlencoded")
+      .setURL(prepUrl)
+      .build();
 
+    const resp = await axios.request(config);
     const mapped = MapUtils.createMappedFlightDetails(
       resp.data.data,
       "OUTBOUND",
@@ -76,38 +68,35 @@ export class OnewayState extends FlightSearchState {
       outbound: mapped,
     };
   }
+
+
 }
 
 export class RoundtripState extends FlightSearchState {
   async search(reqBody, sharedData) {
-    // const keyOut = this.buildCacheKey(reqBody, "ROUNDTRIP_OUTBOUND");
-    // const keyIn = this.buildCacheKey(reqBody, "ROUNDTRIP_INBOUND");
-
-    // const [cachedOut, cachedIn] = await Promise.all([
-    //   this.getCache(keyOut),
-    //   this.getCache(keyIn),
-    // ]);
-
-    // if (cachedOut && cachedIn) {
-    //   console.log("✅ Cache hit: ROUNDTRIP");
-    //   return {
-    //     direction: "ROUNDTRIP",
-    //     outbound: cachedOut,
-    //     inbound: cachedIn,
-    //   };
-    // }
-
-    const configOut = HeaderInterceptor.setConfigOffer(
+    let prepUrl = HeaderInterceptor.setConfigOffer(
       reqBody,
       sharedData.domestic,
       true
     );
+    const token = await HeaderInterceptor.fetchToken()
+    const configOut = new RequestConfigBuilder("get")
+      .setAuth(token)
+      .setContentType("application/x-www-form-urlencoded")
+      .setURL(prepUrl)
+      .build();
 
-    const configIn = HeaderInterceptor.setConfigOffer(
+    prepUrl = HeaderInterceptor.setConfigOffer(
       reqBody,
       sharedData.domestic,
       false
     );
+
+    const configIn = new RequestConfigBuilder("get")
+      .setAuth(token)
+      .setContentType("application/x-www-form-urlencoded")
+      .setURL(prepUrl)
+      .build();
 
     const [respOut, respIn] = await Promise.all([
       axios.request(configOut),
