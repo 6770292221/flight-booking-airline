@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 import { sendBookingPendingPaymentEmail, sendBookingCancelledEmail } from "../email/emailService.js";
 import axios from "axios";
 
-
+// Refactor : Extract method
 export async function createBooking(req, res) {
   try {
     if (!isAuthenticated(req)) {
@@ -29,9 +29,14 @@ export async function createBooking(req, res) {
 
     await newBooking.save();
 
-    const paymentRef = await initiatePayment(newBooking._id);
+    // Refactor : Introduce Explaining Variable 
+    const bookingId = newBooking._id;
+    const user = req.user;
+    const bookingObject = newBooking.toObject();
 
-    await sendPendingEmail(newBooking.toObject(), req.user);
+    const paymentRef = await initiatePayment(bookingId);
+
+    await sendPendingEmail(bookingObject, user);
 
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
