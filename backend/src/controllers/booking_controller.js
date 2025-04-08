@@ -12,70 +12,87 @@ import mongoose from "mongoose";
 import { sendBookingPendingPaymentEmail, sendBookingCancelledEmail } from "../email/emailService.js";
 import axios from "axios";
 
+
 export async function createBooking(req, res) {
   try {
-    if (!req.user || !req.user.userId) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusMessages.FAILED,
-        code: Codes.TKN_6001,
-        message: Messages.TKN_6001,
-      });
+    if (!isAuthenticated(req)) {
+      return respondUnauthorized(res);
     }
-    const userId = req.user.userId;
-    const bookingData = req.body;
-    bookingData.userId = userId;
+
+    const bookingData = { ...req.body, userId: req.user.userId };
     const newBooking = new BookingMongooseModel(bookingData);
 
-    const validationError = newBooking.validateSync();
+    const validationError = validateBooking(newBooking);
     if (validationError) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusMessages.FAILED,
-        code: Codes.VAL_4004,
-        message: Messages.VAL_4004,
-      });
+      return respondValidationError(res);
     }
 
     await newBooking.save();
 
-    let paymentRef = null;
+    const paymentRef = await initiatePayment(newBooking._id);
 
-    try {
-      const response = await axios.post(
-        `http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`,
-        {
-          bookingId: newBooking._id.toString(),
-        }
-      );
-      paymentRef = response?.data?.data?.paymentRef || null;
-
-    } catch (err) {
-      console.error(
-        "Error calling /payments/initiate:",
-        err.response?.data || err.message
-      );
-    }
-
-    await sendBookingPendingPaymentEmail({
-      bookingResponse: newBooking.toObject(),
-      reqUser: req.user,
-    });
+    await sendPendingEmail(newBooking.toObject(), req.user);
 
     return res.status(StatusCodes.CREATE).json({
       status: StatusMessages.SUCCESS,
       code: Codes.RSV_3009,
       message: Messages.RSV_3009,
-      data: {
-        booking: newBooking,
-        paymentRef,
-      },
-
+      data: { booking: newBooking, paymentRef },
     });
   } catch (error) {
-    return res.status(StatusCodes.SERVER_ERROR).json({
-      status: StatusMessages.FAILED,
-      message: StatusMessages.SERVER_ERROR,
-    });
+    return respondServerError(res);
   }
+}
+
+function isAuthenticated(req) {
+  return req.user && req.user.userId;
+}
+
+function respondUnauthorized(res) {
+  return res.status(StatusCodes.UNAUTHORIZED).json({
+    status: StatusMessages.FAILED,
+    code: Codes.TKN_6001,
+    message: Messages.TKN_6001,
+  });
+}
+
+function respondValidationError(res) {
+  return res.status(StatusCodes.BAD_REQUEST).json({
+    status: StatusMessages.FAILED,
+    code: Codes.VAL_4004,
+    message: Messages.VAL_4004,
+  });
+}
+
+function respondServerError(res) {
+  return res.status(StatusCodes.SERVER_ERROR).json({
+    status: StatusMessages.FAILED,
+    message: StatusMessages.SERVER_ERROR,
+  });
+}
+
+function validateBooking(booking) {
+  return booking.validateSync();
+}
+
+async function initiatePayment(bookingId) {
+  try {
+    const response = await axios.post(
+      `http://localhost:${process.env.PORT}/api/v1/payment-core-api/payments/initiate`,
+      { bookingId: bookingId.toString() }
+    );
+    return response?.data?.data?.paymentRef || null;
+  } catch (err) {
+    console.error("Error calling /payments/initiate:", err.response?.data || err.message);
+    return null;
+  }
+}
+
+async function sendPendingEmail(bookingObj, reqUser) {
+  await sendBookingPendingPaymentEmail({
+    bookingResponse: bookingObj,
+    reqUser: reqUser,
+  });
 }
 
 export async function getBookingById(req, res) {
