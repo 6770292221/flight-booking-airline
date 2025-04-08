@@ -1,33 +1,43 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger_utils.js";
 
+const EVENT_CONNECTED = 'connected';
+const EVENT_ERROR = 'error';
+const EVENT_DISCONNECTED = 'disconnected';
+
+const ENV_VAR_FLIGHT_DB = "FLIGHT_DB_URI";
+const ENV_VAR_USER_DB = "USER_DB_URI";
+const ENV_VAR_PAYMENT_DB = "PAYMENT_DB_URI";
+const ENV_VAR_BOOKING_DB = "BOOKING_DB_URI";
+
 function createDbConnection(envVarName, dbName) {
   const connectionString = process.env[envVarName];
 
   if (!connectionString) {
-    logger.error(`Environment variable ${envVarName} is not set. Cannot create connection for ${dbName}.`);
+    const errorMsg = `Environment variable ${envVarName} is not set. Cannot create connection for ${dbName}.`;
+    logger.error(errorMsg);
     throw new Error(`Configuration Error: Environment variable ${envVarName} is required for ${dbName}.`);
   }
 
   logger.info(`Creating connection for ${dbName} using environment variable ${envVarName}`);
   const connection = mongoose.createConnection(connectionString);
 
-  connection.on('connected', () => {
-    logger.info(`[${dbName}] MongoDB connected successfully.`);
+  connection.on(EVENT_CONNECTED, () => {
+    logger.info(`[${dbName}] MongoDB ${EVENT_CONNECTED} successfully.`);
   });
 
-  connection.on('error', (error) => {
-    logger.error(`[${dbName}] MongoDB connection error:`, error);
+  connection.on(EVENT_ERROR, (error) => {
+    logger.error(`[${dbName}] MongoDB connection ${EVENT_ERROR}:`, error);
   });
 
-  connection.on('disconnected', () => {
-    logger.warn(`[${dbName}] MongoDB disconnected.`);
+  connection.on(EVENT_DISCONNECTED, () => {
+    logger.warn(`[${dbName}] MongoDB ${EVENT_DISCONNECTED}.`);
   });
 
   return connection;
 }
 
-export const flightDb = createDbConnection("FLIGHT_DB_URI", "Flight DB");
-export const userDb = createDbConnection("USER_DB_URI", "User DB");
-export const paymentDb = createDbConnection("PAYMENT_DB_URI", "Payment DB");
-export const bookingDb = createDbConnection("BOOKING_DB_URI", "Booking DB");
+export const flightDb = createDbConnection(ENV_VAR_FLIGHT_DB, "Flight DB");
+export const userDb = createDbConnection(ENV_VAR_USER_DB, "User DB");
+export const paymentDb = createDbConnection(ENV_VAR_PAYMENT_DB, "Payment DB");
+export const bookingDb = createDbConnection(ENV_VAR_BOOKING_DB, "Booking DB");
