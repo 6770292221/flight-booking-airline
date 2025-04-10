@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAirports } from "../apis/airport";
 import { searchFlights } from "../apis/flight";
+import { getCabinClasses } from "../apis/cabin";
 
 const SearchFlight = () => {
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
 
   const [airports, setAirports] = useState([]);
+  const [cabinClasses, setCabinClasses] = useState([]);
   const [form, setForm] = useState({
     originLocationCode: "",
     destinationLocationCode: "",
@@ -15,13 +17,15 @@ const SearchFlight = () => {
     arrivalDate: today,
     direction: "ONEWAY",
     adults: 1,
+    children: 0,
+    infants: 0,
     cabinClass: "ECONOMY",
   });
 
   const [flightResults, setFlightResults] = useState([]);
   const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
   const [selectedInboundFlight, setSelectedInboundFlight] = useState(null);
-  const [inboundFlights, setInboundFlights] = useState([]); // state สำหรับ inbound
+  const [inboundFlights, setInboundFlights] = useState([]);
   const [errors, setErrors] = useState({});
   const [popupMessage, setPopupMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,12 +39,33 @@ const SearchFlight = () => {
         console.error("Failed to fetch airports", error);
       }
     };
+
+    const fetchCabinClasses = async () => {
+      try {
+        const res = await getCabinClasses();
+        setCabinClasses(res.data.data.items || []);
+      } catch (error) {
+        console.error("Failed to fetch cabin classes", error);
+      }
+    };
+
     fetchAirports();
+    fetchCabinClasses();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleIncrement = (name) => {
+    setForm((prev) => ({ ...prev, [name]: prev[name] + 1 }));
+  };
+
+  const handleDecrement = (name) => {
+    if (form[name] > 0) {
+      setForm((prev) => ({ ...prev, [name]: prev[name] - 1 }));
+    }
   };
 
   const validateForm = () => {
@@ -69,18 +94,21 @@ const SearchFlight = () => {
         originLocationCode: form.originLocationCode,
         destinationLocationCode: form.destinationLocationCode,
         departureDate: form.departureDate,
-        adults: form.adults,
+        cabinClass: form.cabinClass,
       };
+
+      if (form.adults > 0) body.adults = form.adults;
+      if (form.children > 0) body.children = form.children;
+      if (form.infants > 0) body.infants = form.infants;
 
       if (form.direction === "ROUNDTRIP") {
         body.arrivalDate = form.arrivalDate;
       }
 
-      // Reset results before search
       setFlightResults([]);
       setSelectedOutboundFlight(null);
       setSelectedInboundFlight(null);
-      setInboundFlights([]); // Clear inbound flights
+      setInboundFlights([]);
       setPopupMessage(null);
 
       const res = await searchFlights(body);
@@ -90,10 +118,9 @@ const SearchFlight = () => {
         setFlightResults([]);
         setPopupMessage("No flights found for the selected route and date.");
       } else {
-        setFlightResults(result.outbound); // Update flight results for outbound
+        setFlightResults(result.outbound);
         if (form.direction === "ROUNDTRIP") {
-          // If it's ROUNDTRIP, get the inbound flights after selecting outbound
-          setInboundFlights(result.inbound || []); // Set inbound flights
+          setInboundFlights(result.inbound || []);
         }
       }
     } catch (error) {
@@ -109,7 +136,6 @@ const SearchFlight = () => {
   const handleSelectOutboundFlight = (flight) => {
     setSelectedOutboundFlight(flight);
     if (form.direction === "ROUNDTRIP") {
-      // When outbound is selected, clear inbound flights to be selected
       setInboundFlights([]);
     }
   };
@@ -119,7 +145,6 @@ const SearchFlight = () => {
   };
 
   const handleSelectFlight = () => {
-    // If ROUNDTRIP, ensure both outbound and inbound are selected
     if (
       form.direction === "ROUNDTRIP" &&
       selectedOutboundFlight &&
@@ -141,13 +166,40 @@ const SearchFlight = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
       <div className="max-w-5xl mx-auto mt-10">
-        {/* Search Box */}
         <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
-          <h2 className="text-2xl font-bold text-blue-800 mb-6">
+          <h2 className="text-3xl font-semibold text-blue-800 mb-6">
             🔎 Search Flights
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-4">
+          {/* Trip Type */}
+          <div className="flex items-center mb-6">
+            <div className="flex space-x-6">
+              <label className="text-lg text-gray-700">
+                <input
+                  type="radio"
+                  name="direction"
+                  value="ONEWAY"
+                  checked={form.direction === "ONEWAY"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                One-way
+              </label>
+              <label className="text-lg text-gray-700">
+                <input
+                  type="radio"
+                  name="direction"
+                  value="ROUNDTRIP"
+                  checked={form.direction === "ROUNDTRIP"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Round-trip
+              </label>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
             {/* From */}
             <div>
               <label className="block text-sm text-gray-600 mb-1">From</label>
@@ -155,7 +207,7 @@ const SearchFlight = () => {
                 name="originLocationCode"
                 value={form.originLocationCode}
                 onChange={handleChange}
-                className="w-full border p-2 rounded-lg"
+                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Select Origin --</option>
                 {airports.map((airport) => (
@@ -178,7 +230,7 @@ const SearchFlight = () => {
                 name="destinationLocationCode"
                 value={form.destinationLocationCode}
                 onChange={handleChange}
-                className="w-full border p-2 rounded-lg"
+                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Select Destination --</option>
                 {airports.map((airport) => (
@@ -193,7 +245,9 @@ const SearchFlight = () => {
                 </p>
               )}
             </div>
+          </div>
 
+          <div className="grid md:grid-cols-2 gap-6">
             {/* Departure Date */}
             <div>
               <label className="block text-sm text-gray-600 mb-1">
@@ -205,7 +259,7 @@ const SearchFlight = () => {
                 value={form.departureDate}
                 onChange={handleChange}
                 min={today}
-                className="w-full border p-2 rounded-lg"
+                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.departureDate && (
                 <p className="text-sm text-red-500">{errors.departureDate}</p>
@@ -224,7 +278,7 @@ const SearchFlight = () => {
                   value={form.arrivalDate}
                   onChange={handleChange}
                   min={form.departureDate}
-                  className="w-full border p-2 rounded-lg"
+                  className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {errors.arrivalDate && (
                   <p className="text-sm text-red-500">{errors.arrivalDate}</p>
@@ -233,54 +287,119 @@ const SearchFlight = () => {
             )}
           </div>
 
-          {/* Options */}
-          <div className="mt-4 flex flex-col md:flex-row gap-4 items-center">
-            {/* Round Trip */}
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={form.direction === "ROUNDTRIP"}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    direction: e.target.checked ? "ROUNDTRIP" : "ONEWAY",
-                  })
-                }
-              />
-              <label className="text-sm text-gray-700">Round Trip</label>
+          {/* Passengers and Class */}
+          <div className="grid md:grid-cols-6 gap-6">
+            {/* Adults */}
+            <div className="flex-1">
+              <label className="block text-sm text-gray-600 mb-1">Adults</label>
+              <div className="flex items-center">
+                <button
+                  onClick={() => handleDecrement("adults")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  name="adults"
+                  value={form.adults}
+                  onChange={handleChange}
+                  min="1"
+                  className="w-12 border p-2 mx-2 text-center rounded-lg"
+                />
+                <button
+                  onClick={() => handleIncrement("adults")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
-            {/* Passengers */}
-            <div>
-              <label className="text-sm text-gray-600 mr-2">Passengers:</label>
-              <input
-                type="number"
-                name="adults"
-                min="1"
-                value={form.adults}
-                onChange={handleChange}
-                className="border p-2 w-20 rounded-lg"
-              />
+            {/* Children */}
+            <div className="flex-1">
+              <label className="block text-sm text-gray-600 mb-1">
+                Children
+              </label>
+              <div className="flex items-center">
+                <button
+                  onClick={() => handleDecrement("children")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  name="children"
+                  value={form.children}
+                  onChange={handleChange}
+                  min="0"
+                  className="w-12 border p-2 mx-2 text-center rounded-lg"
+                />
+                <button
+                  onClick={() => handleIncrement("children")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
-            {/* Cabin Class */}
+            {/* Infants */}
+            <div className="flex-1">
+              <label className="block text-sm text-gray-600 mb-1">
+                Infants
+              </label>
+              <div className="flex items-center">
+                <button
+                  onClick={() => handleDecrement("infants")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  name="infants"
+                  value={form.infants}
+                  onChange={handleChange}
+                  min="0"
+                  className="w-12 border p-2 mx-2 text-center rounded-lg"
+                />
+                <button
+                  onClick={() => handleIncrement("infants")}
+                  className="bg-gray-300 px-3 py-2 rounded-lg"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Seat Class */}
             <div>
+              <label className="block text-sm text-gray-600 mb-1">
+                Seat Class
+              </label>
               <select
                 name="cabinClass"
                 value={form.cabinClass}
                 onChange={handleChange}
-                className="border p-2 rounded-lg"
+                className="w-[476px] border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="ECONOMY">Economy</option>
-                <option value="BUSINESS">Business</option>
-                <option value="FIRST">First Class</option>
+                <option value="">-- Select Seat Class --</option>
+                {cabinClasses.map((cabin) => (
+                  <option key={cabin._id} value={cabin.code}>
+                    {cabin.name}
+                  </option>
+                ))}
               </select>
             </div>
+          </div>
 
-            {/* Search Button */}
+          {/* Search Button */}
+          <div className="mt-6 text-right">
             <button
               onClick={handleSearch}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-lg shadow"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow"
             >
               🔍 Search Flights
             </button>
@@ -317,7 +436,7 @@ const SearchFlight = () => {
               >
                 <div className="flex flex-col">
                   <span className="font-semibold text-lg">
-                    ✈️ {flight.airlineName} - {flight.flightNumber}
+                    {flight.airlineName} - {flight.flightNumber}
                   </span>
                   <span className="text-sm text-gray-600">
                     {flight.departure.cityName} ({flight.departure.iataCode}) →
@@ -353,7 +472,7 @@ const SearchFlight = () => {
         ) : (
           flightResults.length === 0 &&
           popupMessage === null && (
-            <div className="text-center text-red-500"></div>
+            <div className="text-center text-red-500">No results found</div>
           )
         )}
       </div>
