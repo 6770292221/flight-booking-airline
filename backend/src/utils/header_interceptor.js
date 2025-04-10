@@ -59,6 +59,7 @@ class HeaderInterceptor {
           ? reqBody.destinationLocationCode
           : reqBody.originLocationCode,
         departureDate: direction ? reqBody.departureDate : reqBody.arrivalDate,
+        travelClass: reqBody.travelClass || undefined,
         nonStop: reqBody.nonStop || undefined,
         max: reqBody.max || undefined,
         currencyCode: reqBody.currencyCode || "THB",
