@@ -29,6 +29,7 @@ const SearchFlight = () => {
   const [errors, setErrors] = useState({});
   const [popupMessage, setPopupMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDetails, setShowDetails] = useState(false); // เพิ่ม state สำหรับการแสดงรายละเอียด
 
   useEffect(() => {
     const fetchAirports = async () => {
@@ -161,6 +162,11 @@ const SearchFlight = () => {
     } else {
       setPopupMessage("Please select both outbound and inbound flights.");
     }
+  };
+
+  // เพิ่มฟังก์ชันนี้เพื่อสลับการแสดง Flight Details
+  const handleShowDetails = () => {
+    setShowDetails(!showDetails);
   };
 
   return (
@@ -465,6 +471,23 @@ const SearchFlight = () => {
                   >
                     Select
                   </button>
+                  {/* Flight Details Button */}
+                  <button
+                    onClick={handleShowDetails}
+                    className="mt-2 bg-gray-600 hover:bg-gray-700 text-white py-1 px-4 rounded"
+                  >
+                    Flight Details
+                  </button>
+                  {showDetails && (
+                    <div className="mt-4 text-sm text-gray-700">
+                      <p>Duration: {flight.duration}</p>
+                      <p>Aircraft: {flight.aircraft.code}</p>
+                      <p>
+                        Baggage: {flight.baggage.checked} checked,{" "}
+                        {flight.baggage.carryOn} carry-on
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
