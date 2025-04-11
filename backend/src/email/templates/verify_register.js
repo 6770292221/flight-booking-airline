@@ -2,7 +2,7 @@ export default function verifyRegisterTemplate({ reqUser }) {
   const { email } = reqUser;
   const subject = `Verify Your Email Address`;
 
-  const text = `Verify your email address by clicking the link below:\n\nhttp://localhost:3000/verify/${email}`;
+  const text = `Verify your email address by clicking the link below:\n\nhttp://localhost:3001/api/v1/user-core-api/verifyUser/${email}`;
 
   const html = `
     <!DOCTYPE html>

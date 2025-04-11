@@ -235,7 +235,7 @@ export async function verifyUserByEmail(req, res) {
     await user.save();
 
     logger.info(`Account verified successfully: ${email}`, "info");
-    return res.redirect(`http://127.0.0.1:5500/frontend/src/pages/index.html`);
+    return res.redirect(`http://localhost:5173/login`);
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
