@@ -31,6 +31,7 @@ const SearchFlight = () => {
   const [popupMessage, setPopupMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false); // เพิ่ม state สำหรับการแสดงรายละเอียด
+  const [selectedDetailIndex, setSelectedDetailIndex] = useState(null);
 
   useEffect(() => {
     const fetchAirports = async () => {
@@ -174,6 +175,32 @@ const SearchFlight = () => {
   const handleShowDetails = () => {
     setShowDetails(!showDetails);
   };
+
+  const handleToggleDetails = (index) => {
+    setSelectedDetailIndex((prevIndex) => (prevIndex === index ? null : index));
+  };
+  function formatDuration(isoDuration) {
+    const regex =
+      /P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)W)?(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?)?/;
+
+    const matches = isoDuration.match(regex);
+
+    if (!matches) return "";
+
+    const [, years, months, weeks, days, hours, minutes, seconds] = matches;
+
+    const parts = [];
+
+    if (years) parts.push(`${years} year${years !== "1" ? "s" : ""}`);
+    if (months) parts.push(`${months} month${months !== "1" ? "s" : ""}`);
+    if (weeks) parts.push(`${weeks} week${weeks !== "1" ? "s" : ""}`);
+    if (days) parts.push(`${days} day${days !== "1" ? "s" : ""}`);
+    if (hours) parts.push(`${hours} hour${hours !== "1" ? "s" : ""}`);
+    if (minutes) parts.push(`${minutes} minute${minutes !== "1" ? "s" : ""}`);
+    if (seconds) parts.push(`${seconds} second${seconds !== "1" ? "s" : ""}`);
+
+    return parts.join(" ");
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
@@ -447,13 +474,16 @@ const SearchFlight = () => {
                 key={index}
                 className="bg-white shadow rounded-lg p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
               >
-                <div className="flex flex-col">
+                <div className="flex flex-col md:flex-row items-center space-x-4 mb-2">
+                  {flight.logoUrl && (
+                    <img
+                      src={flight.logoUrl}
+                      alt={`${flight.airlineName} logo`}
+                      className="w-40 h-30 object-contain"
+                    />
+                  )}
                   <span className="font-semibold text-lg">
                     {flight.airlineName} - {flight.flightNumber}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    {flight.departure.cityName} ({flight.departure.iataCode}) →
-                    {flight.arrival.cityName} ({flight.arrival.iataCode})
                   </span>
                 </div>
 
@@ -478,20 +508,37 @@ const SearchFlight = () => {
                   >
                     Select
                   </button>
-                  {/* Flight Details Button */}
                   <button
-                    onClick={handleShowDetails}
+                    onClick={() => handleToggleDetails(index)}
                     className="mt-2 bg-gray-600 hover:bg-gray-700 text-white py-1 px-4 rounded"
                   >
                     Flight Details
                   </button>
-                  {showDetails && (
-                    <div className="mt-4 text-sm text-gray-700">
-                      <p>Duration: {flight.duration}</p>
-                      <p>Aircraft: {flight.aircraft.code}</p>
+
+                  {selectedDetailIndex === index && (
+                    <div className="mt-4 text-sm text-gray-700 space-y-1 text-left">
                       <p>
-                        Baggage: {flight.baggage.checked} checked,{" "}
-                        {flight.baggage.carryOn} carry-on
+                        <strong>Duration:</strong>{" "}
+                        {formatDuration(flight.duration)}
+                      </p>
+                      <p>
+                        <strong>Aircraft:</strong> {flight.aircraft.name} (
+                        {flight.aircraft.code})
+                      </p>
+                      <p>
+                        <strong>Seat Layout:</strong>{" "}
+                        {flight.aircraft.seatLayout}
+                      </p>
+                      <p>
+                        <strong>Seat Pitch:</strong> {flight.aircraft.seatPitch}
+                      </p>
+                      <p>
+                        <strong>Seat Capacity:</strong>{" "}
+                        {flight.aircraft.seatCapacity}
+                      </p>
+                      <p>
+                        <strong>Baggage:</strong> {flight.baggage.checked}{" "}
+                        checked, {flight.baggage.carryOn} carry-on
                       </p>
                     </div>
                   )}
