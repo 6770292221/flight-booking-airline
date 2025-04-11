@@ -11,6 +11,7 @@ const History = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [searchBookingNumber, setSearchBookingNumber] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  
 
   useEffect(() => {
     const fetchBookings = async () => {
