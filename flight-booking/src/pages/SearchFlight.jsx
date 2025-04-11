@@ -4,6 +4,17 @@ import { getAirports } from "../apis/airport";
 import { searchFlights } from "../apis/flight";
 import { getCabinClasses } from "../apis/cabin";
 import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
+import SearchResult from "../pages/Components/ShowResult";
+import {
+  FaSearch,
+  FaPlaneDeparture,
+  FaPlaneArrival,
+  FaUserFriends,
+  FaChair,
+  FaChild,
+  FaBaby,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const SearchFlight = () => {
   const navigate = useNavigate();
@@ -23,6 +34,7 @@ const SearchFlight = () => {
     cabinClass: "ECONOMY",
   });
 
+  const totalPassengers = form.adults + form.children + form.infants;
   const [flightResults, setFlightResults] = useState([]);
   const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
   const [selectedInboundFlight, setSelectedInboundFlight] = useState(null);
@@ -137,14 +149,31 @@ const SearchFlight = () => {
   };
 
   const handleSelectOutboundFlight = (flight) => {
-    setSelectedOutboundFlight(flight);
-    if (form.direction === "ROUNDTRIP") {
-      setSelectedInboundFlight(null); // Reset the inbound flight if ROUNDTRIP is selected
-    }
+    const data = {
+      direction: flight.direction,
+      airline: flight.airline,
+      flightNumber: flight.flightNumber,
+      airlineName: flight.airlineName,
+      departure: flight.departure,
+      arrival: flight.arrival,
+      price: flight.price,
+    };
+    console.log("Selected Outbound:", data);
+    setSelectedOutboundFlight(data);
   };
 
   const handleSelectInboundFlight = (flight) => {
-    setSelectedInboundFlight(flight);
+    const data = {
+      direction: flight.direction,
+      airline: flight.airline,
+      flightNumber: flight.flightNumber,
+      airlineName: flight.airlineName,
+      departure: flight.departure,
+      arrival: flight.arrival,
+      price: flight.price,
+    };
+    console.log("Selected Inbound:", data);
+    setSelectedInboundFlight(data);
   };
 
   const handleSelectFlight = () => {
@@ -153,7 +182,6 @@ const SearchFlight = () => {
       navigate("/login"); // หากไม่มี token ไปที่หน้า login
       return;
     }
-
     if (
       form.direction === "ROUNDTRIP" &&
       selectedOutboundFlight &&
@@ -163,12 +191,16 @@ const SearchFlight = () => {
         state: {
           outbound: selectedOutboundFlight,
           inbound: selectedInboundFlight,
+          passengerCount: totalPassengers,
         },
       });
     } else if (form.direction === "ONEWAY" && selectedOutboundFlight) {
-      navigate("/select-flight", { state: selectedOutboundFlight });
-    } else {
-      setPopupMessage("Please select both outbound and inbound flights.");
+      navigate("/select-flight", {
+        state: {
+          flight: selectedOutboundFlight,
+          passengerCount: totalPassengers,
+        },
+      });
     }
   };
 
@@ -207,8 +239,8 @@ const SearchFlight = () => {
       <MenuBar /> {/* Add MenuBar component */}
       <div className="max-w-5xl mx-auto mt-10">
         <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
-          <h2 className="text-3xl font-semibold text-blue-800 mb-6">
-            🔎 Search Flights
+          <h2 className="text-3xl font-semibold text-blue-800 mb-6 flex items-center gap-2">
+            <FaSearch /> Search Flights
           </h2>
 
           {/* Trip Type */}
@@ -441,7 +473,7 @@ const SearchFlight = () => {
               onClick={handleSearch}
               className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow"
             >
-              🔍 Search Flights
+              Search Flights
             </button>
           </div>
         </div>
@@ -466,92 +498,63 @@ const SearchFlight = () => {
           </div>
         )}
 
-        {/* Flight Results */}
-        {flightResults.length > 0 ? (
-          <div className="space-y-4">
-            {flightResults.map((flight, index) => (
-              <div
-                key={index}
-                className="bg-white shadow rounded-lg p-5 flex flex-col md:flex-row justify-between items-start md:items-center"
-              >
-                <div className="flex flex-col md:flex-row items-center space-x-4 mb-2">
-                  {flight.logoUrl && (
-                    <img
-                      src={flight.logoUrl}
-                      alt={`${flight.airlineName} logo`}
-                      className="w-40 h-30 object-contain"
-                    />
-                  )}
-                  <span className="font-semibold text-lg">
-                    {flight.airlineName} - {flight.flightNumber}
-                  </span>
-                </div>
-
-                <div className="flex flex-col text-sm text-gray-700">
-                  <span>
-                    Departure:{" "}
-                    {new Date(flight.departure.time).toLocaleTimeString()}
-                  </span>
-                  <span>
-                    Arrival:{" "}
-                    {new Date(flight.arrival.time).toLocaleTimeString()}
-                  </span>
-                </div>
-
-                <div className="text-right mt-2 md:mt-0">
-                  <div className="text-green-600 font-bold text-lg">
-                    {flight.price.amount} {flight.price.currency}
-                  </div>
-                  <button
-                    onClick={() => handleSelectOutboundFlight(flight)}
-                    className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-4 rounded"
-                  >
-                    Select
-                  </button>
-                  <button
-                    onClick={() => handleToggleDetails(index)}
-                    className="mt-2 bg-gray-600 hover:bg-gray-700 text-white py-1 px-4 rounded"
-                  >
-                    Flight Details
-                  </button>
-
-                  {selectedDetailIndex === index && (
-                    <div className="mt-4 text-sm text-gray-700 space-y-1 text-left">
-                      <p>
-                        <strong>Duration:</strong>{" "}
-                        {formatDuration(flight.duration)}
-                      </p>
-                      <p>
-                        <strong>Aircraft:</strong> {flight.aircraft.name} (
-                        {flight.aircraft.code})
-                      </p>
-                      <p>
-                        <strong>Seat Layout:</strong>{" "}
-                        {flight.aircraft.seatLayout}
-                      </p>
-                      <p>
-                        <strong>Seat Pitch:</strong> {flight.aircraft.seatPitch}
-                      </p>
-                      <p>
-                        <strong>Seat Capacity:</strong>{" "}
-                        {flight.aircraft.seatCapacity}
-                      </p>
-                      <p>
-                        <strong>Baggage:</strong> {flight.baggage.checked}{" "}
-                        checked, {flight.baggage.carryOn} carry-on
-                      </p>
-                    </div>
-                  )}
-                </div>
+        <div className="space-y-4">
+          {/* ONEWAY หรือ ROUNDTRIP OUTBOUND */}
+          {flightResults.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-blue-700 mb-2">
+                Select Outbound Flight
+              </h3>
+              <div className="space-y-4">
+                {flightResults.map((flight, index) => (
+                  <SearchResult
+                    key={`outbound-${index}`}
+                    flight={flight}
+                    index={index}
+                    selectedDetailIndex={selectedDetailIndex}
+                    handleSelectOutboundFlight={handleSelectOutboundFlight}
+                    handleToggleDetails={handleToggleDetails}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          flightResults.length === 0 &&
-          popupMessage === null && (
-            <div className="text-center text-red-500"></div>
-          )
-        )}
+            </div>
+          )}
+
+          {/* ROUNDTRIP INBOUND */}
+          {form.direction === "ROUNDTRIP" && inboundFlights.length > 0 && (
+            <div>
+              <h3 className="text-xl font-bold text-blue-700 mb-2">
+                Select Inbound Flight
+              </h3>
+              <div className="space-y-4">
+                {inboundFlights.map((flight, index) => (
+                  <SearchResult
+                    key={`inbound-${index}`}
+                    flight={flight}
+                    index={index + 1000} // ป้องกัน key ซ้ำ
+                    selectedDetailIndex={selectedDetailIndex}
+                    handleSelectOutboundFlight={handleSelectInboundFlight} // <== เปลี่ยน handler
+                    handleToggleDetails={handleToggleDetails}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Continue Button */}
+          {(form.direction === "ONEWAY" && selectedOutboundFlight) ||
+          (form.direction === "ROUNDTRIP" &&
+            selectedOutboundFlight &&
+            selectedInboundFlight) ? (
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleSelectFlight}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow"
+              >
+                Continue to Passenger Details
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
