@@ -18,13 +18,11 @@ export class MapUtils {
       mappedData.set("direction", flag)
       mappedData.set("airline", segment?.carrierCode); // Rename carrierCode -> airLineCode
       mappedData.set("flightNumber", segment?.carrierCode + segment?.number);
-      mappedData.set(
-        "airlineName",
-        airlines.find(
-          (airline) =>
-            airline.carrierCode == value.itineraries[0].segments[0].carrierCode
-        )?.airlineName
+      const airlineInfo = airlines.find(
+        (airline) => airline.carrierCode == segment?.carrierCode
       );
+      mappedData.set("airlineName", airlineInfo?.airlineName);
+      mappedData.set("logoUrl", airlineInfo?.logoUrl);
       mappedData.set("departure", {
         iataCode: segment?.departure?.iataCode,
         cityName: airports.find(
@@ -71,9 +69,9 @@ export class MapUtils {
         amount: value.price?.total,
         currency: value.price?.currency,
       });
-      if(flag == "OUTBOUND") {
+      if (flag == "OUTBOUND") {
         response.push(Object.fromEntries(mappedData));
-      } else if(flag == "INBOUND") {
+      } else if (flag == "INBOUND") {
         response.push(Object.fromEntries(mappedData));
       }
     }
