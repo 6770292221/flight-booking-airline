@@ -138,7 +138,7 @@ const SearchFlight = () => {
   const handleSelectOutboundFlight = (flight) => {
     setSelectedOutboundFlight(flight);
     if (form.direction === "ROUNDTRIP") {
-      setInboundFlights([]);
+      setSelectedInboundFlight(null); // Reset the inbound flight if ROUNDTRIP is selected
     }
   };
 
@@ -147,6 +147,12 @@ const SearchFlight = () => {
   };
 
   const handleSelectFlight = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // หากไม่มี token ไปที่หน้า login
+      return;
+    }
+
     if (
       form.direction === "ROUNDTRIP" &&
       selectedOutboundFlight &&
@@ -165,7 +171,6 @@ const SearchFlight = () => {
     }
   };
 
-  // เพิ่มฟังก์ชันนี้เพื่อสลับการแสดง Flight Details
   const handleShowDetails = () => {
     setShowDetails(!showDetails);
   };

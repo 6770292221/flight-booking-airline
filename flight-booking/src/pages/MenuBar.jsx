@@ -64,9 +64,9 @@ const MenuBar = () => {
           <>
             <button
               className="text-white hover:text-yellow-400 transition duration-300"
-              onClick={() => navigate("/hotels")}
+              onClick={() => navigate("/booking")}
             >
-              Booking
+              My Booking
             </button>
             <button
               className="text-white hover:text-yellow-400 transition duration-300"
