@@ -40,7 +40,7 @@ export class MapUtils {
         )?.cityName,
         time: segment?.arrival?.at,
       });
-      mappedData.set("duration", segment?.duration);
+      mappedData.set("duration", segment?.duration.replace("PT", "").replace("H", "H ").replace("M", "M").trim());
       mappedData.set("aircraft", {
         code: segment?.aircraft?.code,
         name: aircrafts.find(
