@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SearchFlight from "./pages/SearchFlight";
 import SelectFlight from "./pages/SelectFlight";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -9,6 +11,8 @@ function App() {
       <Routes>
         <Route path="/" element={<SearchFlight />} />
         <Route path="/select-flight" element={<SelectFlight />} />
+        <Route path="/register" element={<Register />} /> {/* Register route */}
+        <Route path="/login" element={<Login />} /> {/* Register route */}
       </Routes>
     </BrowserRouter>
   );

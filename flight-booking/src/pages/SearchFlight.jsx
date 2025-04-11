@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getAirports } from "../apis/airport";
 import { searchFlights } from "../apis/flight";
 import { getCabinClasses } from "../apis/cabin";
+import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
 
 const SearchFlight = () => {
   const navigate = useNavigate();
@@ -171,6 +172,7 @@ const SearchFlight = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
+      <MenuBar /> {/* Add MenuBar component */}
       <div className="max-w-5xl mx-auto mt-10">
         <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
           <h2 className="text-3xl font-semibold text-blue-800 mb-6">
@@ -495,7 +497,7 @@ const SearchFlight = () => {
         ) : (
           flightResults.length === 0 &&
           popupMessage === null && (
-            <div className="text-center text-red-500">No results found</div>
+            <div className="text-center text-red-500"></div>
           )
         )}
       </div>
