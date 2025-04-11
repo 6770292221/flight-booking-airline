@@ -4,6 +4,7 @@ import SearchFlight from "./pages/SearchFlight";
 import SelectFlight from "./pages/SelectFlight";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import History from "./pages/History";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/select-flight" element={<SelectFlight />} />
         <Route path="/register" element={<Register />} /> {/* Register route */}
         <Route path="/login" element={<Login />} /> {/* Register route */}
+        <Route path="/history" element={<History />} /> {/* Register route */}
       </Routes>
     </BrowserRouter>
   );

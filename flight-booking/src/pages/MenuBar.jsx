@@ -26,7 +26,12 @@ const MenuBar = () => {
     try {
       // เรียก logout API
       await logoutUser();
+
+      // Clear all items from localStorage
+      localStorage.clear(); // ลบข้อมูลทั้งหมดจาก localStorage
+
       setIsLoggedIn(false); // อัปเดตสถานะ logout
+      setUser(null); // ลบข้อมูลผู้ใช้
       navigate("/"); // ไปที่หน้าแรกหลังจาก logout
     } catch (error) {
       console.error("Logout failed", error);
@@ -53,6 +58,7 @@ const MenuBar = () => {
         >
           Home
         </button>
+
         {/* แสดงปุ่ม Booking และ History เฉพาะเมื่อผู้ใช้ login แล้ว */}
         {isLoggedIn && (
           <>
@@ -64,7 +70,7 @@ const MenuBar = () => {
             </button>
             <button
               className="text-white hover:text-yellow-400 transition duration-300"
-              onClick={() => navigate("/booking")}
+              onClick={() => navigate("/history")}
             >
               History
             </button>
