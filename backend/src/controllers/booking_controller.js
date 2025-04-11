@@ -329,12 +329,37 @@ export async function getMyBookings(req, res) {
       });
     }
 
+    // ดึง payment ข้อมูลทั้งหมดล่วงหน้า เพื่อลดการยิง DB หลายครั้ง
+    const bookingIds = bookings.map((b) => b._id);
+    const payments = await PaymentMongooseModel.find({
+      bookingId: { $in: bookingIds },
+    }).lean();
+
+    // แมป payment ตาม bookingId
+    const paymentMap = {};
+    payments.forEach((payment) => {
+      paymentMap[payment.bookingId.toString()] = {
+        paymentRef: payment.paymentRef,
+        amount: payment.amount,
+      };
+    });
+
+    // เพิ่ม paymentRef และ amount ลงใน booking
+    const enrichedBookings = bookings.map((booking) => {
+      const paymentInfo = paymentMap[booking._id.toString()] || {};
+      return {
+        ...booking,
+        paymentRef: paymentInfo.paymentRef || null,
+        amount: paymentInfo.amount || null,
+      };
+    });
+
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.RSV_3010,
       message: Messages.RSV_3010,
-      count: bookings.length,
-      data: bookings,
+      count: enrichedBookings.length,
+      data: enrichedBookings,
     });
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
@@ -343,6 +368,7 @@ export async function getMyBookings(req, res) {
     });
   }
 }
+
 
 export async function getAllBookingsByAdmin(req, res) {
   try {
@@ -537,6 +563,95 @@ export async function cancelMyBooking(req, res) {
       message: Messages.RSV_3015,
     })
 
+  } catch (error) {
+    return res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      message: StatusMessages.SERVER_ERROR,
+    });
+  }
+}
+
+
+export async function getPendingPayment(req, res) {
+  try {
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusMessages.FAILED,
+        code: Codes.TKN_6001,
+        message: Messages.TKN_6001,
+      });
+    }
+
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(userId);
+
+    if (!isValidObjectId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.VAL_4004,
+        message: Messages.VAL_4004,
+      });
+    }
+
+    const objectIdUser = new mongoose.Types.ObjectId(userId);
+
+    let bookings = [];
+    try {
+      // Filter bookings with PENDING or FAILED_ISSUED status
+      bookings = await BookingMongooseModel.find({
+        userId: objectIdUser,
+        status: { $in: ['PENDING', 'FAILED_ISSUED'] },
+      })
+        .sort({ createdAt: -1 })
+        .lean();
+    } catch (queryError) {
+      return res.status(StatusCodes.SERVER_ERROR).json({
+        status: StatusMessages.FAILED,
+        message: StatusMessages.SERVER_ERROR,
+      });
+    }
+
+    if (!bookings || bookings.length === 0) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.RSV_3011,
+        message: Messages.RSV_3011,
+      });
+    }
+
+    // ดึง payment ข้อมูลทั้งหมดล่วงหน้า เพื่อลดการยิง DB หลายครั้ง
+    const bookingIds = bookings.map((b) => b._id);
+    const payments = await PaymentMongooseModel.find({
+      bookingId: { $in: bookingIds },
+    }).lean();
+
+    // แมป payment ตาม bookingId
+    const paymentMap = {};
+    payments.forEach((payment) => {
+      paymentMap[payment.bookingId.toString()] = {
+        paymentRef: payment.paymentRef,
+        amount: payment.amount,
+      };
+    });
+
+    // เพิ่ม paymentRef และ amount ลงใน booking
+    const enrichedBookings = bookings.map((booking) => {
+      const paymentInfo = paymentMap[booking._id.toString()] || {};
+      return {
+        ...booking,
+        paymentRef: paymentInfo.paymentRef || null,
+        amount: paymentInfo.amount || null,
+      };
+    });
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.RSV_3010,
+      message: Messages.RSV_3010,
+      count: enrichedBookings.length,
+      data: enrichedBookings,
+    });
   } catch (error) {
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
