@@ -24,24 +24,26 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true when form is being submitted
-    setError(null); // Reset any previous error
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const response = await loginUser(formData); // Call the loginUser function from auth.js
-      console.log(response.data); // Log the response for debugging
+      const response = await loginUser(formData);
+      console.log(response.data);
 
-      // Save userId and token in localStorage if login is successful
-      localStorage.setItem("userId", response.data.data.userId); // Save userId
-      localStorage.setItem("token", response.data.token); // Save token
+      localStorage.setItem("userId", response.data.data.userId);
+      localStorage.setItem("token", response.data.token);
 
-      // After successful login, show the OTP modal
       setShowOtpModal(true);
     } catch (error) {
-      console.error(error);
-      setError("Invalid email or password. Please try again.");
+      console.error("Login error:", error);
+      if (error.response?.data?.message) {
+        setError(error.response.data.message); // ดึง message จาก API
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
-      setIsLoading(false); // Set loading to false after operation completes
+      setIsLoading(false);
     }
   };
 
