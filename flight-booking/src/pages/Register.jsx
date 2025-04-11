@@ -31,7 +31,7 @@ const Register = () => {
     try {
       const response = await registerUser(formData); // Call the registerUser function from auth.js
       setSuccessMessage("Registration successful!");
-      console.log(response.data); // Log the response for debugging
+      console.log(response.data);
 
       // Show the popup message after successful registration
       setShowPopup(true);
@@ -49,12 +49,12 @@ const Register = () => {
         setError("Registration failed. Please try again.");
       }
     } finally {
-      setIsLoading(false); // Set loading to false after operation completes
+      setIsLoading(false);
     }
   };
 
   const handlePopupClose = () => {
-    setShowPopup(false); // Close the popup
+    setShowPopup(false);
     navigate("/login"); // Navigate to the login page
   };
   return (

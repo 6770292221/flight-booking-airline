@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import History from "./pages/History";
 import Booking from "./pages/Booking";
+import Payment from "./pages/Payment";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} /> {/* Register route */}
         <Route path="/history" element={<History />} /> {/* Register route */}
         <Route path="/booking" element={<Booking />} /> {/* Register route */}
+        <Route path="/payment" element={<Payment />} /> {/* Register route */}
       </Routes>
     </BrowserRouter>
   );

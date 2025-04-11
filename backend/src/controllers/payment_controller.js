@@ -389,3 +389,64 @@ export async function getAllPayments(req, res) {
     });
   }
 }
+
+export async function getPaymentByBookingId(req, res) {
+  try {
+    const { bookingId } = req.params;
+
+    if (!bookingId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1012,
+        message: Messages.PMT_1012,
+      });
+    }
+
+    const payment = await PaymentMongooseModel.findOne({ bookingId });
+
+    if (!payment) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1012,
+        message: Messages.PMT_1012,
+      });
+    }
+
+    const booking = await BookingMongooseModel.findById(payment.bookingId);
+
+    if (!booking) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PAY_1003,
+        message: Messages.PAY_1003,
+      });
+    }
+
+
+    const userIsNotOwnerOfTheBooking = booking.userId.toString() !== req.user.userId;
+
+    if (userIsNotOwnerOfTheBooking) {
+      return res.status(StatusCodes.FORBIDDEN).json({
+        status: StatusMessages.FAILED,
+        code: Codes.PMT_1016,
+        message: Messages.PMT_1016,
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.PMT_1013,
+      message: Messages.PMT_1013,
+      data: {
+        payment,
+        bookingNumber: booking.bookingNubmer,
+      },
+    });
+  } catch (error) {
+    return res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      code: StatusCodes.SERVER_ERROR,
+      message: Messages.GNR_1001,
+    });
+  }
+}

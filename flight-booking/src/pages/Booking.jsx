@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { getPendingBookings, cancelBooking } from "../apis/booking"; // Import the getPendingBookings and cancelBooking functions
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
-import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
+import { getPendingBookings, cancelBooking } from "../apis/booking";
+import { useNavigate } from "react-router-dom";
+import MenuBar from "../pages/MenuBar";
 
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingDelete, setIsLoadingDelete] = useState(false); // Add state for delete loading
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [error, setError] = useState(null);
-  const [showPopup, setShowPopup] = useState(false); // State to control the popup visibility
-  const [popupBooking, setPopupBooking] = useState(null); // Store the selected booking details for the popup
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupBooking, setPopupBooking] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch bookings when component mounts
   useEffect(() => {
@@ -23,18 +23,14 @@ const Booking = () => {
       }
 
       try {
-        const response = await getPendingBookings(); // Fetch bookings using the getPendingBookings function
+        const response = await getPendingBookings();
         if (response.data.status === "success") {
-          const filteredBookings = response.data.data.filter(
-            (booking) =>
-              booking.status === "PENDING" || booking.status === "FAILED_ISSUED"
-          );
-          setBookings(filteredBookings); // Store the bookings in the state
+          setBookings(response.data.data); // Store all the bookings in the state without filtering
         } else {
           setError(response.data.message); // Handle error from the response
         }
       } catch (error) {
-        setError("Failed to fetch bookings. Please try again."); // Handle error from the try block
+        setError("Failed to fetch bookings. Please try again.");
       } finally {
         setIsLoading(false);
       }

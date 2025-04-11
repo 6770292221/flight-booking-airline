@@ -7,7 +7,6 @@ const MenuBar = () => {
   const [user, setUser] = useState(null); // เก็บข้อมูลผู้ใช้
   const navigate = useNavigate();
 
-  // ตรวจสอบว่า user login แล้วหรือยังจาก localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
