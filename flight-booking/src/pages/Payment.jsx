@@ -106,9 +106,14 @@ const PaymentPage = () => {
     <div className="min-h-screen bg-blue-50">
       <MenuBar />
       <div className="max-w-md mx-auto mt-8 bg-white shadow-md rounded-lg p-4">
-        <h2 className="text-xl font-semibold text-blue-700 text-center mb-4">
-          Payment Details
+        <h2 className="text-xl font-semibold text-blue-700 text-center mb-1">
+          Transaction Details
         </h2>
+        {paymentData?.paymentRef && (
+          <p className="text-center text-xs text-gray-500 mb-4">
+            Payment Ref: {paymentData.paymentRef}
+          </p>
+        )}
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 mb-3 rounded text-sm">
@@ -159,7 +164,6 @@ const PaymentPage = () => {
 
             {paymentMethod === "Credit / Debit Card" && (
               <>
-                {/* Card Type with Icons */}
                 <div className="mb-3">
                   <label className="block text-sm font-medium mb-1">
                     Card Type
@@ -269,7 +273,6 @@ const PaymentPage = () => {
   );
 };
 
-// ✅ Reusable input field
 const Input = ({
   label,
   value,

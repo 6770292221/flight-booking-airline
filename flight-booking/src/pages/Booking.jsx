@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getPendingBookings, cancelBooking } from "../apis/booking";
 import { useNavigate } from "react-router-dom";
 import MenuBar from "../pages/MenuBar";
+import { FaEye, FaMoneyCheckAlt, FaTimesCircle } from "react-icons/fa";
 
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
@@ -113,8 +114,8 @@ const Booking = () => {
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
                           booking.status === "PENDING"
-                            ? "bg-yellow-300 text-yellow-700"
-                            : "bg-red-300 text-red-700"
+                            ? "bg-yellow-200 text-yellow-800"
+                            : "bg-red-200 text-red-800"
                         }`}
                       >
                         {booking.status}
@@ -148,21 +149,21 @@ const Booking = () => {
                     <td className="px-3 py-2 flex flex-col items-center space-y-1">
                       <button
                         onClick={() => handleViewDetails(booking._id)}
-                        className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 w-full"
+                        className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 w-full flex items-center justify-center gap-2"
                       >
-                        View
+                        <FaEye /> View
                       </button>
                       <button
                         onClick={() => handlePayment(booking._id)}
-                        className="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 w-full"
+                        className="bg-emerald-500 text-white px-3 py-1.5 rounded hover:bg-emerald-600 w-full flex items-center justify-center gap-2"
                       >
-                        Pay
+                        <FaMoneyCheckAlt /> Pay
                       </button>
                       <button
                         onClick={() => handleCancel(booking._id)}
-                        className="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 w-full"
+                        className="bg-rose-500 text-white px-3 py-1.5 rounded hover:bg-rose-600 w-full flex items-center justify-center gap-2"
                       >
-                        Cancel
+                        <FaTimesCircle /> Cancel
                       </button>
                     </td>
                   </tr>
