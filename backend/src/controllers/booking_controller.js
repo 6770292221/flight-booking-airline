@@ -601,7 +601,7 @@ export async function getPendingPayment(req, res) {
       // Filter bookings with PENDING or FAILED_ISSUED status
       bookings = await BookingMongooseModel.find({
         userId: objectIdUser,
-        status: { $in: ['PENDING', 'FAILED_ISSUED'] },
+        status: { $in: ['PENDING', 'FAILED_PAID'] },
       })
         .sort({ createdAt: -1 })
         .lean();
