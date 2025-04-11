@@ -12,22 +12,19 @@ const Booking = () => {
   const [popupBooking, setPopupBooking] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch bookings when component mounts
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
-
       if (!token) {
         navigate("/login");
         return;
       }
-
       try {
         const response = await getPendingBookings();
         if (response.data.status === "success") {
-          setBookings(response.data.data); // Store all the bookings in the state without filtering
+          setBookings(response.data.data);
         } else {
-          setError(response.data.message); // Handle error from the response
+          setError(response.data.message);
         }
       } catch (error) {
         setError("Failed to fetch bookings. Please try again.");
@@ -35,79 +32,55 @@ const Booking = () => {
         setIsLoading(false);
       }
     };
-
     fetchBookings();
   }, [navigate]);
 
-  // View details popup
   const handleViewDetails = (bookingId) => {
     const booking = bookings.find((b) => b._id === bookingId);
     setPopupBooking(booking);
-    setShowPopup(true); // Show popup when user clicks on "View"
+    setShowPopup(true);
   };
 
-  // Close popup
   const closePopup = () => {
     setShowPopup(false);
     setPopupBooking(null);
   };
 
-  // Handle payment redirection
   const handlePayment = (bookingId) => {
-    navigate("/payment", { state: { bookingId } }); // Redirect to payment page with bookingId
+    navigate("/payment", { state: { bookingId } });
   };
 
-  // Handle cancel booking and refresh the list with loading state
   const handleCancel = async (bookingId) => {
-    setIsLoadingDelete(true); // Set loading state to true when canceling the booking
+    setIsLoadingDelete(true);
     try {
-      const response = await cancelBooking(bookingId); // Call the cancelBooking function
-
-      // ตรวจสอบ response.data แทนการตรวจสอบแค่ response.status
-      if (response.data && response.data.status === "success") {
-        // ถ้ายกเลิกการจองสำเร็จ
-        const updatedBookings = await getPendingBookings(); // ดึงข้อมูลการจองใหม่
-        setBookings(updatedBookings.data.data); // อัปเดตข้อมูลใน state
+      const response = await cancelBooking(bookingId);
+      if (response.data?.status === "success") {
+        const updatedBookings = await getPendingBookings();
+        setBookings(updatedBookings.data.data);
       } else {
         setError("Failed to cancel booking. Please try again.");
       }
     } catch (error) {
-      console.error("Error during cancelBooking:", error);
-
-      // Handle different types of errors
-      if (error.response) {
-        console.error("API Response error:", error.response.data);
-        setError(
-          `Error: ${error.response.data.message || "Failed to cancel booking"}`
-        );
-      } else if (error.request) {
-        console.error("API Request error:", error.request);
-        setError("Network error, please check your connection.");
-      } else {
-        console.error("Unknown error:", error.message);
-        setError("Error occurred while canceling the booking.");
-      }
+      setError("Error occurred while canceling the booking.");
     } finally {
-      setIsLoadingDelete(false); // Set loading state to false after the request is completed
+      setIsLoadingDelete(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-4 text-sm">
       <MenuBar />
-      <div className="max-w-7xl mx-auto mt-10">
-        <h2 className="text-3xl font-semibold text-blue-800 mb-6">
+      <div className="max-w-6xl mx-auto mt-6">
+        <h2 className="text-2xl font-semibold text-blue-800 mb-4">
           My Booking
         </h2>
 
         {isLoading || isLoadingDelete ? (
           <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
-              <div className="text-center text-xl text-gray-600">
-                {isLoading
-                  ? "Loading bookings..."
-                  : "Deleting booking... Please wait."}
-              </div>
+            <div className="bg-white p-6 rounded shadow w-full max-w-md text-center text-gray-600">
+              {isLoading
+                ? "Loading bookings..."
+                : "Canceling booking... Please wait."}
             </div>
           </div>
         ) : error ? (
@@ -116,33 +89,29 @@ const Booking = () => {
           <div className="text-center text-gray-600">No bookings found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-              <thead className="bg-blue-100 text-gray-700">
+            <table className="min-w-full bg-white border border-gray-300 rounded shadow">
+              <thead className="bg-blue-100 text-gray-700 text-sm">
                 <tr>
-                  <th className="px-6 py-3 text-left font-semibold">
-                    Booking Number
+                  <th className="px-3 py-2 text-left font-semibold">
+                    Booking No.
                   </th>
-                  <th className="px-6 py-3 text-left font-semibold">Status</th>
-                  <th className="px-6 py-3 text-left font-semibold">
-                    Flight Details
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold">
-                    Total Price
-                  </th>
-                  <th className="px-6 py-3 text-center font-semibold w-48">
+                  <th className="px-3 py-2 text-left font-semibold">Status</th>
+                  <th className="px-3 py-2 text-left font-semibold">Flight</th>
+                  <th className="px-3 py-2 text-left font-semibold">Total</th>
+                  <th className="px-3 py-2 text-center font-semibold w-40">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-sm">
                 {bookings.map((booking, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className="px-3 py-2 text-gray-700">
                       {booking.bookingNubmer}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 py-2">
                       <span
-                        className={`px-3 py-1 rounded-full ${
+                        className={`px-2 py-1 rounded-full text-xs ${
                           booking.status === "PENDING"
                             ? "bg-yellow-300 text-yellow-700"
                             : "bg-red-300 text-red-700"
@@ -151,51 +120,49 @@ const Booking = () => {
                         {booking.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-700 w-[300px]">
+                    <td className="px-3 py-2 w-64">
                       {booking.flights.map((flight, idx) => (
-                        <div key={idx}>
-                          <span className="font-semibold">
+                        <div key={idx} className="mb-1">
+                          <p className="font-semibold">
                             {flight.airlineName} - {flight.flightNumber}
-                          </span>
-                          <p>
+                          </p>
+                          <p className="text-xs">
                             {flight.departure.cityName} (
                             {flight.departure.iataCode}) →{" "}
                             {flight.arrival.cityName} ({flight.arrival.iataCode}
                             )
                           </p>
-                          <p>
-                            Departure:{" "}
-                            {new Date(flight.departure.time).toLocaleString()} -
-                            Arrival:{" "}
+                          <p className="text-xs">
+                            {new Date(flight.departure.time).toLocaleString()} -{" "}
                             {new Date(flight.arrival.time).toLocaleString()}
                           </p>
-                          <p>
-                            Price: {flight.price.amount} {flight.price.currency}
+                          <p className="text-xs">
+                            {flight.price.amount} {flight.price.currency}
                           </p>
                         </div>
                       ))}
                     </td>
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className="px-3 py-2 text-gray-700">
                       {booking.amount} {booking.flights[0]?.price.currency}
                     </td>
-                    <td className="px-6 py-4 text-center flex space-x-3">
+                    <td className="px-3 py-2 flex flex-col items-center space-y-1">
                       <button
                         onClick={() => handleViewDetails(booking._id)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+                        className="bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 w-full"
                       >
-                        <i className="fas fa-eye text-lg"></i> View
+                        View
                       </button>
                       <button
                         onClick={() => handlePayment(booking._id)}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all"
+                        className="bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 w-full"
                       >
-                        <i className="fas fa-credit-card text-lg"></i> Pay
+                        Pay
                       </button>
                       <button
                         onClick={() => handleCancel(booking._id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all"
+                        className="bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 w-full"
                       >
-                        <i className="fas fa-times-circle text-lg"></i> Cancel
+                        Cancel
                       </button>
                     </td>
                   </tr>
@@ -206,11 +173,10 @@ const Booking = () => {
         )}
       </div>
 
-      {/* Popup for booking details */}
       {showPopup && popupBooking && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-3xl w-full">
-            <h3 className="text-2xl font-semibold">Booking Details</h3>
+          <div className="bg-white p-5 rounded shadow max-w-2xl w-full text-sm">
+            <h3 className="text-xl font-semibold mb-2">Booking Details</h3>
             <p>
               <strong>Booking Number:</strong> {popupBooking.bookingNubmer}
             </p>
@@ -218,22 +184,20 @@ const Booking = () => {
               <strong>Status:</strong> {popupBooking.status}
             </p>
 
-            <h4 className="mt-4 font-semibold">Flights:</h4>
+            <h4 className="mt-3 font-semibold">Flights:</h4>
             {popupBooking.flights.map((flight, idx) => (
-              <div key={idx} className="mb-4">
+              <div key={idx} className="mb-3">
                 <p>
-                  <strong>Flight Number:</strong> {flight.flightNumber}
+                  <strong>Flight:</strong> {flight.flightNumber} -{" "}
+                  {flight.airlineName}
                 </p>
                 <p>
-                  <strong>Airline:</strong> {flight.airlineName}
-                </p>
-                <p>
-                  <strong>Departure:</strong> {flight.departure.cityName} (
+                  <strong>From:</strong> {flight.departure.cityName} (
                   {flight.departure.iataCode}) -{" "}
                   {new Date(flight.departure.time).toLocaleString()}
                 </p>
                 <p>
-                  <strong>Arrival:</strong> {flight.arrival.cityName} (
+                  <strong>To:</strong> {flight.arrival.cityName} (
                   {flight.arrival.iataCode}) -{" "}
                   {new Date(flight.arrival.time).toLocaleString()}
                 </p>
@@ -244,10 +208,10 @@ const Booking = () => {
               </div>
             ))}
 
-            <h4 className="mt-4 font-semibold">Passengers:</h4>
-            <div className="max-h-96 overflow-y-auto">
+            <h4 className="mt-3 font-semibold">Passengers:</h4>
+            <div className="max-h-80 overflow-y-auto">
               {popupBooking.passengers.map((passenger, idx) => (
-                <div key={idx} className="mb-4">
+                <div key={idx} className="mb-3">
                   <p>
                     <strong>
                       {passenger.firstName} {passenger.lastName}
@@ -257,14 +221,13 @@ const Booking = () => {
                   <p>
                     <strong>Passport:</strong> {passenger.passportNumber}
                   </p>
-
-                  <h5 className="font-semibold">Addons:</h5>
+                  <h5 className="font-semibold mt-1">Addons:</h5>
                   {passenger.addons.length > 0 ? (
-                    <ul>
+                    <ul className="list-disc list-inside">
                       {passenger.addons.map((addon, i) => (
                         <li key={i}>
                           <p>
-                            <strong>Flight Number:</strong> {addon.flightNumber}
+                            <strong>Flight:</strong> {addon.flightNumber}
                           </p>
                           <p>
                             <strong>Seat:</strong> {addon.seat}
@@ -280,18 +243,20 @@ const Booking = () => {
                       ))}
                     </ul>
                   ) : (
-                    <p>No addons available</p>
+                    <p className="text-gray-500">No addons</p>
                   )}
                 </div>
               ))}
             </div>
 
-            <button
-              onClick={closePopup}
-              className="mt-4 bg-gray-500 text-white py-2 px-6 rounded-lg"
-            >
-              Close
-            </button>
+            <div className="text-right mt-4">
+              <button
+                onClick={closePopup}
+                className="bg-gray-600 text-white px-4 py-1.5 rounded"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

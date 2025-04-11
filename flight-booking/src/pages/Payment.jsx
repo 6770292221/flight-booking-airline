@@ -159,23 +159,62 @@ const PaymentPage = () => {
 
             {paymentMethod === "Credit / Debit Card" && (
               <>
+                {/* Card Type with Icons */}
                 <div className="mb-3">
                   <label className="block text-sm font-medium mb-1">
                     Card Type
                   </label>
-                  <div className="flex gap-4 text-sm">
-                    {["Visa", "MasterCard", "JCB"].map((type) => (
-                      <label key={type} className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          value={type}
-                          checked={cardType === type}
-                          onChange={handleCardTypeChange}
-                          className="form-radio text-blue-600"
-                        />
-                        <span className="ml-2">{type}</span>
-                      </label>
-                    ))}
+                  <div className="flex flex-wrap gap-4 items-center">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="cardType"
+                        value="Visa"
+                        checked={cardType === "Visa"}
+                        onChange={handleCardTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <img
+                        src="https://img.icons8.com/color/48/visa.png"
+                        alt="Visa"
+                        className="w-8 h-8"
+                      />
+                      <span className="text-sm">Visa</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="cardType"
+                        value="MasterCard"
+                        checked={cardType === "MasterCard"}
+                        onChange={handleCardTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <img
+                        src="https://img.icons8.com/color/48/mastercard.png"
+                        alt="MasterCard"
+                        className="w-8 h-8"
+                      />
+                      <span className="text-sm">MasterCard</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="cardType"
+                        value="JCB"
+                        checked={cardType === "JCB"}
+                        onChange={handleCardTypeChange}
+                        className="form-radio text-blue-600"
+                      />
+                      <img
+                        src="https://img.icons8.com/color/48/jcb.png"
+                        alt="JCB"
+                        className="w-8 h-8"
+                      />
+                      <span className="text-sm">JCB</span>
+                    </label>
                   </div>
                 </div>
 
@@ -230,6 +269,7 @@ const PaymentPage = () => {
   );
 };
 
+// ✅ Reusable input field
 const Input = ({
   label,
   value,

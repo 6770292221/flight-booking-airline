@@ -68,10 +68,10 @@ const History = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-4">
       <MenuBar /> {/* Add MenuBar component */}
-      <div className="max-w-5xl mx-auto mt-10">
-        <h2 className="text-3xl font-semibold text-blue-800 mb-6">
+      <div className="max-w-3xl mx-auto mt-10">
+        <h2 className="text-2xl font-semibold text-blue-800 mb-4">
           Booking History
         </h2>
 
@@ -82,7 +82,7 @@ const History = () => {
             placeholder="Search Booking Number"
             value={searchBookingNumber}
             onChange={(e) => setSearchBookingNumber(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -91,7 +91,7 @@ const History = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="PENDING">Pending</option>
@@ -113,11 +113,11 @@ const History = () => {
         ) : filteredBookings.length === 0 ? (
           <div className="text-center text-gray-600">No bookings found.</div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {filteredBookings.map((booking, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
+              <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
                 <div className="flex justify-between">
-                  <h3 className="text-xl font-semibold">
+                  <h3 className="text-lg font-semibold">
                     Booking Number: {booking.bookingNubmer}
                   </h3>
                   <span
@@ -133,10 +133,10 @@ const History = () => {
                   </span>
                 </div>
 
-                <div className="mt-4">
-                  <h4 className="text-lg font-semibold">Flight Information:</h4>
+                <div className="mt-3">
+                  <h4 className="text-md font-semibold">Flight Information:</h4>
                   {booking.flights.map((flight, idx) => (
-                    <div key={idx} className="mt-3">
+                    <div key={idx} className="mt-2">
                       <div className="flex justify-between">
                         <div>
                           <span className="font-semibold">
@@ -166,7 +166,7 @@ const History = () => {
                 <div className="mt-4 text-right">
                   <button
                     onClick={() => handleViewDetails(booking)} // เปิด popup เมื่อกด
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
                   >
                     View Details
                   </button>
@@ -179,15 +179,15 @@ const History = () => {
         {/* Show booking details in Popup */}
         {showDetails && selectedBooking && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-              <h3 className="text-2xl font-semibold text-blue-800 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm max-w-lg w-full">
+              <h3 className="text-xl font-semibold text-blue-800 mb-4">
                 Booking Details
               </h3>
 
               <div className="mt-4">
-                <h4 className="text-lg font-semibold">Passengers:</h4>
+                <h4 className="text-md font-semibold">Passengers:</h4>
                 {selectedBooking.passengers.map((passenger, idx) => (
-                  <div key={idx} className="mt-3">
+                  <div key={idx} className="mt-2">
                     <p>
                       <strong>
                         {passenger.firstName} {passenger.lastName}
@@ -213,7 +213,7 @@ const History = () => {
                 (passenger) => passenger.tickets.length > 0
               ) && (
                 <div className="mt-4">
-                  <h4 className="text-lg font-semibold">Tickets:</h4>
+                  <h4 className="text-md font-semibold">Tickets:</h4>
                   {selectedBooking.passengers.map((passenger, idx) => (
                     <div key={idx}>
                       {passenger.tickets.length > 0 && (
@@ -237,10 +237,10 @@ const History = () => {
                 </div>
               )}
 
-              <div className="mt-6 text-right">
+              <div className="mt-4 text-right">
                 <button
                   onClick={handleCloseDetails} // ปิด popup
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
                 >
                   Close Details
                 </button>
