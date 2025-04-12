@@ -4,6 +4,7 @@ import { getAirports } from "../apis/airport";
 import { searchFlights } from "../apis/flight";
 import { getCabinClasses } from "../apis/cabin";
 import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
+import FloatingSelectionTracker from "./Components/FloatingSelectionTracker";
 import SearchResult from "../pages/Components/ShowResult";
 import {
   FaSearch,
@@ -493,8 +494,22 @@ const SearchFlight = () => {
 
         {/* Loading Spinner */}
         {isLoading && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-            <div className="text-white font-bold">Loading...</div>
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+            {" "}
+            {/* Added backdrop-blur-sm */}
+            <div className="flex flex-col items-center">
+              {" "}
+              {/* Container to stack spinner and text */}
+              {/* Spinner */}
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-600 mb-4"></div>{" "}
+              {/* Adjusted size & added margin */}
+              {/* Loading Text */}
+              <div className="text-white font-bold text-lg">
+                {" "}
+                {/* Optional: adjust text size/style */}
+                Looking for flights...
+              </div>
+            </div>
           </div>
         )}
 
@@ -540,20 +555,15 @@ const SearchFlight = () => {
               </div>
             </div>
           )}
-          {/* Continue Button */}
-          {(form.direction === "ONEWAY" && selectedOutboundFlight) ||
-          (form.direction === "ROUNDTRIP" &&
-            selectedOutboundFlight &&
-            selectedInboundFlight) ? (
-            <div className="mt-6 text-center">
-              <button
-                onClick={handleSelectFlight}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold shadow"
-              >
-                Continue to Passenger Details
-              </button>
-            </div>
-          ) : null}
+          {/* === Render the Floating Selection Tracker Component === */}
+          <FloatingSelectionTracker
+            selectedOutboundFlight={selectedOutboundFlight}
+            selectedInboundFlight={selectedInboundFlight}
+            direction={form.direction}
+            onContinue={handleSelectFlight} // Pass the handleSelectFlight function as a prop
+          />
+          {/* Add extra space at the bottom for scrolling */}
+          <div className="pb-64"></div>
         </div>
       </div>
     </div>
