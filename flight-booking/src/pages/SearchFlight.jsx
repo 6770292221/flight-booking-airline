@@ -183,6 +183,10 @@ const SearchFlight = () => {
       navigate("/login"); // หากไม่มี token ไปที่หน้า login
       return;
     }
+
+    // Access adults, children, and infants from the form state
+    const { adults, children, infants } = form;
+
     if (
       form.direction === "ROUNDTRIP" &&
       selectedOutboundFlight &&
@@ -193,6 +197,9 @@ const SearchFlight = () => {
           outbound: selectedOutboundFlight,
           inbound: selectedInboundFlight,
           passengerCount: totalPassengers,
+          adults : adults,
+          children : children,
+          infants : infants,
         },
       });
     } else if (form.direction === "ONEWAY" && selectedOutboundFlight) {
@@ -200,6 +207,9 @@ const SearchFlight = () => {
         state: {
           flight: selectedOutboundFlight,
           passengerCount: totalPassengers,
+          adults : adults,
+          children : children,
+          infants : infants,
         },
       });
     }
@@ -516,8 +526,8 @@ const SearchFlight = () => {
         <div className="space-y-4">
           {/* ONEWAY หรือ ROUNDTRIP OUTBOUND */}
           {flightResults.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-blue-700 mb-2">
+            <div className="mb-6 border p-4 rounded-md bg-gray-50">
+              <h3 className="text-xl font-bold text-blue-700 mb-6">
                 Select Outbound Flight
               </h3>
               <div className="space-y-4">
@@ -537,8 +547,8 @@ const SearchFlight = () => {
 
           {/* ROUNDTRIP INBOUND */}
           {form.direction === "ROUNDTRIP" && inboundFlights.length > 0 && (
-            <div>
-              <h3 className="text-xl font-bold text-blue-700 mb-2">
+            <div className="border p-4 rounded-md bg-gray-100">
+              <h3 className="text-xl font-bold text-blue-700 mb-6">
                 Select Inbound Flight
               </h3>
               <div className="space-y-4">
