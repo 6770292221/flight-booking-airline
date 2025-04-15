@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../apis/auth";
+import logo from "../assets/logo/chulaloka-logo.png";
+import { jwtDecode } from "jwt-decode";
+import UserDropdown from "./UserDropdown";
+import { LogIn, UserPlus } from "lucide-react";
+
+import {
+  FaHome,
+  FaSuitcase,
+  FaHistory,
+  FaPercent,
+  FaPlaneDeparture,
+} from "react-icons/fa";
 
 const MenuBar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -11,8 +23,15 @@ const MenuBar = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      const userData = JSON.parse(localStorage.getItem("user"));
-      setUser(userData);
+      try {
+        const decoded = jwtDecode(token);
+        setUser({
+          firstName: decoded.firstName,
+          lastName: decoded.lastName,
+        });
+      } catch (error) {
+        console.error("Invalid token", error);
+      }
     }
   }, []);
 
@@ -32,72 +51,101 @@ const MenuBar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-3 shadow-lg w-full">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Brand */}
-        <div
-          className="text-lg sm:text-xl font-bold tracking-wide cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          ✈️ Flight Booking
-        </div>
-
-        {/* Center Menu */}
-        <div className="hidden md:flex space-x-4 text-sm justify-center flex-1">
-          <button
-            className="hover:text-yellow-300 transition"
+    <nav className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-3 shadow-lg w-full">
+      <div className="flex items-center justify-between">
+        {/* Left: Logo */}
+        <div className="flex items-center gap-6">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate("/")}
           >
-            Home
+            <img src={logo} alt="ChulaLoka Logo" className="h-12 w-auto" />
+            <div className="leading-tight">
+              <div className="text-2xl font-bold tracking-wide">
+                <span className="text-pink-300">Chula</span>
+                <span className="text-white">Loka</span>
+              </div>
+              <div className="text-sm text-blue-100">Your Flight Companion</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Center: Main Menu */}
+        <div className="hidden md:flex space-x-6 text-base font-medium">
+          <button
+            className="flex items-center space-x-2 hover:text-pink-300 transition"
+            onClick={() => navigate("/")}
+          >
+            <FaPlaneDeparture />
+            <span>Flights</span>
           </button>
+
           {isLoggedIn && (
             <>
               <button
-                className="hover:text-yellow-300 transition"
+                className="flex items-center space-x-2 hover:text-pink-300 transition"
                 onClick={() => navigate("/booking")}
               >
-                My Booking
+                <FaSuitcase />
+                <span>Bookings</span>
               </button>
               <button
-                className="hover:text-yellow-300 transition"
+                className="flex items-center space-x-2 hover:text-pink-300 transition"
                 onClick={() => navigate("/history")}
               >
-                History
+                <FaHistory />
+                <span>History</span>
               </button>
             </>
           )}
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center space-x-3 text-sm">
+        {/* Right: Auth Section */}
+        <div className="flex items-center space-x-4 text-sm">
           {isLoggedIn ? (
-            <>
-              <span className="font-medium hidden sm:block">
-                {user?.firstName}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-white text-blue-600 px-3 py-1 rounded-md text-sm hover:bg-gray-100 transition"
-              >
-                Logout
-              </button>
-            </>
+            <UserDropdown user={user} onLogout={handleLogout} />
           ) : (
             <>
               <button
                 onClick={handleLogin}
-                className="bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
+                className="flex items-center space-x-2 bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
               >
-                Login
+                <LogIn className="w-4 h-4" />
+                <span>Login</span>
               </button>
               <button
                 onClick={handleRegister}
-                className="bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
+                className="flex items-center space-x-2 bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
               >
-                Register
+                <UserPlus className="w-4 h-4" />
+                <span>Register</span>
               </button>
             </>
           )}
+
+          {/* TH | THB */}
+          <div className="flex items-center bg-white/10 border border-white/30 rounded-md px-3 py-1 cursor-pointer ml-2">
+            <img
+              src="https://flagcdn.com/w40/th.png"
+              alt="Thai Flag"
+              className="w-5 h-3.5 mr-2"
+            />
+            <span className="text-white text-sm font-medium">TH | THB</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 ml-1 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
       </div>
     </nav>
