@@ -235,7 +235,7 @@ const SearchFlight = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
       <MenuBar /> {/* Add MenuBar component */}
       <div className="max-w-5xl mx-auto mt-10">
         <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
