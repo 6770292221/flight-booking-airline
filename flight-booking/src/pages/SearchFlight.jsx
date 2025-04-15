@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAirports } from "../apis/airport";
 import { searchFlights } from "../apis/flight";
 import { getCabinClasses } from "../apis/cabin";
 import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
 import FloatingSelectionTracker from "./Components/FloatingSelectionTracker";
+import FlightJourneyTracker from "./Components/FlightJourneyTracker";
 import SearchResult from "../pages/Components/ShowResult";
 import {
   FaSearch,
@@ -20,6 +21,7 @@ import {
 const SearchFlight = () => {
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
+  const searchResultsRef = useRef(null);
 
   const [airports, setAirports] = useState([]);
   const [cabinClasses, setCabinClasses] = useState([]);
@@ -35,10 +37,38 @@ const SearchFlight = () => {
     cabinClass: "ECONOMY",
   });
 
+  const handleOutboundTrackerClick = () => {
+    // Reset the selected outbound flight to trigger re-render of outbound options
+    setSelectedOutboundFlight(null);
+    setIsOneWayFlightSelected(false); // Reset one-way selection as well
+    // Optionally, scroll back to the search results
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
+  const handleInboundTrackerClick = () => {
+    if (form.direction === "ROUNDTRIP" && selectedOutboundFlight) {
+      // Reset the selected inbound flight to trigger re-render of inbound options
+      setSelectedInboundFlight(null);
+      // Optionally, scroll back to the inbound flight results (if rendered)
+      if (searchResultsRef.current) {
+        searchResultsRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
+  };
+
   const totalPassengers = form.adults + form.children + form.infants;
   const [flightResults, setFlightResults] = useState([]);
   const [selectedOutboundFlight, setSelectedOutboundFlight] = useState(null);
   const [selectedInboundFlight, setSelectedInboundFlight] = useState(null);
+  const [isOneWayFlightSelected, setIsOneWayFlightSelected] = useState(false);
   const [inboundFlights, setInboundFlights] = useState([]);
   const [errors, setErrors] = useState({});
   const [popupMessage, setPopupMessage] = useState(null);
@@ -150,6 +180,15 @@ const SearchFlight = () => {
   };
 
   const handleSelectOutboundFlight = (flight) => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Fallback
+    }
+
     const data = {
       direction: flight.direction,
       airline: flight.airline,
@@ -164,6 +203,15 @@ const SearchFlight = () => {
   };
 
   const handleSelectInboundFlight = (flight) => {
+    if (searchResultsRef.current) {
+      searchResultsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Fallback
+    }
+
     const data = {
       direction: flight.direction,
       airline: flight.airline,
@@ -197,9 +245,9 @@ const SearchFlight = () => {
           outbound: selectedOutboundFlight,
           inbound: selectedInboundFlight,
           passengerCount: totalPassengers,
-          adults : adults,
-          children : children,
-          infants : infants,
+          adults: adults,
+          children: children,
+          infants: infants,
         },
       });
     } else if (form.direction === "ONEWAY" && selectedOutboundFlight) {
@@ -207,9 +255,9 @@ const SearchFlight = () => {
         state: {
           flight: selectedOutboundFlight,
           passengerCount: totalPassengers,
-          adults : adults,
-          children : children,
-          infants : infants,
+          adults: adults,
+          children: children,
+          infants: infants,
         },
       });
     }
@@ -523,48 +571,74 @@ const SearchFlight = () => {
           </div>
         )}
 
+        <div ref={searchResultsRef}>
+          <FlightJourneyTracker
+            direction={form.direction}
+            selectedOutboundFlight={selectedOutboundFlight}
+            selectedInboundFlight={selectedInboundFlight}
+            onOutboundClick={handleOutboundTrackerClick}
+            onInboundClick={handleInboundTrackerClick}
+          />
+        </div>
+
         <div className="space-y-4">
           {/* ONEWAY หรือ ROUNDTRIP OUTBOUND */}
-          {flightResults.length > 0 && (
-            <div className="mb-6 border p-4 rounded-md bg-gray-50">
-              <h3 className="text-xl font-bold text-blue-700 mb-6">
-                Select Outbound Flight
-              </h3>
-              <div className="space-y-4">
-                {flightResults.map((flight, index) => (
-                  <SearchResult
-                    key={`outbound-${index}`}
-                    flight={flight}
-                    index={index}
-                    selectedDetailIndex={selectedDetailIndex}
-                    handleSelectOutboundFlight={handleSelectOutboundFlight}
-                    handleToggleDetails={handleToggleDetails}
-                  />
-                ))}
+          {flightResults.length > 0 &&
+            ((form.direction === "ONEWAY" && !isOneWayFlightSelected) ||
+              (form.direction === "ROUNDTRIP" && !selectedOutboundFlight)) && (
+              <div className="mb-6 border p-4 rounded-md bg-gray-50">
+                <h3 className="text-xl font-bold text-blue-700 mb-6">
+                  Select Outbound Flight
+                </h3>
+                <div className="space-y-4">
+                  {flightResults.map((flight, index) => (
+                    <SearchResult
+                      key={`outbound-${index}`}
+                      flight={flight}
+                      index={index}
+                      selectedDetailIndex={selectedDetailIndex}
+                      handleSelect={handleSelectOutboundFlight}
+                      onSelectType="outbound"
+                      handleToggleDetails={handleToggleDetails}
+                      isSelected={
+                        form.direction === "ONEWAY"
+                          ? isOneWayFlightSelected &&
+                            selectedOutboundFlight?.flightNumber ===
+                              flight.flightNumber &&
+                            selectedOutboundFlight?.airline === flight.airline
+                          : selectedOutboundFlight?.flightNumber ===
+                              flight.flightNumber &&
+                            selectedOutboundFlight?.airline === flight.airline
+                      }
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* ROUNDTRIP INBOUND */}
-          {form.direction === "ROUNDTRIP" && inboundFlights.length > 0 && (
-            <div className="border p-4 rounded-md bg-gray-100">
-              <h3 className="text-xl font-bold text-blue-700 mb-6">
-                Select Inbound Flight
-              </h3>
-              <div className="space-y-4">
-                {inboundFlights.map((flight, index) => (
-                  <SearchResult
-                    key={`inbound-${index}`}
-                    flight={flight}
-                    index={index + 1000} // ป้องกัน key ซ้ำ
-                    selectedDetailIndex={selectedDetailIndex}
-                    handleSelectOutboundFlight={handleSelectInboundFlight} // <== เปลี่ยน handler
-                    handleToggleDetails={handleToggleDetails}
-                  />
-                ))}
+          {form.direction === "ROUNDTRIP" &&
+            inboundFlights.length > 0 &&
+            selectedOutboundFlight && (
+              <div className="border p-4 rounded-md bg-gray-100">
+                <h3 className="text-xl font-bold text-blue-700 mb-6">
+                  Select Inbound Flight
+                </h3>
+                <div className="space-y-4">
+                  {inboundFlights.map((flight, index) => (
+                    <SearchResult
+                      key={`inbound-${index}`}
+                      flight={flight}
+                      index={index + 1000} // ป้องกัน key ซ้ำ
+                      selectedDetailIndex={selectedDetailIndex}
+                      handleSelect={handleSelectInboundFlight} // Changed prop name to be generic
+                      onSelectType="inbound" // Added identifier prop
+                      handleToggleDetails={handleToggleDetails}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {/* === Render the Floating Selection Tracker Component === */}
           <FloatingSelectionTracker
             selectedOutboundFlight={selectedOutboundFlight}

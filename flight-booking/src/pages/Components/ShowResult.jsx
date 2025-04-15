@@ -17,7 +17,8 @@ const SearchResult = ({
   flight,
   index,
   selectedDetailIndex,
-  handleSelectOutboundFlight,
+  handleSelect, // Generic handler prop
+  onSelectType, // Identifier prop
   handleToggleDetails,
   isSelected,
 }) => {
@@ -37,6 +38,14 @@ const SearchResult = ({
     if (minutes) parts.push(`${minutes} minute${minutes !== "1" ? "s" : ""}`);
     if (seconds) parts.push(`${seconds} second${seconds !== "1" ? "s" : ""}`);
     return parts.join(" ");
+  };
+
+  const handleSelectClick = () => {
+    if (onSelectType === "outbound") {
+      handleSelect(flight);
+    } else if (onSelectType === "inbound") {
+      handleSelect(flight);
+    }
   };
 
   return (
@@ -69,7 +78,7 @@ const SearchResult = ({
             {flight.price.amount} {flight.price.currency}
           </div>
           <button
-            onClick={() => handleSelectOutboundFlight(flight)}
+            onClick={handleSelectClick}
             className={`py-2 px-8 rounded font-semibold flex items-center gap-2 ${
               isSelected
                 ? "bg-green-600 text-white cursor-default"
