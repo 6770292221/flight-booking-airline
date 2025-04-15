@@ -528,7 +528,7 @@ export async function cancelMyBooking(req, res) {
       });
     }
 
-    if (booking.status !== "PENDING") {
+    if (booking.status !== "PENDING" && booking.status !== "FAILED_PAID") {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.RSV_3002,

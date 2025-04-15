@@ -28,7 +28,6 @@ const Booking = () => {
           setError(response.data.message);
         }
       } catch (error) {
-        setError("Failed to fetch bookings. Please try again.");
       } finally {
         setIsLoading(false);
       }
