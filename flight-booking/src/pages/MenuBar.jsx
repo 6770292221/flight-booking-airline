@@ -73,7 +73,7 @@ const MenuBar = () => {
         {/* Center: Main Menu */}
         <div className="hidden md:flex space-x-6 text-base font-medium">
           <button
-            className="flex items-center space-x-2 hover:text-pink-300 transition"
+            className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
             onClick={() => navigate("/")}
           >
             <FaPlaneDeparture />
@@ -83,14 +83,14 @@ const MenuBar = () => {
           {isLoggedIn && (
             <>
               <button
-                className="flex items-center space-x-2 hover:text-pink-300 transition"
+                className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/booking")}
               >
                 <FaSuitcase />
                 <span>Bookings</span>
               </button>
               <button
-                className="flex items-center space-x-2 hover:text-pink-300 transition"
+                className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/history")}
               >
                 <FaHistory />
