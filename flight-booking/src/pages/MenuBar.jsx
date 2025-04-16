@@ -62,7 +62,7 @@ const MenuBar = () => {
             <img src={logo} alt="ChulaLoka Logo" className="h-12 w-auto" />
             <div className="leading-tight">
               <div className="text-2xl font-bold tracking-wide">
-                <span className="text-pink-300">Chula</span>
+                <span className="text-[#FF4EB5]">Chula</span>
                 <span className="text-white">Loka</span>
               </div>
               <div className="text-sm text-blue-100">Your Flight Companion</div>
@@ -73,7 +73,7 @@ const MenuBar = () => {
         {/* Center: Main Menu */}
         <div className="hidden md:flex space-x-6 text-base font-medium">
           <button
-            className="flex items-center space-x-2 hover:text-pink-300 transition"
+            className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
             onClick={() => navigate("/")}
           >
             <FaPlaneDeparture />
@@ -83,14 +83,14 @@ const MenuBar = () => {
           {isLoggedIn && (
             <>
               <button
-                className="flex items-center space-x-2 hover:text-pink-300 transition"
+                className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/booking")}
               >
                 <FaSuitcase />
                 <span>Bookings</span>
               </button>
               <button
-                className="flex items-center space-x-2 hover:text-pink-300 transition"
+                className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/history")}
               >
                 <FaHistory />
