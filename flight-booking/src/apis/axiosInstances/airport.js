@@ -1,7 +1,10 @@
 import axios from 'axios';
+import config from "../config";
+
 
 const airport = axios.create({
-    baseURL: 'http://localhost:3001/api/v1/airport-core-api',
+    baseURL: `${config.BASE_URL}/airport-core-api`,
+
     headers: {
         'Content-Type': 'application/json',
     },

@@ -28,7 +28,6 @@ const Booking = () => {
           setError(response.data.message);
         }
       } catch (error) {
-        setError("Failed to fetch bookings. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -69,7 +68,7 @@ const Booking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-4 text-sm">
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
       <MenuBar />
       <div className="max-w-6xl mx-auto mt-6">
         <h2 className="text-2xl font-semibold text-blue-800 mb-4">

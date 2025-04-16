@@ -68,7 +68,7 @@ const History = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
       <MenuBar /> {/* Add MenuBar component */}
       <div className="max-w-3xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold text-blue-800 mb-4">
