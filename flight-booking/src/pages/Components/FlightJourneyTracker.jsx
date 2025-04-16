@@ -65,7 +65,7 @@ const FlightJourneyTracker = ({
           <FaCheckCircle size={24} />
         </div>
         <span className={`${textBaseClasses} ${ (direction === "ONEWAY" && selectedOutboundFlight) || (direction === "ROUNDTRIP" && selectedOutboundFlight && selectedInboundFlight) ? 'text-green-600' : ''}`}>
-          {direction === "ONEWAY" ? 'Confirm Flight' : 'Confirm Flights'}
+          {direction === "ONEWAY" ? 'Proceed to Booking' : 'Proceed to Booking'}
         </span>
       </div>
     </div>

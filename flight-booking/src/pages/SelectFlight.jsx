@@ -15,8 +15,14 @@ import {
 } from "react-icons/fa";
 import MenuBar from "../pages/MenuBar";
 import countries from "./Components/Countries"; // Import countries list
+import { createBooking } from "../apis/booking";
 
 const SelectFlight = () => {
+
+  const [isBookingLoading, setIsBookingLoading] = useState(false);
+  const [bookingError, setBookingError] = useState(null);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
   // Extract data from location state
   const location = useLocation();
   const {
@@ -27,25 +33,53 @@ const SelectFlight = () => {
     adults,
     children,
     infants,
+    logoUrlOutbound,
+    logoUrlInbound,
   } = location.state;
   const selectedOutbound = outbound || flight; // Use outbound flight or fallback to single flight
 
-  // Initialize passengers state
-  const [passengers, setPassengers] = useState(
-    Array.from({ length: passengerCount }, () => ({
-      firstName: "",
-      lastName: "",
-      type: "ADULT",
-      gender: "",
-      dateOfBirth: "",
-      nationality: "",
-      nationalId: "",
-      passportNumber: "",
-      addons: [],
-      seatSelected: false,
-      mealSelected: false,
-    }))
+  // State for outbound add-ons (per passenger)
+  const [outboundAddons, setOutboundAddons] = useState(
+    Array.from({ length: passengerCount || 0 }, () => [])
   );
+
+  // State for inbound add-ons (per passenger)
+  const [inboundAddons, setInboundAddons] = useState(
+    Array.from({ length: passengerCount || 0 }, () => [])
+  );
+
+  // Initialize passengers state
+  const [passengers, setPassengers] = useState(() => {
+    // Use functional update form for complex initial state
+    if (passengerCount <= 0) {
+      return []; // Handle case where there are no passengers
+    }
+    return Array.from({ length: passengerCount }, (_, idx) => {
+      // Use index 'idx'
+      let passengerType;
+      if (idx < adults) {
+        passengerType = "ADULT"; // <<< This line was hardcoded before
+      } else if (idx < adults + children) {
+        passengerType = "CHILD"; // <<< This logic determines the type
+      } else {
+        passengerType = "INFANT"; // <<< Based on index and counts
+      }
+
+      return {
+        firstName: "",
+        lastName: "",
+        type: passengerType, // Assign the correctly determined type
+        gender: "",
+        dateOfBirth: "",
+        nationality: "",
+        nationalId: "",
+        passportNumber: "",
+        addons: [], // Keep initial addons empty here
+        seatSelected: false,
+        mealSelected: false,
+      };
+    });
+  });
 
   // Initialize errors state
   const [errors, setErrors] = useState(
@@ -53,40 +87,56 @@ const SelectFlight = () => {
   );
 
   // Render flight summary for outbound and inbound flights
-  const renderFlightSummary = (label, data) => {
+  const renderFlightSummary = (label, data, logoUrl) => {
     if (!data) return null;
 
     return (
-      <div className="border p-4 rounded-xl mb-6 bg-white shadow-md">
-        <h3 className="font-bold text-lg mb-3 text-blue-700 flex items-center gap-2">
-          <FaTicketAlt className="text-blue-500" /> {label}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-800">
-          <div className="space-y-1">
-            {/* Flight details */}
-            <p className="flex items-center gap-2">
-              <FaPlaneDeparture className="text-blue-500" />
-              <strong>{data.airlineName}</strong> - {data.flightNumber}
-            </p>
-            <p className="flex items-center gap-2">
-              <FaPlaneDeparture className="text-indigo-500" />
-              {data.departure.cityName} ({data.departure.iataCode})
-            </p>
-            <p className="flex items-center gap-2">
-              <FaPlaneArrival className="text-pink-500" />
-              {data.arrival.cityName} ({data.arrival.iataCode})
-            </p>
+      <div className="border p-4 rounded-xl mb-6 bg-white shadow-md flex items-center">
+        {" "}
+        {/* Added flex and items-center */}
+        <div>
+          <h3 className="font-bold text-lg mb-3 text-blue-700 flex items-center gap-2">
+            <FaTicketAlt className="text-blue-500" /> {label}
+          </h3>
+          <div>
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt={`${data.airlineName || ""} logo`}
+                className="h-10 w-30 mr-3 rounded-full object-contain flex-shrink-0"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            )}
           </div>
-          <div className="space-y-1">
-            {/* Flight timing and price */}
-            <p className="flex items-center gap-2">
-              <FaClock className="text-gray-700" />
-              {new Date(data.departure.time).toLocaleString()} →{" "}
-              {new Date(data.arrival.time).toLocaleString()}
-            </p>
-            <p className="flex items-center gap-2 text-green-700 font-semibold">
-              <FaMoneyBillWave /> {data.price.amount} {data.price.currency}
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 text-gray-800">
+            <div className="space-y-1">
+              {/* Flight details */}
+              <p className="flex items-center gap-2">
+                <FaPlaneDeparture className="text-blue-500" />
+                <strong>{data.airlineName}</strong> - {data.flightNumber}
+              </p>
+              <p className="flex items-center gap-2">
+                <FaPlaneDeparture className="text-indigo-500" />
+                {data.departure.cityName} ({data.departure.iataCode})
+              </p>
+              <p className="flex items-center gap-2">
+                <FaPlaneArrival className="text-pink-500" />
+                {data.arrival.cityName} ({data.arrival.iataCode})
+              </p>
+            </div>
+            <div className="space-y-1">
+              {/* Flight timing and price */}
+              <p className="flex items-center gap-2">
+                <FaClock className="text-gray-700" />
+                {new Date(data.departure.time).toLocaleString()} →{" "}
+                {new Date(data.arrival.time).toLocaleString()}
+              </p>
+              <p className="flex items-center gap-2 text-green-700 font-semibold">
+                <FaMoneyBillWave /> {data.price.amount} {data.price.currency}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -108,50 +158,57 @@ const SelectFlight = () => {
   };
 
   // Handle add-on selection (seat and meal)
-  const handleAddonToggle = (index, type) => {
-    setPassengers((prev) => {
-      const updated = [...prev];
-      const passenger = { ...updated[index] };
-      const flightNumber = selectedOutbound.flightNumber; // Use outbound flight number for add-ons
+  const handleFlightAddonToggle = (
+    passengerIndex,
+    flightType,
+    addonType,
+    flightNumber,
+    value, // The specific value of the add-on (e.g., "12A" for seat, "Vegetarian Meal" for meal)
+    amount,
+    currency,
+    isChecked
+  ) => {
+    const newAddon = {
+      flightNumber: flightNumber,
+      type: addonType,
+      [addonType]: value, // Use the addonType as the key for the specific value
+      price: {
+        amount: amount.toFixed(2),
+        currency: currency,
+      },
+    };
 
-      // Toggle seat or meal selection
-      if (type === "seat") {
-        passenger.seatSelected = !passenger.seatSelected;
-      } else if (type === "meal") {
-        passenger.mealSelected = !passenger.mealSelected;
-      }
-
-      // Define add-on prices
-      const seatPrice = passenger.seatSelected ? 1499 : 0; // Seat price in THB
-      const mealPrice = passenger.mealSelected ? 199 : 0; // Meal price in THB
-
-      // Calculate the total price
-      const totalPrice = seatPrice + mealPrice;
-
-      // Create the add-on object
-      const newAddon = {
-        flightNumber,
-        seat: passenger.seatSelected ? "12A" : "", // Example seat number
-        meal: passenger.mealSelected ? "Chicken with Rice" : "", // Example meal
-        price: {
-          amount: totalPrice.toFixed(2), // Total price for add-ons
-          currency: "THB",
-        },
-      };
-
-      // Remove existing add-ons for the flight
-      passenger.addons = passenger.addons.filter(
-        (a) => a.flightNumber !== flightNumber
+    const updateAddons = (prevAddons) => {
+      const updated = [...prevAddons];
+      const passengerAddons = updated[passengerIndex] || [];
+      const existingAddonIndex = passengerAddons.findIndex(
+        (addon) =>
+          addon.type === addonType &&
+          addon[addonType] === value &&
+          addon.flightNumber === flightNumber
       );
 
-      // Add the new add-on if either seat or meal is selected
-      if (passenger.seatSelected || passenger.mealSelected) {
-        passenger.addons.push(newAddon);
+      if (isChecked) {
+        // Add the new add-on if it doesn't exist
+        if (existingAddonIndex === -1) {
+          updated[passengerIndex] = [...passengerAddons, newAddon];
+        }
+      } else {
+        // Remove the add-on if it exists
+        if (existingAddonIndex > -1) {
+          updated[passengerIndex] = passengerAddons.filter(
+            (_, index) => index !== existingAddonIndex
+          );
+        }
       }
-
-      updated[index] = passenger;
       return updated;
-    });
+    };
+
+    if (flightType === "outbound") {
+      setOutboundAddons(updateAddons);
+    } else if (flightType === "inbound") {
+      setInboundAddons(updateAddons);
+    }
   };
 
   // Validate passenger age based on type (Adult, Child, Infant)
@@ -220,9 +277,14 @@ const SelectFlight = () => {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+
     if (validateForm()) {
-      // Prepare the flights array
+
+      setIsBookingLoading(true); // Set loading to true when the request starts
+      setBookingError(null);
+      setBookingSuccess(false);
+
       const flights = [];
       if (selectedOutbound) {
         flights.push({
@@ -247,29 +309,64 @@ const SelectFlight = () => {
         });
       }
 
-      // Prepare the passengers array
-      const passengersData = passengers.map((passenger) => ({
-        firstName: passenger.firstName,
-        lastName: passenger.lastName,
-        type: passenger.type,
-        nationality: passenger.nationality,
-        nationalId: passenger.nationalId,
-        passportNumber: passenger.passportNumber,
-        dateOfBirth: passenger.dateOfBirth,
-        gender: passenger.gender,
-        addons: passenger.addons,
-      }));
+      const passengersData = passengers.map((passenger, index) => {
+        const passengerData = {
+          firstName: passenger.firstName,
+          lastName: passenger.lastName,
+          type: passenger.type,
+          nationality: passenger.nationality,
+          nationalId: passenger.nationalId,
+          passportNumber: passenger.passportNumber,
+          dateOfBirth: passenger.dateOfBirth,
+          gender: passenger.gender,
+          addons: [], // Initialize addons array for each passenger
+        };
 
-      // Combine flights and passengers into the final payload
+        const outboundPassengerAddons = outboundAddons[index] || [];
+        outboundPassengerAddons.forEach((addon) => {
+          passengerData.addons.push({
+            flightNumber: selectedOutbound.flightNumber,
+            [addon.type]: addon[addon.type], // Dynamically add 'seat' or 'meal' key
+            price: addon.price,
+          });
+        });
+
+        if (inbound) {
+          const inboundPassengerAddons = inboundAddons[index] || [];
+          inboundPassengerAddons.forEach((addon) => {
+            passengerData.addons.push({
+              flightNumber: inbound.flightNumber,
+              [addon.type]: addon[addon.type], // Dynamically add 'seat' or 'meal' key
+              price: addon.price,
+            });
+          });
+        }
+
+        return passengerData;
+      });
+
       const payload = {
         flights,
         passengers: passengersData,
       };
 
-      // Log the payload (or send it to an API)
-      console.log("Booking confirmed:", payload);
+      console.log("Booking data to send:", payload);
+
+      try {
+        const response = await createBooking(payload);
+        console.log("Booking created successfully:", response.data);
+        setIsBookingLoading(false); // Set loading to false on success
+        setBookingSuccess(true);
+        // Optionally redirect or show a success message
+      } catch (error) {
+        console.error("Error creating booking:", error);
+        setIsBookingLoading(false); // Set loading to false on error
+        setBookingError("An error occurred while creating your booking. Please try again.");
+        // Optionally display a more specific error message to the user
+      }
     } else {
       console.log("Form validation failed");
+      // Optionally display a message to the user about validation errors
     }
   };
 
@@ -282,8 +379,17 @@ const SelectFlight = () => {
           Flight Summary
         </h2>
 
-        {renderFlightSummary("Outbound Flight", selectedOutbound)}
-        {inbound && renderFlightSummary("Inbound Flight", inbound)}
+        {renderFlightSummary(
+          "Outbound Flight",
+          selectedOutbound,
+          logoUrlOutbound // Pass the logoUrlOutbound prop
+        )}
+        {inbound &&
+          renderFlightSummary(
+            "Inbound Flight",
+            inbound,
+            logoUrlInbound // Pass the logoUrlInbound prop
+          )}
 
         <h2 className="text-xl font-bold mb-4 mt-10 text-blue-800">
           Enter Passenger Details
@@ -438,31 +544,115 @@ const SelectFlight = () => {
               </div>
 
               <div className="mt-6">
-                <label className="block mb-2 font-medium text-gray-700">
-                  Add-ons (Optional)
-                </label>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={p.seatSelected}
-                      onChange={() => handleAddonToggle(idx, "seat")}
-                      className="mr-2"
-                    />
-                    <FaChair className="text-blue-500 mr-1" /> Preferred Seat
-                    (1,499 THB)
+                <div>
+                  <label className="block mb-2 font-medium text-gray-700">
+                    Outbound Flight Add-ons (Optional)
                   </label>
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={p.mealSelected}
-                      onChange={() => handleAddonToggle(idx, "meal")}
-                      className="mr-2"
-                    />
-                    <FaUtensils className="text-green-500 mr-1" /> On Board Thai
-                    Meal (199 THB)
-                  </label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={outboundAddons[idx]?.some(
+                          (addon) => addon.type === "meal"
+                        )}
+                        onChange={(e) =>
+                          handleFlightAddonToggle(
+                            idx,
+                            "outbound",
+                            "meal",
+                            selectedOutbound.flightNumber,
+                            "On Board Meal", // Specific meal value
+                            199,
+                            "THB",
+                            e.target.checked
+                          )
+                        }
+                        className="mr-2"
+                      />
+                      <FaUtensils className="text-green-500 mr-1" /> On Board
+                      Meal (199 THB)
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={outboundAddons[idx]?.some(
+                          (addon) => addon.type === "seat"
+                        )}
+                        onChange={(e) =>
+                          handleFlightAddonToggle(
+                            idx,
+                            "outbound",
+                            "seat",
+                            selectedOutbound.flightNumber,
+                            "12A", // Example seat value
+                            1499,
+                            "THB",
+                            e.target.checked
+                          )
+                        }
+                        className="mr-2"
+                      />
+                      <FaChair className="text-blue-500 mr-1" /> Preferred Seat
+                      (1,499 THB)
+                    </label>
+                  </div>
                 </div>
+
+                {inbound && (
+                  <div className="mt-6">
+                    <label className="block mb-2 font-medium text-gray-700">
+                      Inbound Flight Add-ons (Optional)
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={inboundAddons[idx]?.some(
+                            (addon) => addon.type === "meal"
+                          )}
+                          onChange={(e) =>
+                            handleFlightAddonToggle(
+                              idx,
+                              "inbound",
+                              "meal",
+                              inbound.flightNumber,
+                              "On Board Meal", // Specific meal value
+                              199,
+                              "THB",
+                              e.target.checked
+                            )
+                          }
+                          className="mr-2"
+                        />
+                        <FaUtensils className="text-green-500 mr-1" /> On Board
+                        Meal (199 THB)
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={inboundAddons[idx]?.some(
+                            (addon) => addon.type === "seat"
+                          )}
+                          onChange={(e) =>
+                            handleFlightAddonToggle(
+                              idx,
+                              "inbound",
+                              "seat",
+                              inbound.flightNumber,
+                              "12B", // Example seat value
+                              1499,
+                              "THB",
+                              e.target.checked
+                            )
+                          }
+                          className="mr-2"
+                        />
+                        <FaChair className="text-blue-500 mr-1" /> Preferred
+                        Seat (1,499 THB)
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -486,31 +676,72 @@ const SelectFlight = () => {
               </div>
 
               {/* Add-ons Price */}
-              {passengers.map((passenger, idx) => {
-                // Determine passenger type label
-                const passengerType =
-                  idx < adults
-                    ? `Adult (${idx + 1} of ${adults})`
-                    : idx < adults + children
-                    ? `Child (${idx + 1 - adults} of ${children})`
-                    : `Infant (${idx + 1 - adults - children} of ${infants})`;
-
-                return (
-                  <div key={idx} className="flex justify-between">
-                    <span>Add-ons for {passengerType}:</span>
-                    <span className="font-semibold">
-                      {passenger.addons
-                        .reduce(
-                          (total, addon) =>
-                            total + parseFloat(addon.price.amount),
-                          0
-                        )
-                        .toFixed(2)}{" "}
-                      THB
-                    </span>
-                  </div>
-                );
-              })}
+              {passengers.map((passenger, idx) => (
+                <div key={idx} className="space-y-1">
+                  {outboundAddons[idx]?.some(
+                    (addon) => addon.type === "seat"
+                  ) && (
+                    <div className="flex justify-between">
+                      <span>
+                        Outbound Preferred Seat for{" "}
+                        {idx < adults
+                          ? `Adult (${idx + 1})`
+                          : idx < adults + children
+                          ? `Child (${idx + 1 - adults})`
+                          : `Infant (${idx + 1 - adults - children})`}
+                        :
+                      </span>
+                      <span className="font-semibold">1499.00 THB</span>
+                    </div>
+                  )}
+                  {outboundAddons[idx]?.some(
+                    (addon) => addon.type === "meal"
+                  ) && (
+                    <div className="flex justify-between">
+                      <span>
+                        Outbound On Board Meal for{" "}
+                        {idx < adults
+                          ? `Adult (${idx + 1})`
+                          : idx < adults + children
+                          ? `Child (${idx + 1 - adults})`
+                          : `Infant (${idx + 1 - adults - children})`}
+                        :
+                      </span>
+                      <span className="font-semibold">199.00 THB</span>
+                    </div>
+                  )}
+                  {inboundAddons[idx]?.some((addon) => addon.type === "seat") &&
+                    inbound && (
+                      <div className="flex justify-between">
+                        <span>
+                          Inbound Preferred Seat for{" "}
+                          {idx < adults
+                            ? `Adult (${idx + 1})`
+                            : idx < adults + children
+                            ? `Child (${idx + 1 - adults})`
+                            : `Infant (${idx + 1 - adults - children})`}
+                          :
+                        </span>
+                        <span className="font-semibold">1499.00 THB</span>
+                      </div>
+                    )}
+                  {inboundAddons[idx]?.some((addon) => addon.type === "meal") &&
+                    inbound && (
+                      <div className="flex justify-between">
+                        <span>
+                          Inbound On Board Meal for{" "}
+                          {idx < adults
+                            ? `Adult (${idx + 1})`
+                            : idx < adults + children
+                            ? `Child (${idx + 1 - adults})`
+                            : `Infant (${idx + 1 - adults - children})`}
+                          :
+                        </span>
+                        <span className="font-semibold">199.00 THB</span>
+                      </div>
+                    )}
+                </div>
+              ))}
 
               {/* Total Price */}
               <div className="flex justify-between border-t pt-2 mt-2 font-bold text-lg">
@@ -519,16 +750,21 @@ const SelectFlight = () => {
                   {(
                     parseFloat(selectedOutbound.price.amount) +
                     (inbound ? parseFloat(inbound.price.amount) : 0) +
-                    passengers.reduce(
-                      (total, passenger) =>
-                        total +
-                        passenger.addons.reduce(
-                          (addonTotal, addon) =>
-                            addonTotal + parseFloat(addon.price.amount),
-                          0
-                        ),
-                      0
-                    )
+                    passengers.reduce((total, _, index) => {
+                      const outboundAddonTotal = (
+                        outboundAddons[index] || []
+                      ).reduce(
+                        (sum, addon) => sum + parseFloat(addon.price.amount),
+                        0
+                      );
+                      const inboundAddonTotal = (
+                        inboundAddons[index] || []
+                      ).reduce(
+                        (sum, addon) => sum + parseFloat(addon.price.amount),
+                        0
+                      );
+                      return total + outboundAddonTotal + inboundAddonTotal;
+                    }, 0)
                   ).toFixed(2)}{" "}
                   THB
                 </span>
@@ -537,13 +773,28 @@ const SelectFlight = () => {
           </div>
 
           <div className="text-center mt-10">
-            <button
-              onClick={handleSubmit}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow flex items-center gap-2 mx-auto"
-            >
-              <FaCheckCircle /> Confirm Booking
-            </button>
-          </div>
+          <button
+            onClick={handleSubmit}
+            className={`bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow flex items-center gap-2 mx-auto ${isBookingLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isBookingLoading}
+          >
+            {isBookingLoading ? (
+              <FaClock className="animate-spin" /> // Or a custom loading spinner
+            ) : (
+              <FaCheckCircle />
+            )}
+            {isBookingLoading ? "Confirming Booking..." : "Confirm Booking"}
+          </button>
+
+          {bookingError && (
+            <p className="text-red-500 mt-4">{bookingError}</p>
+          )}
+
+          {bookingSuccess && (
+            <p className="text-green-500 mt-4">Booking successful!</p>
+            // Optionally add a link to a confirmation page
+          )}
+        </div>
         </div>
       </div>
     </div>

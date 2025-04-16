@@ -30,29 +30,24 @@ const formatDateTimeInBKK = (isoDateTimeString) => {
   }
 };
 
-const getAirlineLogoUrl = (airlineCode) => {
-  if (!airlineCode) return null;
-  return `https://logos.skyscnr.com/images/airlines/favicon/${airlineCode}.png`;
-};
-
 // --- Sub-Component for Displaying Single Flight Info ---
 const FlightInfoDisplay = ({ flight, label, labelColor }) => {
   if (!flight) return null;
-  const logoUrl = getAirlineLogoUrl(flight.airline);
+
   const departureTimeBKK = formatDateTimeInBKK(flight.departure?.time);
   const arrivalTimeBKK = formatDateTimeInBKK(flight.arrival?.time);
 
   return (
     <div>
-      <span className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-2`}>
+      <span className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-3`}>
         {label}
       </span>
-      <div className="flex items-center gap-1 text-sm mb-1">
-        {logoUrl && (
+      <div className="flex items-center gap-3 text-sm mb-3">
+        {flight.logoUrl && ( // Using flight.logoUrl directly
           <img
-            src={logoUrl}
+            src={flight.logoUrl}
             alt={`${flight.airlineName || ""} logo`}
-            className="h-5 w-5 bg-white rounded-full p-0.5 object-contain flex-shrink-0"
+            className="h-15 w-20 bg-white p-2 round-full object-contain flex-shrink-0"
             onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
         )}
@@ -151,7 +146,7 @@ const FloatingSelectionTracker = ({
             onClick={onContinue}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-1 rounded-lg font-semibold shadow alinge-left"
           >
-            Proceed
+            Proceed to Booking
           </button>
         </div>
       )}

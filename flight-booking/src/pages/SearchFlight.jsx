@@ -124,6 +124,14 @@ const SearchFlight = () => {
       newErrors.departureDate = "Please select departure date";
     if (form.direction === "ROUNDTRIP" && !form.arrivalDate)
       newErrors.arrivalDate = "Please select return date";
+    if (
+      form.originLocationCode &&
+      form.destinationLocationCode &&
+      form.originLocationCode === form.destinationLocationCode
+    ) {
+      newErrors.destinationLocationCode =
+        "Origin and destination airports must be different";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -197,9 +205,11 @@ const SearchFlight = () => {
       departure: flight.departure,
       arrival: flight.arrival,
       price: flight.price,
+      logoUrl: flight.logoUrl,
     };
     console.log("Selected Outbound:", data);
     setSelectedOutboundFlight(data);
+    setIsOneWayFlightSelected(true); // Indicate a one-way flight is selected
   };
 
   const handleSelectInboundFlight = (flight) => {
@@ -220,6 +230,7 @@ const SearchFlight = () => {
       departure: flight.departure,
       arrival: flight.arrival,
       price: flight.price,
+      logoUrl: flight.logoUrl,
     };
     console.log("Selected Inbound:", data);
     setSelectedInboundFlight(data);
@@ -248,6 +259,8 @@ const SearchFlight = () => {
           adults: adults,
           children: children,
           infants: infants,
+          logoUrlOutbound: selectedOutboundFlight.logoUrl,
+          logoUrlInbound: selectedInboundFlight.logoUrl,
         },
       });
     } else if (form.direction === "ONEWAY" && selectedOutboundFlight) {
