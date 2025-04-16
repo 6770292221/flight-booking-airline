@@ -62,7 +62,7 @@ const MenuBar = () => {
             <img src={logo} alt="ChulaLoka Logo" className="h-12 w-auto" />
             <div className="leading-tight">
               <div className="text-2xl font-bold tracking-wide">
-                <span className="text-pink-300">Chula</span>
+                <span className="text-[#FF4EB5]">Chula</span>
                 <span className="text-white">Loka</span>
               </div>
               <div className="text-sm text-blue-100">Your Flight Companion</div>
