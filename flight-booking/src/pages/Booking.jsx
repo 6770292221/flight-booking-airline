@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import { getPendingBookings, cancelBooking } from "../apis/booking";
 import { useNavigate } from "react-router-dom";
 import MenuBar from "../pages/MenuBar";
-import { FaEye, FaMoneyCheckAlt, FaTimesCircle } from "react-icons/fa";
+import {
+  FaEye,
+  FaMoneyCheckAlt,
+  FaTimesCircle,
+  FaCheckCircle,
+  FaHourglassHalf,
+  FaPlane,
+  FaUser,
+} from "react-icons/fa";
 
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
@@ -64,6 +72,32 @@ const Booking = () => {
       setError("Error occurred while canceling the booking.");
     } finally {
       setIsLoadingDelete(false);
+    }
+  };
+
+  const renderStatus = (status) => {
+    switch (status) {
+      case "PENDING":
+        return (
+          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full">
+            <FaHourglassHalf className="mr-1 text-yellow-600" />
+            Pending
+          </span>
+        );
+
+      case "FAILED_PAID":
+        return (
+          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full">
+            <FaTimesCircle className="mr-1 text-red-600" />
+            FAILED_PAID
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -175,78 +209,121 @@ const Booking = () => {
 
       {showPopup && popupBooking && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-          <div className="bg-white p-5 rounded shadow max-w-2xl w-full text-sm">
-            <h3 className="text-xl font-semibold mb-2">Booking Details</h3>
-            <p>
-              <strong>Booking Number:</strong> {popupBooking.bookingNubmer}
-            </p>
-            <p>
-              <strong>Status:</strong> {popupBooking.status}
-            </p>
+          <div className="bg-white p-5 rounded shadow max-w-2xl w-full text-sm max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              Booking Details
+            </h3>
 
-            <h4 className="mt-3 font-semibold">Flights:</h4>
-            {popupBooking.flights.map((flight, idx) => (
-              <div key={idx} className="mb-3">
+            <div className="space-y-4">
+              <div>
                 <p>
-                  <strong>Flight:</strong> {flight.flightNumber} -{" "}
-                  {flight.airlineName}
+                  <span className="font-semibold">Booking Number:</span>{" "}
+                  {popupBooking.bookingNumber}
                 </p>
                 <p>
-                  <strong>From:</strong> {flight.departure.cityName} (
-                  {flight.departure.iataCode}) -{" "}
-                  {new Date(flight.departure.time).toLocaleString()}
-                </p>
-                <p>
-                  <strong>To:</strong> {flight.arrival.cityName} (
-                  {flight.arrival.iataCode}) -{" "}
-                  {new Date(flight.arrival.time).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Price:</strong> {flight.price.amount}{" "}
-                  {flight.price.currency}
+                  <span className="font-semibold">Status:</span>{" "}
+                  {renderStatus(popupBooking.status)}
                 </p>
               </div>
-            ))}
 
-            <h4 className="mt-3 font-semibold">Passengers:</h4>
-            <div className="max-h-80 overflow-y-auto">
-              {popupBooking.passengers.map((passenger, idx) => (
-                <div key={idx} className="mb-3">
-                  <p>
-                    <strong>
-                      {passenger.firstName} {passenger.lastName}
-                    </strong>{" "}
-                    ({passenger.type})
-                  </p>
-                  <p>
-                    <strong>Passport:</strong> {passenger.passportNumber}
-                  </p>
-                  <h5 className="font-semibold mt-1">Addons:</h5>
-                  {passenger.addons.length > 0 ? (
-                    <ul className="list-disc list-inside">
-                      {passenger.addons.map((addon, i) => (
-                        <li key={i}>
-                          <p>
-                            <strong>Flight:</strong> {addon.flightNumber}
-                          </p>
-                          <p>
-                            <strong>Seat:</strong> {addon.seat}
-                          </p>
-                          <p>
-                            <strong>Meal:</strong> {addon.meal}
-                          </p>
-                          <p>
-                            <strong>Price:</strong> {addon.price.amount}{" "}
-                            {addon.price.currency}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-500">No addons</p>
-                  )}
-                </div>
-              ))}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <FaPlane className="text-blue-500" /> Flights
+                </h4>
+                {popupBooking.flights.map((flight, idx) => (
+                  <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
+                    <p>
+                      <span className="font-semibold">Flight:</span>{" "}
+                      {flight.flightNumber} - {flight.airlineName}
+                    </p>
+                    <p>
+                      <span className="font-semibold">From:</span>{" "}
+                      {flight.departure.cityName} ({flight.departure.iataCode})
+                      - {new Date(flight.departure.time).toLocaleString()}
+                    </p>
+                    <p>
+                      <span className="font-semibold">To:</span>{" "}
+                      {flight.arrival.cityName} ({flight.arrival.iataCode}) -{" "}
+                      {new Date(flight.arrival.time).toLocaleString()}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Price:</span>{" "}
+                      {flight.price.amount} {flight.price.currency}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <FaUser className="text-green-500" /> Passengers
+                </h4>
+                {popupBooking.passengers.map((passenger, idx) => (
+                  <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
+                    <p className="font-semibold mb-1">
+                      Passenger #{idx + 1}: {passenger.firstName}{" "}
+                      {passenger.lastName} ({passenger.type})
+                    </p>
+                    <p>
+                      <span className="font-semibold">Nationality:</span>{" "}
+                      {passenger.nationality}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Date of Birth:</span>{" "}
+                      {new Date(passenger.dateOfBirth).toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">Passport:</span>{" "}
+                      {passenger.passportNumber}
+                    </p>
+                    <p>
+                      <span className="font-semibold">National ID:</span>{" "}
+                      {passenger.nationalId}
+                    </p>
+
+                    <div className="mt-2">
+                      <h5 className="font-semibold">Addons:</h5>
+                      {passenger.addons.length > 0 ? (
+                        <div className="space-y-2">
+                          {passenger.addons.map((addon, i) => (
+                            <div
+                              key={i}
+                              className="pl-4 border-l-2 border-gray-300"
+                            >
+                              <p>
+                                <span className="font-semibold">Flight:</span>{" "}
+                                {addon.flightNumber}
+                              </p>
+                              <p>
+                                <span className="font-semibold">Seat:</span>{" "}
+                                {addon.seat}
+                              </p>
+                              <p>
+                                <span className="font-semibold">Meal:</span>{" "}
+                                {addon.meal}
+                              </p>
+                              <p>
+                                <span className="font-semibold">Price:</span>{" "}
+                                {addon.price.amount} {addon.price.currency}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">No addons</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="text-right mt-4">

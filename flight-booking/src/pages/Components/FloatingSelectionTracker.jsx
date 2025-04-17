@@ -1,6 +1,11 @@
 // src/components/FloatingSelectionTracker.jsx
 import React from "react";
-import { FaPlaneDeparture, FaPlaneArrival, FaClock, FaMapMarkerAlt } from 'react-icons/fa';
+import {
+  FaPlaneDeparture,
+  FaPlaneArrival,
+  FaClock,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 // --- Helper Functions ---
 const formatPrice = (price) => {
@@ -10,23 +15,23 @@ const formatPrice = (price) => {
 };
 
 const formatDateTimeInBKK = (isoDateTimeString) => {
-  if (!isoDateTimeString) return 'N/A';
+  if (!isoDateTimeString) return "N/A";
   try {
     const date = new Date(isoDateTimeString);
     if (isNaN(date.getTime())) {
       throw new Error("Invalid date string");
     }
     const options = {
-      timeZone: 'Asia/Bangkok',
-      hour: '2-digit',
-      minute: '2-digit',
+      timeZone: "Asia/Bangkok",
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: false,
     };
-    return new Intl.DateTimeFormat('en-GB', options).format(date);
+    return new Intl.DateTimeFormat("en-GB", options).format(date);
   } catch (error) {
     console.error("Error formatting date:", isoDateTimeString, error);
-    const timePart = isoDateTimeString.split('T')[1]?.substring(0, 5);
-    return timePart || 'Invalid Time';
+    const timePart = isoDateTimeString.split("T")[1]?.substring(0, 5);
+    return timePart || "Invalid Time";
   }
 };
 
@@ -39,7 +44,9 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
 
   return (
     <div>
-      <span className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-3`}>
+      <span
+        className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-3`}
+      >
         {label}
       </span>
       <div className="flex items-center gap-3 text-sm mb-3">
@@ -47,8 +54,10 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
           <img
             src={flight.logoUrl}
             alt={`${flight.airlineName || ""} logo`}
-            className="h-15 w-20 bg-white p-2 round-full object-contain flex-shrink-0"
-            onError={(e) => { e.currentTarget.style.display = "none"; }}
+            className="h-24 w-32 p-2 round-full object-contain flex-shrink-0"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
         )}
         <span className="font-medium leading-tight">
@@ -56,19 +65,21 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
         </span>
       </div>
       <div className="flex items-center gap-1.5 text-xs text-gray-100 opacity-95 mb-1.5 pl-1">
-         <FaClock className="flex-shrink-0"/>
-         <span>{departureTimeBKK} &ndash; {arrivalTimeBKK}</span>
-         <span className="text-[10px]">(BKK time)</span>
+        <FaClock className="flex-shrink-0" />
+        <span>
+          {departureTimeBKK} &ndash; {arrivalTimeBKK}
+        </span>
+        <span className="text-[10px]">(BKK time)</span>
       </div>
       <div className="flex items-center gap-1.5 text-xs text-gray-100 opacity-95 pl-1">
-         <FaMapMarkerAlt className="flex-shrink-0"/>
-         <span>{flight.departure?.iataCode} &rarr; {flight.arrival?.iataCode}</span>
+        <FaMapMarkerAlt className="flex-shrink-0" />
+        <span>
+          {flight.departure?.iataCode} &rarr; {flight.arrival?.iataCode}
+        </span>
       </div>
-       <div className="mt-2 text-right">
-          <span className="text-lg font-bold">
-            {formatPrice(flight.price)}
-          </span>
-       </div>
+      <div className="mt-2 text-right">
+        <span className="text-lg font-bold">{formatPrice(flight.price)}</span>
+      </div>
     </div>
   );
 };
@@ -84,8 +95,11 @@ const FloatingSelectionTracker = ({
     return null;
   }
 
-  const canContinue = (direction === "ONEWAY" && selectedOutboundFlight) ||
-                      (direction === "ROUNDTRIP" && selectedOutboundFlight && selectedInboundFlight);
+  const canContinue =
+    (direction === "ONEWAY" && selectedOutboundFlight) ||
+    (direction === "ROUNDTRIP" &&
+      selectedOutboundFlight &&
+      selectedInboundFlight);
 
   return (
     <div
@@ -98,13 +112,15 @@ const FloatingSelectionTracker = ({
         p-2
         transition-transform duration-300 ease-in-out
         transform
-        ${selectedOutboundFlight ? 'translate-y-0' : 'translate-y-[110%]'}
+        ${selectedOutboundFlight ? "translate-y-0" : "translate-y-[110%]"}
         flex flex-col
       `}
       role="status"
       aria-live="polite"
     >
-      <div className="flex flex-col gap-6 md:flex-row md:justify-around mb-1 p-5"> {/* Added mb-4 for button spacing */}
+      <div className="flex flex-col gap-6 md:flex-row md:justify-around mb-1 p-5">
+        {" "}
+        {/* Added mb-4 for button spacing */}
         <div className="flex-1">
           <FlightInfoDisplay
             flight={selectedOutboundFlight}
@@ -112,11 +128,9 @@ const FloatingSelectionTracker = ({
             labelColor="text-blue-200"
           />
         </div>
-
         {direction === "ROUNDTRIP" && (
-            <hr className="border-t border-blue-400 opacity-40 my-2 hidden md:block" />
+          <hr className="border-t border-blue-400 opacity-40 my-2 hidden md:block" />
         )}
-
         {direction === "ROUNDTRIP" && (
           <div className="flex-1">
             {selectedInboundFlight ? (
@@ -127,12 +141,12 @@ const FloatingSelectionTracker = ({
               />
             ) : (
               <div>
-                 <span className="text-sm font-semibold uppercase tracking-wider text-indigo-200 block mb-2">
-                   Return
-                 </span>
-                 <span className="text-sm italic text-indigo-200 opacity-80 block">
-                   Select return flight
-                 </span>
+                <span className="text-sm font-semibold uppercase tracking-wider text-indigo-200 block mb-2">
+                  Return
+                </span>
+                <span className="text-sm italic text-indigo-200 opacity-80 block">
+                  Select return flight
+                </span>
               </div>
             )}
           </div>

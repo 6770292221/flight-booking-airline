@@ -105,6 +105,10 @@ export const Codes = Object.freeze({
   FGT_1007: "FGT_1007",
   FGT_1008: "FGT_1008",
   FGT_1009: "FGT_1009",
+  FGT_1010: "FGT_1010",
+  FGT_1010: "FGT_1011",
+
+
 
   //Payment
   PMT_1001: "PMT_1001",
