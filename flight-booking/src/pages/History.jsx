@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getBookings } from "../apis/booking"; // Import ฟังก์ชัน getBookings
 import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
+import BookingDetails from "../pages/Components/BookingDetails";
+import StatusBooking from "../pages/Components/StatusBooking";
 
 const History = () => {
   const [bookings, setBookings] = useState([]);
@@ -120,17 +122,7 @@ const History = () => {
                   <h3 className="text-lg font-semibold">
                     Booking Number: {booking.bookingNubmer}
                   </h3>
-                  <span
-                    className={`text-sm ${
-                      booking.status === "PENDING"
-                        ? "text-yellow-600"
-                        : booking.status === "CANCELLED"
-                        ? "text-red-600"
-                        : "text-green-600"
-                    }`}
-                  >
-                    {booking.status}
-                  </span>
+                  <StatusBooking status={booking.status} />
                 </div>
 
                 <div className="mt-3">
@@ -178,75 +170,10 @@ const History = () => {
 
         {/* Show booking details in Popup */}
         {showDetails && selectedBooking && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-4 rounded-lg shadow-sm max-w-lg w-full">
-              <h3 className="text-xl font-semibold text-blue-800 mb-4">
-                Booking Details
-              </h3>
-
-              <div className="mt-4">
-                <h4 className="text-md font-semibold">Passengers:</h4>
-                {selectedBooking.passengers.map((passenger, idx) => (
-                  <div key={idx} className="mt-2">
-                    <p>
-                      <strong>
-                        {passenger.firstName} {passenger.lastName}
-                      </strong>{" "}
-                      - {passenger.type}
-                    </p>
-                    <p>Passport: {passenger.passportNumber}</p>
-                    <p>
-                      Meal:{" "}
-                      {passenger.addons.map((addon, i) => (
-                        <span key={i}>
-                          {addon.meal} ({addon.flightNumber})
-                          {i < passenger.addons.length - 1 && ", "}
-                        </span>
-                      ))}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Show tickets details if available */}
-              {selectedBooking.passengers.some(
-                (passenger) => passenger.tickets.length > 0
-              ) && (
-                <div className="mt-4">
-                  <h4 className="text-md font-semibold">Tickets:</h4>
-                  {selectedBooking.passengers.map((passenger, idx) => (
-                    <div key={idx}>
-                      {passenger.tickets.length > 0 && (
-                        <div className="mt-2">
-                          <p>
-                            <strong>
-                              {passenger.firstName} {passenger.lastName}'s
-                              Tickets:
-                            </strong>
-                          </p>
-                          {passenger.tickets.map((ticket, i) => (
-                            <p key={i}>
-                              Flight {ticket.flightNumber}:{" "}
-                              {ticket.ticketNumber}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-4 text-right">
-                <button
-                  onClick={handleCloseDetails} // ปิด popup
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
-                >
-                  Close Details
-                </button>
-              </div>
-            </div>
-          </div>
+          <BookingDetails
+            booking={selectedBooking}
+            onClose={handleCloseDetails}
+          />
         )}
       </div>
     </div>

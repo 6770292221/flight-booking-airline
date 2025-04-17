@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { getPendingBookings, cancelBooking } from "../apis/booking";
 import { useNavigate } from "react-router-dom";
 import MenuBar from "../pages/MenuBar";
+import BookingDetails from "../pages/Components/BookingDetails";
+import StatusBooking from "../pages/Components/StatusBooking";
+
 import {
   FaEye,
   FaMoneyCheckAlt,
@@ -144,15 +147,7 @@ const Booking = () => {
                       {booking.bookingNubmer}
                     </td>
                     <td className="px-3 py-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          booking.status === "PENDING"
-                            ? "bg-yellow-200 text-yellow-800"
-                            : "bg-red-200 text-red-800"
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
+                      <StatusBooking status={booking.status} />
                     </td>
                     <td className="px-3 py-2 w-64">
                       {booking.flights.map((flight, idx) => (
@@ -208,134 +203,7 @@ const Booking = () => {
       </div>
 
       {showPopup && popupBooking && (
-        <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-          <div className="bg-white p-5 rounded shadow max-w-2xl w-full text-sm max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              Booking Details
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <p>
-                  <span className="font-semibold">Booking Number:</span>{" "}
-                  {popupBooking.bookingNumber}
-                </p>
-                <p>
-                  <span className="font-semibold">Status:</span>{" "}
-                  {renderStatus(popupBooking.status)}
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <FaPlane className="text-blue-500" /> Flights
-                </h4>
-                {popupBooking.flights.map((flight, idx) => (
-                  <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
-                    <p>
-                      <span className="font-semibold">Flight:</span>{" "}
-                      {flight.flightNumber} - {flight.airlineName}
-                    </p>
-                    <p>
-                      <span className="font-semibold">From:</span>{" "}
-                      {flight.departure.cityName} ({flight.departure.iataCode})
-                      - {new Date(flight.departure.time).toLocaleString()}
-                    </p>
-                    <p>
-                      <span className="font-semibold">To:</span>{" "}
-                      {flight.arrival.cityName} ({flight.arrival.iataCode}) -{" "}
-                      {new Date(flight.arrival.time).toLocaleString()}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Price:</span>{" "}
-                      {flight.price.amount} {flight.price.currency}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <h4 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <FaUser className="text-green-500" /> Passengers
-                </h4>
-                {popupBooking.passengers.map((passenger, idx) => (
-                  <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
-                    <p className="font-semibold mb-1">
-                      Passenger #{idx + 1}: {passenger.firstName}{" "}
-                      {passenger.lastName} ({passenger.type})
-                    </p>
-                    <p>
-                      <span className="font-semibold">Nationality:</span>{" "}
-                      {passenger.nationality}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Date of Birth:</span>{" "}
-                      {new Date(passenger.dateOfBirth).toLocaleDateString(
-                        "en-GB",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-                    </p>
-
-                    <p>
-                      <span className="font-semibold">Passport:</span>{" "}
-                      {passenger.passportNumber}
-                    </p>
-                    <p>
-                      <span className="font-semibold">National ID:</span>{" "}
-                      {passenger.nationalId}
-                    </p>
-
-                    <div className="mt-2">
-                      <h5 className="font-semibold">Addons:</h5>
-                      {passenger.addons.length > 0 ? (
-                        <div className="space-y-2">
-                          {passenger.addons.map((addon, i) => (
-                            <div
-                              key={i}
-                              className="pl-4 border-l-2 border-gray-300"
-                            >
-                              <p>
-                                <span className="font-semibold">Flight:</span>{" "}
-                                {addon.flightNumber}
-                              </p>
-                              <p>
-                                <span className="font-semibold">Seat:</span>{" "}
-                                {addon.seat}
-                              </p>
-                              <p>
-                                <span className="font-semibold">Meal:</span>{" "}
-                                {addon.meal}
-                              </p>
-                              <p>
-                                <span className="font-semibold">Price:</span>{" "}
-                                {addon.price.amount} {addon.price.currency}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-gray-500">No addons</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-right mt-4">
-              <button
-                onClick={closePopup}
-                className="bg-gray-600 text-white px-4 py-1.5 rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <BookingDetails booking={popupBooking} onClose={closePopup} />
       )}
     </div>
   );
