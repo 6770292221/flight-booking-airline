@@ -1,5 +1,5 @@
 // Import necessary libraries and components
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   FaUtensils,
@@ -22,7 +22,7 @@ const SelectFlight = () => {
   const [isBookingLoading, setIsBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-
+  const navigate = useNavigate();
   // Extract data from location state
   const location = useLocation();
   const {
@@ -85,6 +85,11 @@ const SelectFlight = () => {
   const [errors, setErrors] = useState(
     Array.from({ length: passengerCount }, () => ({}))
   );
+
+  // Handle redirect to payment
+  const handlePayment = (bookingId) => {
+    navigate("/payment", { state: { bookingId } });
+  };
 
   // Render flight summary for outbound and inbound flights
   const renderFlightSummary = (label, data, logoUrl) => {
@@ -357,6 +362,7 @@ const SelectFlight = () => {
         console.log("Booking created successfully:", response.data);
         setIsBookingLoading(false); // Set loading to false on success
         setBookingSuccess(true);
+        handlePayment(response.data.data.booking._id);
         // Optionally redirect or show a success message
       } catch (error) {
         console.error("Error creating booking:", error);
