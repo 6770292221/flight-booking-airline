@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 import MenuBar from "../pages/MenuBar";
-import { getPaymentDetail } from "../apis/payment";
+import { getPaymentDetail, postPaymentWebhook } from "../apis/payment";
+import Swal from "sweetalert2";
 
 const PaymentPage = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const bookingId = state?.bookingId;
 
   const [paymentData, setPaymentData] = useState(null);
@@ -39,7 +40,6 @@ const PaymentPage = () => {
           setIsLoading(false);
         }
       };
-
       fetchPaymentData();
     }
   }, [bookingId]);
@@ -78,24 +78,36 @@ const PaymentPage = () => {
 
     setIsProcessing(true);
     try {
-      const response = await axios.post("/api/v1/payment-core-api/2c2p", {
+      const eventPayload = {
+        event: cardType === "JCB" ? "FAILED_PAID" : "SUCCESS_PAID",
         paymentRef: paymentData.paymentRef,
+        paymentTransactionId: `PYND-${Date.now()}`,
+        paymentMethod: "CREDIT_CARD",
+        paymentProvider: "2C2P",
+        cardType: cardType.toUpperCase(),
         amount: paymentData.amount,
         currency: paymentData.currency,
-        paymentMethod,
-        cardType,
-        cardNumber,
-        nameOnCard,
-        expiryDate,
-        cvv,
-      });
+        paidAt: new Date().toISOString(),
+      };
 
-      if (response.data.status === "success") {
-        alert("Payment successful!");
+      const response = await postPaymentWebhook(eventPayload);
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "Payment Successful!",
+          text: "Your payment has been completed. Click OK to view your payment status.",
+          confirmButtonText: "Go to History",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/payments");
+          }
+        });
       } else {
-        setError(response.data.message);
+        setError("Payment failed. Please try again.");
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Failed to process payment. Please try again.");
     } finally {
       setIsProcessing(false);

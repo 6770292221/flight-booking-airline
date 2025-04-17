@@ -365,8 +365,8 @@ export async function getAllPayments(req, res) {
   const user = req.user; // ข้อมูล user มาจาก middleware ที่ decode token แล้ว
 
   try {
-    const payments = await PaymentMongooseModel.find({ userId: user._id }); // ดึงเฉพาะของ user นั้น
-
+    const payments = await PaymentMongooseModel.find({ userId: user._id }) // ดึงเฉพาะของ user นั้น
+      .sort({ createdAt: -1 });
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.PMT_1013,
