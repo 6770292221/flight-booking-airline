@@ -21,8 +21,7 @@ dotenv.config({ path: "./src/config/config.env" });
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: "*" }));
-
+app.use(cors());
 app.use(express.json());
 app.use("/api/v1/user-core-api", routerAccount, routerAuth);
 app.use("/api/v1/payment-core-api", routerPayment);
