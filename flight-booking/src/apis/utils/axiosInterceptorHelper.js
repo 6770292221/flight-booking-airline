@@ -2,22 +2,16 @@ import Swal from 'sweetalert2';
 
 let isRedirecting = false;
 
-export const handle400Error = (code) => {
-    if (code === "FGT_1011") {
-        Swal.fire({
-            icon: 'error',
-            title: 'Duplicate Passport',
-            text: 'Please use a unique passport number.',
-            confirmButtonText: 'OK'
-        });
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'Request Failed',
-            text: 'Please try again later.',
-            confirmButtonText: 'OK'
-        });
-    }
+export const handle400Error = (error) => {
+    const code = error?.response?.data?.code || "UNKNOWN";
+    const message = error?.response?.data?.message || "Something went wrong.";
+
+    Swal.fire({
+        icon: 'error',
+        title: `Error: ${code}`,
+        text: message,
+        confirmButtonText: 'OK',
+    });
 };
 
 export const handle401Redirect = () => {
@@ -48,4 +42,17 @@ export const handle404Error = () => {
         confirmButtonText: 'OK'
     });
 };
+
+export const handle201CreateBooking = () => {
+    Swal.fire({
+        icon: 'success',
+        title: 'Booking Created',
+        html: 'Your booking has been created successfully.<br><b>Please complete payment within 10 minutes</b>, otherwise your booking will be automatically cancelled.',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        window.location.href = '/booking';
+    });
+};
+
 
