@@ -362,16 +362,11 @@ export async function getPaymentById(req, res) {
 }
 
 export async function getAllPayments(req, res) {
-  const user = req.user
-  if (!user.isAdmin) {
-    return res.status(StatusCodes.UNAUTHORIZED).json({
-      status: StatusMessages.FAILED,
-      code: Codes.TKN_6003,
-      message: Messages.TKN_6003,
-    })
-  }
+  const user = req.user; // ข้อมูล user มาจาก middleware ที่ decode token แล้ว
+
   try {
-    const payments = await PaymentMongooseModel.find({})
+    const payments = await PaymentMongooseModel.find({ userId: user._id }); // ดึงเฉพาะของ user นั้น
+
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.PMT_1013,
@@ -382,6 +377,7 @@ export async function getAllPayments(req, res) {
       },
     });
   } catch (error) {
+    console.error(error);
     return res.status(StatusCodes.SERVER_ERROR).json({
       status: StatusMessages.FAILED,
       code: StatusCodes.SERVER_ERROR,
@@ -389,6 +385,7 @@ export async function getAllPayments(req, res) {
     });
   }
 }
+
 
 export async function getPaymentByBookingId(req, res) {
   try {

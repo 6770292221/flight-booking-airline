@@ -4,16 +4,9 @@ import { useNavigate } from "react-router-dom";
 import MenuBar from "../pages/MenuBar";
 import BookingDetails from "../pages/Components/BookingDetails";
 import StatusBooking from "../pages/Components/StatusBooking";
+import LoadingModal from "../pages/Components/LoadingModal";
 
-import {
-  FaEye,
-  FaMoneyCheckAlt,
-  FaTimesCircle,
-  FaCheckCircle,
-  FaHourglassHalf,
-  FaPlane,
-  FaUser,
-} from "react-icons/fa";
+import { FaEye, FaMoneyCheckAlt, FaTimesCircle } from "react-icons/fa";
 
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
@@ -39,6 +32,7 @@ const Booking = () => {
           setError(response.data.message);
         }
       } catch (error) {
+        setError("Error loading bookings");
       } finally {
         setIsLoading(false);
       }
@@ -78,32 +72,6 @@ const Booking = () => {
     }
   };
 
-  const renderStatus = (status) => {
-    switch (status) {
-      case "PENDING":
-        return (
-          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-yellow-800 bg-yellow-100 rounded-full">
-            <FaHourglassHalf className="mr-1 text-yellow-600" />
-            Pending
-          </span>
-        );
-
-      case "FAILED_PAID":
-        return (
-          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full">
-            <FaTimesCircle className="mr-1 text-red-600" />
-            FAILED_PAID
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-800 bg-gray-100 rounded-full">
-            {status}
-          </span>
-        );
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
       <MenuBar />
@@ -112,15 +80,17 @@ const Booking = () => {
           My Booking
         </h2>
 
-        {isLoading || isLoadingDelete ? (
-          <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded shadow w-full max-w-md text-center text-gray-600">
-              {isLoading
+        {(isLoading || isLoadingDelete) && (
+          <LoadingModal
+            message={
+              isLoading
                 ? "Loading bookings..."
-                : "Canceling booking... Please wait."}
-            </div>
-          </div>
-        ) : error ? (
+                : "Canceling booking... Please wait."
+            }
+          />
+        )}
+
+        {error ? (
           <div className="text-center text-red-600">{error}</div>
         ) : bookings.length === 0 ? (
           <div className="text-center text-gray-600">No bookings found.</div>

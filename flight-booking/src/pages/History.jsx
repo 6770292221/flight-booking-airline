@@ -3,6 +3,7 @@ import { getBookings } from "../apis/booking"; // Import ฟังก์ชั�
 import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
 import BookingDetails from "../pages/Components/BookingDetails";
 import StatusBooking from "../pages/Components/StatusBooking";
+import LoadingModal from "../pages/Components/LoadingModal";
 
 const History = () => {
   const [bookings, setBookings] = useState([]);
@@ -72,6 +73,7 @@ const History = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
       <MenuBar /> {/* Add MenuBar component */}
+      {isLoading && <LoadingModal message="Loading bookings..." />}
       <div className="max-w-3xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold text-blue-800 mb-4">
           Booking History
@@ -107,9 +109,7 @@ const History = () => {
         </div>
 
         {isLoading ? (
-          <div className="text-center text-xl text-gray-600">
-            Loading bookings...
-          </div>
+          <div className="text-center text-xl text-gray-600"></div>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
         ) : filteredBookings.length === 0 ? (

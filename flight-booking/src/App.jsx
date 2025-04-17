@@ -6,7 +6,8 @@ import Login from "./pages/Login";
 import History from "./pages/History";
 import Booking from "./pages/Booking";
 import SelectFlight from "./pages/SelectFlight";
-import Payment from "./pages/Payment"; // ✅ เพิ่มตรงนี้
+import Payment from "./pages/Payment";
+import PaymentHistory from "./pages/PaymentHistory.jsx";
 
 function App() {
   return (
@@ -17,8 +18,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/history" element={<History />} />
         <Route path="/booking" element={<Booking />} />
-        <Route path="/payment" element={<Payment />} /> {/* ✅ ใช้งานได้แล้ว */}
+        <Route path="/payment" element={<Payment />} /> {}
         <Route path="/select-flight" element={<SelectFlight />} />
+        <Route path="/payments" element={<PaymentHistory />} />{" "}
       </Routes>
     </BrowserRouter>
   );
