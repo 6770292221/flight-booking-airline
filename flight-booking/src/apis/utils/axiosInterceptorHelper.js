@@ -30,3 +30,4 @@ export const handle404Error = () => {
         confirmButtonText: 'OK'
     });
 };
+

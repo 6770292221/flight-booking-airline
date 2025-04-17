@@ -7,3 +7,7 @@ export const getPaymentDetail = (bookingId) => {
 export const getPayments = (bookingId) => {
     return payment.get(`/payments`);
 };
+
+export const postPaymentWebhook = (payload) => {
+    return payment.post(`/payments/webhook`, payload);
+};
