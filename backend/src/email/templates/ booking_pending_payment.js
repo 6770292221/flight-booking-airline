@@ -71,36 +71,38 @@ export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser
         <td><strong>${outboundFlight?.price.amount || '0.00'} ${outboundFlight?.price.currency || ''}</strong></td>
       </tr>
     </table>
-
-    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-
     <!-- INBOUND -->
-    <table width="100%" cellpadding="5" cellspacing="0" border="0">
-      <tr>
-        <td><strong>Return</strong></td>
-        <td>${inboundFlight?.flightNumber || 'N/A'} - ${inboundFlight?.airlineName || 'N/A'}</td>
-      </tr>
-      <tr>
-        <td>From</td>
-        <td>${inboundFlight?.departure.cityName || 'N/A'} (${inboundFlight?.departure.iataCode || 'N/A'})</td>
-      </tr>
-      <tr>
-        <td>To</td>
-        <td>${inboundFlight?.arrival.cityName || 'N/A'} (${inboundFlight?.arrival.iataCode || 'N/A'})</td>
-      </tr>
-      <tr>
-        <td>Departure</td>
-        <td>${inboundFlight ? new Date(inboundFlight.departure.time).toLocaleString() : 'N/A'}</td>
-      </tr>
-      <tr>
-        <td>Arrival</td>
-        <td>${inboundFlight ? new Date(inboundFlight.arrival.time).toLocaleString() : 'N/A'}</td>
-      </tr>
-      <tr>
-        <td><strong>Price</strong></td>
-        <td><strong>${inboundFlight?.price.amount || '0.00'} ${inboundFlight?.price.currency || ''}</strong></td>
-      </tr>
-    </table>
+    ${inboundFlight ? `
+      <!-- INBOUND -->
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <table width="100%" cellpadding="5" cellspacing="0" border="0">
+        <tr>
+          <td><strong>Return</strong></td>
+          <td>${inboundFlight.flightNumber || 'N/A'} - ${inboundFlight.airlineName || 'N/A'}</td>
+        </tr>
+        <tr>
+          <td>From</td>
+          <td>${inboundFlight.departure.cityName || 'N/A'} (${inboundFlight.departure.iataCode || 'N/A'})</td>
+        </tr>
+        <tr>
+          <td>To</td>
+          <td>${inboundFlight.arrival.cityName || 'N/A'} (${inboundFlight.arrival.iataCode || 'N/A'})</td>
+        </tr>
+        <tr>
+          <td>Departure</td>
+          <td>${new Date(inboundFlight.departure.time).toLocaleString()}</td>
+        </tr>
+        <tr>
+          <td>Arrival</td>
+          <td>${new Date(inboundFlight.arrival.time).toLocaleString()}</td>
+        </tr>
+        <tr>
+          <td><strong>Price</strong></td>
+          <td><strong>${inboundFlight.price.amount || '0.00'} ${inboundFlight.price.currency || ''}</strong></td>
+        </tr>
+      </table>
+    ` : ''}
+    
   </td>
 </tr>
 
