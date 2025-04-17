@@ -362,29 +362,57 @@ export async function getPaymentById(req, res) {
 }
 
 export async function getAllPayments(req, res) {
-  const user = req.user; // ข้อมูล user มาจาก middleware ที่ decode token แล้ว
+  const userId = req.user.userId;
+
+  if (!userId) {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      status: StatusMessages.FAILED,
+      code: Codes.TKN_6001,
+      message: Messages.TKN_6001,
+    });
+  }
 
   try {
-    const payments = await PaymentMongooseModel.find({ userId: user._id }) // ดึงเฉพาะของ user นั้น
-      .sort({ createdAt: -1 });
-    return res.status(StatusCodes.OK).json({
-      status: StatusMessages.SUCCESS,
-      code: Codes.PMT_1013,
-      message: Messages.PMT_1013,
+    // ✅ ดึง booking ที่เป็นของ user นี้
+    const bookings = await BookingMongooseModel.find({ userId }, "_id");
+
+    if (!bookings.length) {
+      return res.status(200).json({
+        status: "success",
+        code: "PMT_1013",
+        message: "No bookings found for this user.",
+        data: [],
+        meta: { itemCount: 0 }
+      });
+    }
+
+    const bookingIds = bookings.map((b) => b._id);
+
+    // ✅ ดึง payments ที่ผูกกับ bookingId เหล่านี้
+    const payments = await PaymentMongooseModel.find({
+      bookingId: { $in: bookingIds }
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      status: "success",
+      code: "PMT_1013",
+      message: "Successfully fetched payment history",
       data: payments,
       meta: {
-        itemCount: payments.length,
-      },
+        itemCount: payments.length
+      }
     });
   } catch (error) {
-    console.error(error);
-    return res.status(StatusCodes.SERVER_ERROR).json({
-      status: StatusMessages.FAILED,
-      code: StatusCodes.SERVER_ERROR,
-      message: StatusMessages.SERVER_ERROR,
+    console.error("getAllPayments error:", error);
+    return res.status(500).json({
+      status: "failed",
+      code: 500,
+      message: "Internal Server Error"
     });
   }
 }
+
+
 
 
 export async function getPaymentByBookingId(req, res) {
