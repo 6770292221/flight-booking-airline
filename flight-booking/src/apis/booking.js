@@ -11,3 +11,7 @@ export const cancelBooking = (bookingId) => {
 export const getPendingBookings = () => {
     return booking.get('/pending/booking');
 };
+
+export const createBooking = (payload) => {
+    return booking.post('/booking', payload);
+};
