@@ -18,7 +18,6 @@ import countries from "./Components/Countries"; // Import countries list
 import { createBooking } from "../apis/booking";
 
 const SelectFlight = () => {
-
   const [isBookingLoading, setIsBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -283,9 +282,7 @@ const SelectFlight = () => {
 
   // Handle form submission
   const handleSubmit = async () => {
-
     if (validateForm()) {
-
       setIsBookingLoading(true); // Set loading to true when the request starts
       setBookingError(null);
       setBookingSuccess(false);
@@ -367,7 +364,7 @@ const SelectFlight = () => {
       } catch (error) {
         console.error("Error creating booking:", error);
         setIsBookingLoading(false); // Set loading to false on error
-        setBookingError("An error occurred while creating your booking. Please try again.");
+        setBookingError("");
         // Optionally display a more specific error message to the user
       }
     } else {
@@ -779,28 +776,30 @@ const SelectFlight = () => {
           </div>
 
           <div className="text-center mt-10">
-          <button
-            onClick={handleSubmit}
-            className={`bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow flex items-center gap-2 mx-auto ${isBookingLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={isBookingLoading}
-          >
-            {isBookingLoading ? (
-              <FaClock className="animate-spin" /> // Or a custom loading spinner
-            ) : (
-              <FaCheckCircle />
+            <button
+              onClick={handleSubmit}
+              className={`bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow flex items-center gap-2 mx-auto ${
+                isBookingLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isBookingLoading}
+            >
+              {isBookingLoading ? (
+                <FaClock className="animate-spin" /> // Or a custom loading spinner
+              ) : (
+                <FaCheckCircle />
+              )}
+              {isBookingLoading ? "Confirming Booking..." : "Confirm Booking"}
+            </button>
+
+            {bookingError && (
+              <p className="text-red-500 mt-4">{bookingError}</p>
             )}
-            {isBookingLoading ? "Confirming Booking..." : "Confirm Booking"}
-          </button>
 
-          {bookingError && (
-            <p className="text-red-500 mt-4">{bookingError}</p>
-          )}
-
-          {bookingSuccess && (
-            <p className="text-green-500 mt-4">Booking successful!</p>
-            // Optionally add a link to a confirmation page
-          )}
-        </div>
+            {bookingSuccess && (
+              <p className="text-green-500 mt-4">Booking successful!</p>
+              // Optionally add a link to a confirmation page
+            )}
+          </div>
         </div>
       </div>
     </div>
