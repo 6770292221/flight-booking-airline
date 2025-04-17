@@ -63,7 +63,7 @@ const UserDropdown = ({ user, onLogout }) => {
 
           <MenuItem
             icon={<CreditCard />}
-            label="Payment History"
+            label="Payment & Refunds"
             onClick={() => navigate("/payments")}
           />
           <MenuItem

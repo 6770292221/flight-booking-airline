@@ -10,6 +10,7 @@ import {
   FaLink,
   FaMoneyCheckAlt,
 } from "react-icons/fa";
+import LoadingModal from "../pages/Components/LoadingModal";
 
 const PaymentHistory = () => {
   const [payments, setPayments] = useState([]);
@@ -59,17 +60,16 @@ const PaymentHistory = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-50 pb-10">
       <MenuBar />
-
       <div className="max-w-5xl mx-auto px-6 py-10">
         <h2 className="text-3xl font-bold text-blue-900 mb-8 border-b pb-2">
-          Payment History
+          Payment & Refunds
         </h2>
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <input
             type="text"
-            placeholder="🔍 Search by Payment Ref"
+            placeholder="Search by Payment Ref"
             value={searchRef}
             onChange={(e) => setSearchRef(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg flex-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -90,7 +90,7 @@ const PaymentHistory = () => {
 
         {/* Payment List */}
         {loading ? (
-          <div className="text-center text-gray-600">Loading...</div>
+          <LoadingModal message="Loading payment history..." />
         ) : error ? (
           <div className="text-center text-red-500">{error}</div>
         ) : filtered.length === 0 ? (
