@@ -61,12 +61,11 @@ const UserDropdown = ({ user, onLogout }) => {
           <div className="font-bold text-gray-800">{user?.firstName}</div>
           <div className="border-b border-gray-200 mb-2" />
 
-          {/* <MenuItem
-            icon={<Undo2 />}
-            label="Refunds"
-            badge="New!"
-            onClick={() => navigate("/refunds")}
-          /> */}
+          <MenuItem
+            icon={<CreditCard />}
+            label="Payment History"
+            onClick={() => navigate("/payments")}
+          />
           <MenuItem
             icon={<LogOut />}
             label="Log Out"
