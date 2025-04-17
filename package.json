@@ -3,6 +3,7 @@
     "amadeus": "^11.0.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.488.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "sweetalert2": "^11.18.0"
   }
