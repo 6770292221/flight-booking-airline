@@ -26,6 +26,30 @@ export async function createBooking(req, res) {
     bookingData.userId = userId;
     const newBooking = new BookingMongooseModel(bookingData);
 
+    // ตรวจ passportNumber ซ้ำ
+    const passportNumbers = bookingData.passengers.map(p => p.passportNumber);
+    const duplicatePassports = passportNumbers.filter((item, index) => passportNumbers.indexOf(item) !== index);
+
+    if (duplicatePassports.length > 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.FGT_1010,
+        message: `Duplicate passport number(s) found: ${[...new Set(duplicatePassports)].join(", ")}`,
+      });
+    }
+
+    // ตรวจ nationality ซ้ำ
+    const nationalIds = bookingData.passengers.map(p => p.nationalId);
+    const duplicateNationalIds = nationalIds.filter((item, index) => nationalIds.indexOf(item) !== index);
+
+    if (duplicateNationalIds.length > 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.FGT_1010,
+        message: `Duplicate national ID(s) found: ${[...new Set(duplicateNationalIds)].join(", ")}`,
+      });
+    }
+
     const validationError = newBooking.validateSync();
     if (validationError) {
       return res.status(StatusCodes.BAD_REQUEST).json({

@@ -27,6 +27,7 @@ const passengerSchema = new mongoose.Schema({
     lastName: String,
     type: String,
     nationality: String,
+    nationalId: String,
     passportNumber: String,
     passportExpiryDate: Date,
     dateOfBirth: Date,
