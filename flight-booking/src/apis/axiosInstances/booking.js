@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from '../config';
-import { handle401Redirect, handle404Error } from '../utils/axiosInterceptorHelper';
+import { handle400Error, handle401Redirect, handle404Error } from '../utils/axiosInterceptorHelper';
 
 const booking = axios.create({
     baseURL: `${config.BASE_URL}/booking-core-api`,
@@ -18,6 +18,9 @@ booking.interceptors.response.use(
     (response) => response,
     (error) => {
         const status = error.response?.status;
+        if (status === 400) {
+            handle400Error(error.response.data.code);
+        }
 
         if (status === 401) {
             handle401Redirect();

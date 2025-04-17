@@ -2,6 +2,25 @@ import Swal from 'sweetalert2';
 
 let isRedirecting = false;
 
+export const handle400Error = (code) => {
+    if (code === "FGT_1011") {
+        Swal.fire({
+            icon: 'error',
+            title: 'Duplicate Passport',
+            text: 'Please use a unique passport number.',
+            confirmButtonText: 'OK'
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Request Failed',
+            text: 'Please try again later.',
+            confirmButtonText: 'OK'
+        });
+    }
+};
+
+
 export const handle401Redirect = () => {
     if (!isRedirecting) {
         isRedirecting = true;
