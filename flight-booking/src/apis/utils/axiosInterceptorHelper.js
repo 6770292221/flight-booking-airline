@@ -20,7 +20,6 @@ export const handle400Error = (code) => {
     }
 };
 
-
 export const handle401Redirect = () => {
     if (!isRedirecting) {
         isRedirecting = true;

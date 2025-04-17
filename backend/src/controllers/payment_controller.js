@@ -373,7 +373,6 @@ export async function getAllPayments(req, res) {
   }
 
   try {
-    // ✅ ดึง booking ที่เป็นของ user นี้
     const bookings = await BookingMongooseModel.find({ userId }, "_id");
 
     if (!bookings.length) {
@@ -388,7 +387,6 @@ export async function getAllPayments(req, res) {
 
     const bookingIds = bookings.map((b) => b._id);
 
-    // ✅ ดึง payments ที่ผูกกับ bookingId เหล่านี้
     const payments = await PaymentMongooseModel.find({
       bookingId: { $in: bookingIds }
     }).sort({ createdAt: -1 });
