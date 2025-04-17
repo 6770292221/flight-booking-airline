@@ -45,7 +45,7 @@ export async function createBooking(req, res) {
     if (duplicateNationalIds.length > 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
-        code: Codes.FGT_1010,
+        code: Codes.FGT_1011,
         message: `Duplicate national ID(s) found: ${[...new Set(duplicateNationalIds)].join(", ")}`,
       });
     }
