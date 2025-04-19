@@ -1,4 +1,4 @@
-import userAPI from './axiosInstances/user';
+import userAPI from './axiosInstances/auth.js';
 
 export const login = (email, password) => {
     return userAPI.post('/auth/login', { email, password });
