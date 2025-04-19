@@ -208,6 +208,12 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
   } else if (airline === "DD") {
     console.log("delay TG 40 seconds");
     await _delay(40000);
+  } else if (airline === "TG") {
+    console.log("delay TG 1 seconds");
+    await _delay(1000);
+  } else if (airline === "PG") {
+    console.log("delay TG 40 seconds");
+    await _delay(40000);
   }
 
   const response = await axios.post(

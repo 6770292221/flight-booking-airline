@@ -123,6 +123,8 @@ export function getStrategy(airlineId) {
       return new ThaiLionStrategy();
     case "DD":
       return new NokAirStrategy();
+    default:
+      return new AirAsiaStrategy();
   }
 }
 
