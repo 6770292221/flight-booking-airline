@@ -336,7 +336,7 @@ export async function getMyBookings(req, res) {
     let bookings = [];
     try {
       bookings = await BookingMongooseModel.find({ userId: objectIdUser })
-        .sort({ createdAt: -1 })
+        // .sort({ updatedAt: -1 })
         .lean();
     } catch (queryError) {
       return res.status(StatusCodes.SERVER_ERROR).json({
