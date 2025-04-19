@@ -183,3 +183,42 @@ export async function verifyEmailOtp(req, res) {
     });
   }
 }
+
+export async function googleLoginController(req, res) {
+  try {
+    const user = req.user;
+    const email = user.email;
+
+    // สร้าง JWT token
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: user.firstName + " " + user.lastName,
+        isAdmin: user.isAdmin,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION,
+      }
+    );
+
+    await redisClient.set(`token:${token}`, JSON.stringify({ verified: true }), {
+      EX: 3600,
+    });
+
+    const redirectURL = process.env.GOOGLE_LOGIN_REDIRECT;
+
+    return res.redirect(
+      `${redirectURL}?token=${token}&email=${user.email}&name=${encodeURIComponent(user.firstName + " " + user.lastName)}&userId=${user._id}`
+    );
+  } catch (error) {
+    console.error("[GoogleLogin Error]", error);
+    return res.status(500).json({
+      status: "failed",
+      message: "Internal server error",
+    });
+  }
+}

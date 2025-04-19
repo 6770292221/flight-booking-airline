@@ -16,10 +16,21 @@ import routerCabin from "./routes/cabin_routes.js";
 import routerTicket from "./routes/ticket_routes.js";
 import { cancelBooking } from "./schedules/cancel_expired_schedules.js"
 import routerAircraft from "./routes/aircraft_routes.js";
+import passport from "passport";
+import session from "express-session";
+
 
 dotenv.config({ path: "./src/config/config.env" });
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors());
 app.use(express.json());
