@@ -50,7 +50,7 @@ export default function paymentSuccessTemplate({ bookingResponse, reqUser, payme
                 <p style="margin-top: 20px;">Thank you for choosing our airline service.</p>
   
                 <p style="text-align: center; margin: 30px 0;">
-                  <a href="https://yourwebsite.com/bookings/${bookingResponse.bookingNubmer}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">View Booking</a>
+                  <a href="http://localhost:5173/payments" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">View Booking</a>
                 </p>
               </td>
             </tr>

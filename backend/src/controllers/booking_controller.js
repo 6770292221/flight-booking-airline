@@ -26,7 +26,7 @@ export async function createBooking(req, res) {
     bookingData.userId = userId;
     const newBooking = new BookingMongooseModel(bookingData);
 
-    // ตรวจ passportNumber ซ้ำ
+    // passportNumber ซ้ำ
     const passportNumbers = bookingData.passengers.map(p => p.passportNumber);
     const duplicatePassports = passportNumbers.filter((item, index) => passportNumbers.indexOf(item) !== index);
 
@@ -38,7 +38,7 @@ export async function createBooking(req, res) {
       });
     }
 
-    // ตรวจ nationality ซ้ำ
+    // nationality ซ้ำ
     const nationalIds = bookingData.passengers.map(p => p.nationalId);
     const duplicateNationalIds = nationalIds.filter((item, index) => nationalIds.indexOf(item) !== index);
 

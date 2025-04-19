@@ -6,8 +6,8 @@ import "./Login.css";
 import OtpPopup from "./OtpPopup";
 
 function Login() {
-  const [email, setEmail] = useState("maicomsci55@gmail.com");
-  const [password, setPassword] = useState("wFn*E5#r7jJ");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [userData, setUserData] = useState(null);
   const [showOtp, setShowOtp] = useState(false);
   const navigate = useNavigate();

@@ -52,7 +52,7 @@ export default function paymentFailedTemplate({ bookingResponse, reqUser, paymen
                 <p style="color: #E53935;">Please try again to complete your booking. Your seat is not secured until the payment is completed.</p>
   
                 <p style="text-align: center; margin: 30px 0;">
-                  <a href="https://yourwebsite.com/payments/${bookingResponse.bookingNubmer}" style="background-color: #E53935; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">Retry Payment</a>
+                  <a href="http://localhost:5173/payments" style="background-color: #E53935; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">Retry Payment</a>
                 </p>
               </td>
             </tr>

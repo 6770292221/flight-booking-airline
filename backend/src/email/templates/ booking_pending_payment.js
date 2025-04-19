@@ -138,11 +138,12 @@ export default function bookingPendingPaymentTemplate({ bookingResponse, reqUser
 
             <!-- CTA Button -->
             <p style="text-align: center; margin: 30px 0;">
-            <a href="https://yourwebsite.com/payments/${bookingResponse.bookingId}" 
+              <a href="http://localhost:5173/booking" 
                 style="background-color: #4CAF50; color: #ffffff; padding: 15px 25px; text-decoration: none; border-radius: 5px;">
                 Proceed to Payment
-            </a>
+              </a>
             </p>
+
 
           </table>
         </td>

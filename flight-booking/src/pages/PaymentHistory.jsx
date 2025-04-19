@@ -41,12 +41,12 @@ const PaymentHistory = () => {
   }, []);
 
   const filtered = payments.filter((p) => {
-    const matchRef = p.paymentRef
-      .toLowerCase()
-      .includes(searchRef.toLowerCase());
+    const searchLower = searchRef.toLowerCase();
+    const matchRef = p.paymentRef?.toLowerCase().includes(searchLower);
+    const matchBooking = p.bookingNumber?.toLowerCase().includes(searchLower);
     const matchStatus =
       statusFilter === "ALL" || p.paymentStatus === statusFilter;
-    return matchRef && matchStatus;
+    return (matchRef || matchBooking) && matchStatus;
   });
 
   const getCardLogo = (cardType) => {
@@ -69,7 +69,7 @@ const PaymentHistory = () => {
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <input
             type="text"
-            placeholder="Search by Payment Ref"
+            placeholder="Search by Payment Ref or Booking Number"
             value={searchRef}
             onChange={(e) => setSearchRef(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg flex-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -144,8 +144,8 @@ const PaymentHistory = () => {
 
                   <p className="flex items-center gap-2">
                     <FaLink className="text-gray-600" />
-                    <span className="font-semibold">Booking ID:</span>{" "}
-                    {payment.bookingId}
+                    <span className="font-semibold">Booking Number:</span>{" "}
+                    {payment.bookingNumber}
                   </p>
                 </div>
 

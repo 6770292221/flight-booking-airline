@@ -44,6 +44,7 @@ export async function initiatePayment(req, res) {
 
     const payment = new PaymentMongooseModel({
       bookingId: booking._id,
+      bookingNumber: booking.bookingNubmer,
       paymentRef,
       paymentMethod,
       paymentStatus: "PENDING",
