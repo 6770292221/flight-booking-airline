@@ -45,7 +45,7 @@ export async function loginUser(req, res) {
     }
 
     if (!user.verified) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2005,
         message: Messages.LGN_2005,
