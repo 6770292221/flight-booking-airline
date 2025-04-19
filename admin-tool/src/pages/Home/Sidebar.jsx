@@ -26,7 +26,7 @@ function Sidebar() {
     try {
       await logout();
       localStorage.removeItem("token");
-      navigate("/"); 
+      navigate("/");
     } catch (err) {
       console.error("Logout failed", err);
     }
@@ -98,11 +98,6 @@ function Sidebar() {
             <li>
               <Link to="/bookings">
                 <FaTicketAlt /> {!collapsed && "Booking"}
-              </Link>
-            </li>
-            <li>
-              <Link to="/payments">
-                <MdOutlinePayment /> {!collapsed && "Payment"}
               </Link>
             </li>
           </>

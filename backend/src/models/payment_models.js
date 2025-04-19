@@ -14,6 +14,11 @@ const refundSchema = new mongoose.Schema({
 
 const paymentSchema = new mongoose.Schema({
     bookingId: { type: mongoose.Schema.Types.ObjectId, ref: "Booking", required: true },
+    bookingNumber: {
+        type: String,
+        unique: true,
+        required: true
+    },
     paymentRef: {
         type: String,
         unique: true,

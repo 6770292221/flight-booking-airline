@@ -92,6 +92,22 @@ const BookingDetails = ({ booking, onClose }) => {
                   {passenger.nationalId}
                 </p>
 
+                {passenger.tickets?.length > 0 && (
+                  <div className="mt-2">
+                    <h5 className="font-semibold">Tickets:</h5>
+                    <div className="space-y-1 pl-4 border-l-2 border-gray-300">
+                      {passenger.tickets.map((ticket, i) => (
+                        <p key={i}>
+                          <span className="font-semibold">Flight:</span>{" "}
+                          {ticket.flightNumber} |{" "}
+                          <span className="font-semibold">Ticket No.:</span>{" "}
+                          {ticket.ticketNumber}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-2">
                   <h5 className="font-semibold">Addons:</h5>
                   {passenger.addons.length > 0 ? (
