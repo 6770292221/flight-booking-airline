@@ -118,7 +118,7 @@ const Booking = () => {
         setError("Failed to cancel booking. Please try again.");
       }
     } catch (error) {
-      setError("Error occurred while canceling the booking.");
+      setBookings([]);
     } finally {
       setIsLoadingDelete(false);
     }
