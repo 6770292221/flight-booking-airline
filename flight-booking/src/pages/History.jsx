@@ -4,6 +4,7 @@ import MenuBar from "../pages/MenuBar"; // Import the MenuBar component
 import BookingDetails from "../pages/Components/BookingDetails";
 import StatusBooking from "../pages/Components/StatusBooking";
 import LoadingModal from "../pages/Components/LoadingModal";
+import { useNavigate } from "react-router-dom";
 
 const History = () => {
   const [bookings, setBookings] = useState([]);
@@ -14,13 +15,13 @@ const History = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [searchBookingNumber, setSearchBookingNumber] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        // หากไม่มี token ให้ redirect ไปหน้า login
         navigate("/login");
         return;
       }
@@ -29,14 +30,20 @@ const History = () => {
         const response = await getBookings();
         if (response.data.status === "success") {
           setBookings(response.data.data);
-          setFilteredBookings(response.data.data); // เก็บข้อมูลการจองทั้งหมด
+          setFilteredBookings(response.data.data);
         } else {
-          setError(response.data.message); // แสดงข้อผิดพลาดจาก API
+          setError(response.data.message);
         }
       } catch (error) {
-        setError("Failed to fetch bookings. Please try again.");
+        if (error.response?.status === 404) {
+          // No data, not an error — set empty bookings
+          setBookings([]);
+          setFilteredBookings([]);
+        } else {
+          setError("Failed to fetch bookings. Please try again.");
+        }
       } finally {
-        setIsLoading(false); // ซ่อน loading spinner เมื่อโหลดเสร็จ
+        setIsLoading(false);
       }
     };
 
@@ -44,14 +51,10 @@ const History = () => {
   }, []);
 
   useEffect(() => {
-    // ฟังก์ชันกรองข้อมูลการจอง
     const filtered = bookings.filter((booking) => {
-      // ค้นหาหมายเลขการจอง
       const matchBookingNumber = booking.bookingNubmer
-        .toLowerCase()
+        ?.toLowerCase()
         .includes(searchBookingNumber.toLowerCase());
-
-      // กรองตามสถานะ
       const matchStatus =
         selectedStatus === "ALL" || booking.status === selectedStatus;
 
@@ -72,14 +75,13 @@ const History = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white p-0">
-      <MenuBar /> {/* Add MenuBar component */}
+      <MenuBar />
       {isLoading && <LoadingModal message="Loading bookings..." />}
       <div className="max-w-3xl mx-auto mt-10">
         <h2 className="text-2xl font-semibold text-blue-800 mb-4">
           Booking History
         </h2>
 
-        {/* ช่องค้นหาหมายเลขการจอง */}
         <div className="mb-4">
           <input
             type="text"
@@ -90,7 +92,6 @@ const History = () => {
           />
         </div>
 
-        {/* ช่องกรองสถานะ */}
         <div className="mb-4">
           <select
             value={selectedStatus}
@@ -113,7 +114,16 @@ const History = () => {
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
         ) : filteredBookings.length === 0 ? (
-          <div className="text-center text-gray-600">No bookings found.</div>
+          <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+            {/* Mock Table Header */}
+            <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-600 border-b pb-2 mb-2">
+              <div>Booking Number</div>
+              <div>Status</div>
+              <div>Flight</div>
+            </div>
+
+            <p className="text-gray-500 py-6">No bookings found.</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {filteredBookings.map((booking, index) => (
@@ -157,7 +167,7 @@ const History = () => {
 
                 <div className="mt-4 text-right">
                   <button
-                    onClick={() => handleViewDetails(booking)} // เปิด popup เมื่อกด
+                    onClick={() => handleViewDetails(booking)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
                   >
                     View Details
@@ -168,7 +178,6 @@ const History = () => {
           </div>
         )}
 
-        {/* Show booking details in Popup */}
         {showDetails && selectedBooking && (
           <BookingDetails
             booking={selectedBooking}

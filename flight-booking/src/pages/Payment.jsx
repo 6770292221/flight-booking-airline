@@ -66,13 +66,24 @@ const PaymentPage = () => {
       return;
     }
 
-    if (!/^\d{16}$/.test(cardNumber)) {
+    // ลบขีดออกจากหมายเลขบัตรก่อนตรวจสอบ
+    const sanitizedCardNumber = cardNumber.replace(/-/g, "");
+
+    if (!/^\d{16}$/.test(sanitizedCardNumber)) {
       setError("Card number must be 16 digits.");
       return;
     }
 
-    if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+    // ลบขีดเฉียงออกจากวันหมดอายุก่อนตรวจสอบ
+    const sanitizedExpiryDate = expiryDate.replace(/\//g, "");
+
+    if (!/^(0[1-9]|1[0-2])\d{2}$/.test(sanitizedExpiryDate)) {
       setError("Expiry must be in MM/YY format.");
+      return;
+    }
+
+    if (!/^\d{3}$/.test(cvv)) {
+      setError("CVV must be a 3-digit number.");
       return;
     }
 
@@ -237,13 +248,23 @@ const PaymentPage = () => {
                 <Input
                   label="Card Number"
                   value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  placeholder="0000 0000 0000 0000"
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, "").slice(0, 16);
+                    value = value.replace(/(.{4})/g, "$1-").replace(/-$/, "");
+                    setCardNumber(value);
+                  }}
+                  placeholder="0000-0000-0000-0000"
                 />
+
                 <Input
                   label="Name on Card"
                   value={nameOnCard}
-                  onChange={(e) => setNameOnCard(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^[A-Za-z\s]*$/.test(value)) {
+                      setNameOnCard(value);
+                    }
+                  }}
                   placeholder="John Doe"
                 />
                 <div className="flex gap-3">
@@ -251,7 +272,15 @@ const PaymentPage = () => {
                     <Input
                       label="Expiry Date"
                       value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)}
+                      onChange={(e) => {
+                        let value = e.target.value
+                          .replace(/[^\d]/g, "")
+                          .slice(0, 4);
+                        if (value.length >= 3) {
+                          value = `${value.slice(0, 2)}/${value.slice(2)}`;
+                        }
+                        setExpiryDate(value);
+                      }}
                       placeholder="MM/YY"
                     />
                   </div>
@@ -259,7 +288,12 @@ const PaymentPage = () => {
                     <Input
                       label="CVV"
                       value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 3);
+                        setCvv(value);
+                      }}
                       placeholder="123"
                     />
                   </div>

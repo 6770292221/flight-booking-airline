@@ -28,10 +28,6 @@ booking.interceptors.response.use(
             handle401Redirect();
         }
 
-        if (status === 404) {
-            handle404Error();
-        }
-
         if (status === 400) {
             handle400Error(error);
         }

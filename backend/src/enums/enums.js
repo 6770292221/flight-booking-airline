@@ -212,7 +212,7 @@ export const Messages = Object.freeze({
   LGN_2002: "Missing required information: flightId, email, password and otp are mandatory.",
   LGN_2003: "The email you entered is incorrect. Please try again.",
   LGN_2004: "Two-factor authentication is not set up for this account.",
-  LGN_2005: "Account not verified. Please contact admin.",
+  LGN_2005: "Account not verified. Please confirm your email.",
   LGN_2006: "The password you entered is incorrect. Please try again.",
 
   // Booking Messages

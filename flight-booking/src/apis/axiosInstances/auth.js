@@ -1,6 +1,6 @@
 import axios from 'axios';
 import config from "../config";
-import { handle401Redirect } from '../utils/axiosInterceptorHelper';
+import { handle401Redirect, handle400Error } from '../utils/axiosInterceptorHelper';
 
 const auth = axios.create({
     baseURL: `${config.BASE_URL}/user-core-api`,
@@ -29,11 +29,19 @@ auth.interceptors.request.use((config) => {
 auth.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const status = error.response?.status;
+
+        if (status === 401) {
             handle401Redirect();
         }
+
+        if (status === 400) {
+            handle400Error(error);
+        }
+
         return Promise.reject(error);
     }
 );
+
 
 export default auth;

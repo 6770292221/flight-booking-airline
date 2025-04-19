@@ -94,7 +94,9 @@ const PaymentHistory = () => {
         ) : error ? (
           <div className="text-center text-red-500">{error}</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center text-gray-500">No matching results.</div>
+          <div className="text-center text-gray-500">
+            No payment transaction found.
+          </div>
         ) : (
           <div className="space-y-6">
             {filtered.map((payment) => (

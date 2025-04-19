@@ -36,7 +36,7 @@ const Booking = () => {
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          setError("No bookings found.");
+          setBookings([]);
         } else {
           setError("An error occurred while loading bookings.");
         }
@@ -52,12 +52,11 @@ const Booking = () => {
       const currentTime = new Date();
       setNow(currentTime);
 
-      // รีโหลดแค่ครั้งแรกที่พบว่า booking หมดอายุ
       if (!hasReloaded.current) {
         const justExpired = bookings.some(
           (b) =>
             new Date(b.expiresAt) <= currentTime &&
-            new Date(b.expiresAt) > new Date(now) // หมดอายุ "หลัง" จากรอบที่แล้ว
+            new Date(b.expiresAt) > new Date(now)
         );
 
         if (justExpired) {
@@ -153,7 +152,29 @@ const Booking = () => {
         {error ? (
           <div className="text-center text-red-600">{error}</div>
         ) : bookings.length === 0 ? (
-          <div className="text-center text-gray-600">No bookings found.</div>
+          <div className="overflow-x-auto bg-white border border-dashed border-gray-300 rounded shadow p-6 text-center">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4"></h3>
+
+            <table className="min-w-full">
+              <thead className="bg-blue-100 text-gray-700 text-sm">
+                <tr>
+                  <th className="px-3 py-2 text-left font-semibold">
+                    Booking No.
+                  </th>
+                  <th className="px-3 py-2 text-left font-semibold">Status</th>
+                  <th className="px-3 py-2 text-left font-semibold">Flight</th>
+                  <th className="px-3 py-2 text-left font-semibold">Total</th>
+                  <th className="px-3 py-2 text-center font-semibold w-40">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+            </table>
+
+            <div className="flex flex-col items-center justify-center mt-8 text-gray-400">
+              <p className="text-base">No bookings found.</p>
+            </div>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 rounded shadow">
