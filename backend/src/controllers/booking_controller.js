@@ -683,3 +683,71 @@ export async function getPendingPayment(req, res) {
     });
   }
 }
+
+
+
+export async function cancelBooking(req, res) {
+  try {
+    if (!req.user || !req.user.userId) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusMessages.FAILED,
+        code: Codes.TKN_6001,
+        message: Messages.TKN_6001,
+      });
+    }
+
+    const userId = req.user.userId;
+    const bookingId = req.params._id;
+
+    const booking = await BookingMongooseModel.findById(bookingId);
+
+    if (!booking) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        status: StatusMessages.FAILED,
+        code: Codes.RSV_3011,
+        message: Messages.RSV_3011,
+      });
+    }
+
+    if (booking.status !== "PENDING" && booking.status !== "FAILED_PAID") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusMessages.FAILED,
+        code: Codes.RSV_3002,
+        message: Messages.RSV_3002,
+      });
+    }
+
+    booking.status = "CANCELLED";
+    booking.updatedAt = new Date();
+
+    await booking.save();
+
+    await PaymentMongooseModel.updateOne(
+      { bookingId: booking._id },
+      {
+        $set: {
+          paymentStatus: "REJECTED",
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    await sendBookingCancelledEmail({
+      bookingResponse: booking.toObject(),
+      reqUser: req.user,
+      reason: "User cancelled the booking",
+    });
+
+    return res.status(StatusCodes.OK).json({
+      status: StatusMessages.SUCCESS,
+      code: Codes.RSV_3015,
+      message: Messages.RSV_3015,
+    })
+
+  } catch (error) {
+    return res.status(StatusCodes.SERVER_ERROR).json({
+      status: StatusMessages.FAILED,
+      message: StatusMessages.SERVER_ERROR,
+    });
+  }
+}

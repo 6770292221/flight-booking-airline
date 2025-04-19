@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
 import Sidebar from "../Home/Sidebar";
-import { getAllBookings } from "../../apis/booking";
+import { getAllBookings, cancelBookingById } from "../../apis/booking";
+import ConfirmationPopup from "../components/ConfirmationPopup";
 import "./Booking.css";
 import React from "react";
+import Swal from "sweetalert2"; // เพิ่มถ้ายังไม่มี
 
 function Bookings() {
   const [bookingList, setBookingList] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedBookings, setExpandedBookings] = useState({});
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     fetchBookings();
@@ -31,10 +35,54 @@ function Bookings() {
     }));
   };
 
-  // Search and filter function
+  const handleCancelConfirm = (bookingId) => {
+    setBookingToCancel(bookingId);
+    setShowCancelPopup(true);
+  };
+
+  const cancelBooking = async () => {
+    setIsCancelling(true);
+
+    try {
+      const res = await cancelBookingById(bookingToCancel);
+
+      if (res.data.status === "success") {
+        setShowCancelPopup(false);
+        setBookingToCancel(null);
+
+        Swal.fire({
+          icon: "success",
+          title: "Booking Cancelled",
+          text: "The booking has been cancelled successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Cancel",
+          text: res.data.message || "Unable to cancel booking.",
+        });
+      }
+    } catch (err) {
+      console.error("Error cancelling booking", err);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text:
+          err.response?.data?.message ||
+          "An error occurred while cancelling the booking.",
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const filteredBookings = bookingList.filter((item) => {
     const matchesSearchQuery =
-      item.bookingNubmer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.bookingNubmer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.bookingNumber?.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatusFilter =
@@ -43,7 +91,6 @@ function Bookings() {
     return matchesSearchQuery && matchesStatusFilter;
   });
 
-  // Function to get the status class based on the status value
   const getStatusClass = (status) => {
     switch (status) {
       case "PENDING":
@@ -65,13 +112,16 @@ function Bookings() {
     }
   };
 
+  const isCancellable = (status) => {
+    return status === "PENDING" || status === "FAILED_PAID";
+  };
+
   return (
     <div className="home-wrapper">
       <Sidebar />
       <div className="booking-container">
         <h2>Bookings</h2>
 
-        {/* Search Bar */}
         <div className="booking-controls">
           <input
             className="search-input"
@@ -95,7 +145,7 @@ function Bookings() {
               <option value="FAILED_PAID">FAILED_PAID</option>
               <option value="TICKETING">TICKETING</option>
               <option value="ISSUED">ISSUED</option>
-              <option value="FAILED_ISSUE">FAILED_ISSUE</option>
+              <option value="FAILED_ISSUED">FAILED_ISSUED</option>
             </select>
           </div>
         </div>
@@ -123,7 +173,6 @@ function Bookings() {
                       .join(", ")}
                   </td>
                   <td>
-                    {/* Displaying Flights */}
                     {item.flights.map((flight) => (
                       <div key={flight.flightNumber}>
                         {flight.airlineName} - {flight.flightNumber} from{" "}
@@ -133,7 +182,7 @@ function Bookings() {
                         {new Date(flight.departure.time).toLocaleString(
                           "en-US",
                           { timeZone: "Asia/Bangkok" }
-                        )}
+                        )}{" "}
                         - Arrival:{" "}
                         {new Date(flight.arrival.time).toLocaleString("en-US", {
                           timeZone: "Asia/Bangkok",
@@ -147,12 +196,6 @@ function Bookings() {
                   <td>
                     <div className="action-buttons">
                       <button
-                        className="icon-button edit"
-                        onClick={() => console.log("Edit Booking", item._id)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
                         className="expand-btn"
                         onClick={() => handleExpandToggle(item._id)}
                       >
@@ -160,11 +203,18 @@ function Bookings() {
                           ? "Hide Details"
                           : "See Details"}
                       </button>
+                      {isCancellable(item.status) && (
+                        <button
+                          className="icon-button delete"
+                          onClick={() => handleCancelConfirm(item._id)}
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
 
-                {/* Show detailed information when expanded */}
                 {expandedBookings[item._id] && (
                   <tr>
                     <td colSpan="7">
@@ -198,7 +248,6 @@ function Bookings() {
                           </div>
                         ))}
 
-                        {/* Show the ticket details if available */}
                         {item.events &&
                           item.events.some(
                             (event) =>
@@ -247,6 +296,24 @@ function Bookings() {
             ))}
           </tbody>
         </table>
+
+        {showCancelPopup && (
+          <ConfirmationPopup
+            message="Are you sure you want to cancel this booking?"
+            onConfirm={cancelBooking}
+            onCancel={() => setShowCancelPopup(false)}
+          />
+        )}
+
+        {/* Loading Modal ตรงนี้เลย */}
+        {isCancelling && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white px-6 py-4 rounded shadow text-center text-lg font-semibold">
+              <div className="animate-spin inline-block w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full mr-2"></div>
+              Cancelling your booking...
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

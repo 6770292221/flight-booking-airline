@@ -192,8 +192,8 @@ function Airline() {
                   <img
                     src={item.logoUrl}
                     alt={item.airlineName}
-                    width="50"
-                    height="50"
+                    width="100"
+                    height="30"
                   />
                 </td>
                 <td>{new Date(item.createdAt).toLocaleString()}</td>

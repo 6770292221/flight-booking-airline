@@ -9,6 +9,7 @@ import {
     cancelExpiredBookings,
     cancelMyBooking,
     getPendingPayment,
+    cancelBooking
 
 } from "../controllers/booking_controller.js";
 
@@ -25,6 +26,7 @@ routerBooking.get("/admin/booking", verifyAdmin, getAllBookingsByAdmin);
 routerBooking.patch('/bookings/cancel-expired', cancelExpiredBookings);
 routerBooking.patch('/booking/:_id/cancel', verifyToken, cancelMyBooking);
 routerBooking.get("/pending/booking", verifyToken, getPendingPayment);
+routerBooking.patch('/booking/:_id/admin/cancel', verifyAdmin, cancelBooking);
 
 
 
