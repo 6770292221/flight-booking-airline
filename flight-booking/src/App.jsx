@@ -15,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SearchFlight />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login key={location.key} />} />
         <Route path="/history" element={<History />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/payment" element={<Payment />} /> {}
