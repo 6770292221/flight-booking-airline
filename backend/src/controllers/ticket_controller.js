@@ -197,23 +197,23 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
   const { airline } = flight;
   console.log(`❤️ bookingNubmer started: ${bookingNubmer}`);
   if (airline === "VZ") {
-    console.log("delay VZ 5 seconds");
-    await _delay(5000);
+    console.log("delay VZ 15 seconds");
+    await _delay(15000);
   } else if (airline === "FD") {
-    console.log("delay FD 5 seconds");
-    await _delay(5000);
+    console.log("delay FD 15 seconds");
+    await _delay(15000);
   } else if (airline === "SL") {
-    console.log("delay SL 30 seconds");
-    await _delay(30000);
+    console.log("delay SL 15 seconds");
+    await _delay(15000);
   } else if (airline === "DD") {
-    console.log("delay TG 40 seconds");
-    await _delay(40000);
+    console.log("delay 15000 15 seconds");
+    await _delay(15000);
   } else if (airline === "TG") {
-    console.log("delay TG 1 seconds");
-    await _delay(1000);
+    console.log("delay TG 15 seconds");
+    await _delay(15000);
   } else if (airline === "PG") {
-    console.log("delay TG 40 seconds");
-    await _delay(40000);
+    console.log("delay PG 15 seconds");
+    await _delay(15000);
   }
 
   const response = await axios.post(
