@@ -266,15 +266,16 @@ export async function requestTicketIssued(req, res) {
     let results = [];
 
     for (let i = 0; i < booking.flights.length; i++) {
+      booking.status = "TICKETING";
+      await booking.save();
       const flight = booking.flights[i];
       const result = await _sendTicketRequest(
         flight,
         booking.passengers,
         booking.bookingNubmer
       );
-      booking.status = "TICKETING";
+
       results.push(result.response.data);
-      await booking.save();
     }
 
     const reArrange = mergeWebhookResults(results);

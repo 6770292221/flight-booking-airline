@@ -359,7 +359,6 @@ const SelectFlight = () => {
         console.log("Booking created successfully:", response.data);
         setIsBookingLoading(false); // Set loading to false on success
         setBookingSuccess(true);
-        handlePayment(response.data.data.booking._id);
         // Optionally redirect or show a success message
       } catch (error) {
         console.error("Error creating booking:", error);
