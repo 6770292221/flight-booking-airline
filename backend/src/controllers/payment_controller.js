@@ -288,7 +288,8 @@ export async function webhookHandler(req, res) {
         payment: payment,
       });
 
-      await delay(2000);
+      await delay(10000);
+      console.log("delay 10s for demo")
       await axios.get(
         `http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`
       );
