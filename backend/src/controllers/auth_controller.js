@@ -88,7 +88,7 @@ export const logoutUser = async (req, res) => {
     }
 
     await redisClient.set(`blacklist:${token}`, "blacklist", {
-      EX: 3600,
+      EX: 500,
     });
 
     res.status(StatusCodes.OK).json({
