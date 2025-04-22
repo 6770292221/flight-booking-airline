@@ -13,6 +13,9 @@ import {
   sendRefundsTemplate,
 } from "../email/emailService.js";
 import axios from "axios";
+import { sendTicketRequestToKafka } from "../utils/kafka/producer.js";
+
+
 
 export async function initiatePayment(req, res) {
   try {
@@ -280,7 +283,7 @@ export async function webhookHandler(req, res) {
       data: {},
     });
 
-    // Send email + Call ticket issuance
+    // Send email
     if (event === "SUCCESS_PAID") {
       await sendPaymentSuccessEmail({
         bookingResponse: booking.toObject(),
@@ -288,11 +291,11 @@ export async function webhookHandler(req, res) {
         payment: payment,
       });
 
+      //  send to message queue
       await delay(10000);
-      console.log("delay 10s for demo")
-      await axios.get(
-        `http://localhost:${process.env.PORT}/api/v1/ticket-core-api/ticket/${booking.bookingNubmer}/request-ticket-issued`
-      );
+      await sendTicketRequestToKafka({
+        bookingNumber: booking.bookingNubmer,
+      });
     } else if (event === "FAILED_PAID") {
       await sendPaymentFailedEmail({
         bookingResponse: booking.toObject(),
@@ -411,8 +414,6 @@ export async function getAllPayments(req, res) {
     });
   }
 }
-
-
 
 
 export async function getPaymentByBookingId(req, res) {

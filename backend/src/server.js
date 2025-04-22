@@ -18,6 +18,7 @@ import { cancelBooking } from "./schedules/cancel_expired_schedules.js"
 import routerAircraft from "./routes/aircraft_routes.js";
 import passport from "passport";
 import session from "express-session";
+import { startTicketConsumer } from './utils/kafka/consumer.js';
 
 
 dotenv.config({ path: "./src/config/config.env" });
@@ -44,17 +45,31 @@ app.use('/api/v1/airport-core-api', routerAirports);
 app.use('/api/v1/ticket-core-api', routerTicket);
 app.use('/api/v1/aircraft-core-api', routerAircraft);
 
-connectDB(logger);
-redisClient.connect();
+const startServer = async () => {
+  try {
+    await connectDB(logger);
+    await redisClient.connect();
+    console.log('MongoDB & Redis connected');
 
-app.listen(port, () => {
-  logger.info('Notification email sent successfully.');
-  logger.info(`server started on port ${port}`);
-});
+    app.listen(port, () => {
+      logger.info('Server started on port ' + port);
+    });
 
-// setInterval(async () => {
-//   console.log(`[Scheduler] Calling cancelBooking API...`);
-//   await cancelBooking();
-// }, 1000);
+    await startTicketConsumer();
+    console.log('Kafka consumer started successfully');
+
+    // Start scheduler
+
+    // setInterval(async () => {
+    //   console.log(`[Scheduler] Calling cancelBooking API...`);
+    //   await cancelBooking();
+    // }, 1000);
+
+  } catch (err) {
+    console.error('Failed to initialize server:', err);
+  }
+};
+
+startServer();
 
 export default app;
