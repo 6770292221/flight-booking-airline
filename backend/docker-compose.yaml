@@ -1,16 +1,30 @@
 version: "3"
+
 services:
-  my-redis-docker-service:
-    image: redis:latest
-    container_name: my-redis
-    restart: always
-    ports:
-      - "15313:6379"  # Map Redis container's port 6379 to host port 15313
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
     environment:
-      - REDIS_PASSWORD=nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz
-    command: ["redis-server", "--requirepass", "nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz"]
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a nI1K2nxwws2XCa1xCqpgzDRdp5CcTohz ping | grep PONG"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKER_CONNECT: kafka:9092
+    depends_on:
+      - kafka
