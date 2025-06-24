@@ -235,7 +235,7 @@ export async function verifyUserByEmail(req, res) {
     await user.save();
 
     logger.info(`Account verified successfully: ${email}`, "info");
-    return res.redirect(`http://localhost:5173/login`);
+    return res.redirect(`https://flight-booking-frontend-x6qv.onrender.com/login`);
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
       code: Codes.REG_1008,
