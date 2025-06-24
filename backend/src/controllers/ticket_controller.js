@@ -151,7 +151,7 @@ export async function webhookUpdateTickets(req, res) {
 
       if (user) {
         await axios.post(
-          "http://localhost:3001/api/v1/payment-core-api/payments/webhook",
+          "https://flight-booking-airline.onrender.com/payment-core-api/payments/webhook",
           {
             event: "REFUNDED_SUCCESS",
             paymentRef: payment.paymentRef,
@@ -217,7 +217,7 @@ async function _sendTicketRequest(flight, passengers, bookingNubmer) {
   }
 
   const response = await axios.post(
-    "http://localhost:3001/api/v1/airline-core-api/airlines/ticketing",
+    "https://flight-booking-airline.onrender.com/airline-core-api/airlines/ticketing",
     {
       airlineId: airline,
       passengers: passengers,
@@ -282,7 +282,7 @@ export async function requestTicketIssued(req, res) {
     console.log(reArrange);
 
     await axios.post(
-      `http://localhost:3001/api/v1/ticket-core-api/webhooks/update-tickets/${booking._id}`,
+      `https://flight-booking-airline.onrender.com/ticket-core-api/webhooks/update-tickets/${booking._id}`,
       reArrange
     );
 
