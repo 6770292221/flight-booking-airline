@@ -129,11 +129,17 @@ const PaymentPage = () => {
     <div className="min-h-screen bg-blue-50">
       <MenuBar />
       <div className="max-w-md mx-auto mt-8 bg-white shadow-md rounded-lg p-4">
-        <h2 className="text-xl font-semibold text-blue-700 text-center mb-1">
+        <h2
+          className="text-xl font-semibold text-blue-700 text-center mb-1"
+          data-testid="heading-transaction-details"
+        >
           Transaction Details
         </h2>
         {paymentData?.paymentRef && (
-          <p className="text-center text-xs text-gray-500 mb-4">
+          <p
+            className="text-center text-xs text-gray-500 mb-4"
+            data-testid="text-payment-ref"
+          >
             Payment Ref: {paymentData.paymentRef}
           </p>
         )}
@@ -151,10 +157,21 @@ const PaymentPage = () => {
           <p className="text-center text-blue-600 text-sm">Loading...</p>
         ) : (
           <>
-            <Input label="Payment Provider" value="2C2P" readOnly />
-            <Input label="Booking Number" value={bookingNumber} readOnly />
+            <Input
+              label="Payment Provider"
+              value="2C2P"
+              readOnly
+              data-testid="input-payment-provider"
+            />
+            <Input
+              label="Booking Number"
+              testId="input-booking-number"
+              value={bookingNumber}
+              readOnly
+            />
             <Input
               label="Amount"
+              testId="input-amount"
               value={
                 paymentData
                   ? `${paymentData.amount} ${paymentData.currency}`

@@ -15,17 +15,24 @@ const BookingDetails = ({ booking, onClose }) => {
   if (!booking) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+    <div
+      className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50"
+      data-testid="booking-details-modal"
+    >
       <div className="bg-white p-5 rounded shadow max-w-2xl w-full text-sm max-h-[90vh] overflow-y-auto">
-        <h3 className="text-2xl font-bold text-gray-800 mb-4">
+        <h3
+          className="text-2xl font-bold text-gray-800 mb-4"
+          data-testid="booking-details-title"
+        >
           Booking Details
         </h3>
 
         <div className="space-y-4">
           <div>
             <p data-testid="booking-number">
-              <span className="font-semibold">Booking Number:</span>{" "}
-              {booking.bookingNumber}
+              <span data-testid="booking-number-value">
+                {booking.bookingNumber}
+              </span>
             </p>
             <p data-testid="booking-status">
               <span className="font-semibold">Status:</span>{" "}
