@@ -337,6 +337,7 @@ const Input = ({
   onChange,
   placeholder = "",
   readOnly = false,
+  testId,
 }) => (
   <div className="mb-3">
     <label className="block text-sm font-medium mb-1">{label}</label>
