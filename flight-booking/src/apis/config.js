@@ -1,5 +1,5 @@
 const config = {
-    BASE_URL: 'http://localhost:3001/api/v1',
+    BASE_URL: 'https://flight-booking-airline.onrender.com',
 };
 
 export default config;

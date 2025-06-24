@@ -1,0 +1,37 @@
+@startuml
+class Customer {
+  +customer_id: int
+  +name: string
+  +email: string
+  +phone: string
+}
+
+class Booking {
+  +booking_id: int
+  +check_in: Date
+  +check_out: Date
+  +total_price: float
+}
+
+class Room {
+  +room_id: int
+  +price: float
+  +room_type: string
+}
+
+class Payment {
+  +payment_id: int
+  +amount: float
+  +payment_date: Date
+}
+
+class Cancellation {
+  +cancellation_id: int
+  +cancel_date: Date
+}
+
+Customer "1" -- "0..*" Booking : Makes
+Booking "1" -- "1" Room : Includes
+Booking "1" -- "1" Payment : Processed by
+Booking "1" -- "0..1" Cancellation : May have
+@enduml

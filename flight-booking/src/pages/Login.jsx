@@ -146,7 +146,7 @@ const Login = () => {
               type="button"
               onClick={() =>
                 (window.location.href =
-                  "http://localhost:3001/api/v1/user-core-api/auth/google")
+                  "https://flight-booking-airline.onrender.com/user-core-api/auth/google")
               }
               className="w-full flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-3 rounded-lg shadow transition"
             >
