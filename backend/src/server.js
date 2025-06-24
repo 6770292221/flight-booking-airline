@@ -55,7 +55,7 @@ const startServer = async () => {
       logger.info('Server started on port ' + port);
     });
 
-    await startTicketConsumer();
+    // await startTicketConsumer();
     console.log('Kafka consumer started successfully');
 
     // Start scheduler
