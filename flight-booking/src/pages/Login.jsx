@@ -142,7 +142,7 @@ const Login = () => {
 
           <div className="text-center mt-6">
             <p className="text-gray-500 text-sm mb-4">or sign in with</p>
-            <button
+            {/* <button
               type="button"
               onClick={() =>
                 (window.location.href =
@@ -156,7 +156,7 @@ const Login = () => {
                 className="w-6 h-6"
               />
               Continue with Google
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
