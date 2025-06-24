@@ -141,7 +141,6 @@ const Login = () => {
           </form>
 
           <div className="text-center mt-6">
-            <p className="text-gray-500 text-sm mb-4">or sign in with</p>
             {/* <button
               type="button"
               onClick={() =>
