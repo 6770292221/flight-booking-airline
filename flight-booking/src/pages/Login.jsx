@@ -150,6 +150,7 @@ const Login = () => {
 
           <div className="text-center mt-6">
             <button
+              data-testid="btn-google-login"
               type="button"
               onClick={() =>
                 (window.location.href =
