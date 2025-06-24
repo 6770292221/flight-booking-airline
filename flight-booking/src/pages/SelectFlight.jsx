@@ -95,7 +95,10 @@ const SelectFlight = () => {
     if (!data) return null;
 
     return (
-      <div className="border p-4 rounded-xl mb-6 bg-white shadow-md flex items-center">
+      <div
+        className="border p-4 rounded-xl mb-6 bg-white shadow-md flex items-center"
+        data-testid={`flight-summary-${label.toLowerCase().replace(" ", "-")}`}
+      >
         {" "}
         {/* Added flex and items-center */}
         <div>
@@ -399,7 +402,11 @@ const SelectFlight = () => {
 
         <div className="space-y-8">
           {passengers.map((p, idx) => (
-            <div key={idx} className="border rounded-xl p-6 bg-white shadow-md">
+            <div
+              key={idx}
+              className="border rounded-xl p-6 bg-white shadow-md"
+              data-testid={`passenger-card-${idx}`}
+            >
               <h3 className="font-semibold mb-4 flex items-center gap-2 text-blue-600 text-lg">
                 <FaUser className="text-blue-500" />
                 {idx < adults && `Adult (${idx + 1} of ${adults})`}
@@ -416,6 +423,7 @@ const SelectFlight = () => {
                   <input
                     type="text"
                     placeholder="First Name"
+                    data-testid={`input-firstname-${idx}`}
                     value={p.firstName}
                     onChange={(e) =>
                       handleInputChange(idx, "firstName", e.target.value)
@@ -435,6 +443,7 @@ const SelectFlight = () => {
                     type="text"
                     placeholder="Last Name"
                     value={p.lastName}
+                    data-testid={`input-lastname-${idx}`}
                     onChange={(e) =>
                       handleInputChange(idx, "lastName", e.target.value)
                     }
@@ -458,6 +467,7 @@ const SelectFlight = () => {
                         : "INFANT"
                     }
                     disabled
+                    data-testid={`select-gender-${idx}`}
                     className="border p-2 rounded w-full bg-gray-100 text-gray-700 cursor-not-allowed"
                   >
                     <option value="ADULT">ADULT</option>
@@ -488,6 +498,7 @@ const SelectFlight = () => {
                 <div>
                   <input
                     type="date"
+                    data-testid={`input-dob-${idx}`}
                     value={p.dateOfBirth}
                     onChange={(e) =>
                       handleInputChange(idx, "dateOfBirth", e.target.value)
@@ -505,6 +516,7 @@ const SelectFlight = () => {
                 <div>
                   <select
                     value={p.nationality}
+                    data-testid={`select-nationality-${idx}`}
                     onChange={(e) =>
                       handleInputChange(idx, "nationality", e.target.value)
                     }
@@ -529,6 +541,7 @@ const SelectFlight = () => {
                   type="text"
                   placeholder="National ID"
                   value={p.nationalId}
+                  data-testid={`input-national-id-${idx}`}
                   onChange={(e) =>
                     handleInputChange(idx, "nationalId", e.target.value)
                   }
@@ -542,6 +555,7 @@ const SelectFlight = () => {
                     handleInputChange(idx, "passportNumber", e.target.value)
                   }
                   className="border p-2 rounded w-full"
+                  data-testid={`input-passport-number-${idx}`}
                 />
               </div>
 
@@ -554,6 +568,7 @@ const SelectFlight = () => {
                     <label className="inline-flex items-center">
                       <input
                         type="checkbox"
+                        data-testid={`addon-outbound-meal-${idx}`}
                         checked={outboundAddons[idx]?.some(
                           (addon) => addon.type === "meal"
                         )}
@@ -576,6 +591,7 @@ const SelectFlight = () => {
                     </label>
                     <label className="inline-flex items-center">
                       <input
+                        data-testid={`addon-outbound-seat-${idx}`}
                         type="checkbox"
                         checked={outboundAddons[idx]?.some(
                           (addon) => addon.type === "seat"
@@ -609,6 +625,7 @@ const SelectFlight = () => {
                       <label className="inline-flex items-center">
                         <input
                           type="checkbox"
+                          data-testid={`addon-inbound-meal-${idx}`}
                           checked={inboundAddons[idx]?.some(
                             (addon) => addon.type === "meal"
                           )}
@@ -632,6 +649,7 @@ const SelectFlight = () => {
                       <label className="inline-flex items-center">
                         <input
                           type="checkbox"
+                          data-testid={`addon-inbound-seat-${idx}`}
                           checked={inboundAddons[idx]?.some(
                             (addon) => addon.type === "seat"
                           )}
@@ -661,12 +679,15 @@ const SelectFlight = () => {
 
           {/* Total Price Summary Section */}
           <div className="mt-10 border rounded-xl p-6 bg-white shadow-md">
-            <h2 className="text-xl font-bold mb-4 text-blue-800">
+            <h2
+              className="text-xl font-bold mb-4 text-blue-800"
+              data-testid="price-summary"
+            >
               Payment Summary
             </h2>
             <div className="space-y-2 text-gray-800">
               {/* Ticket Price */}
-              <div className="flex justify-between">
+              <div className="flex justify-between" data-testid="price-ticket">
                 <span>Ticket Price:</span>
                 <span className="font-semibold">
                   {(
@@ -683,7 +704,10 @@ const SelectFlight = () => {
                   {outboundAddons[idx]?.some(
                     (addon) => addon.type === "seat"
                   ) && (
-                    <div className="flex justify-between">
+                    <div
+                      className="flex justify-between"
+                      data-testid={`addon-outbound-seat-${idx}`}
+                    >
                       <span>
                         Outbound Preferred Seat for{" "}
                         {idx < adults
@@ -699,7 +723,10 @@ const SelectFlight = () => {
                   {outboundAddons[idx]?.some(
                     (addon) => addon.type === "meal"
                   ) && (
-                    <div className="flex justify-between">
+                    <div
+                      className="flex justify-between"
+                      data-testid={`addon-outbound-meal-${idx}`}
+                    >
                       <span>
                         Outbound On Board Meal for{" "}
                         {idx < adults
@@ -714,7 +741,10 @@ const SelectFlight = () => {
                   )}
                   {inboundAddons[idx]?.some((addon) => addon.type === "seat") &&
                     inbound && (
-                      <div className="flex justify-between">
+                      <div
+                        className="flex justify-between"
+                        data-testid={`addon-inbound-seat-${idx}`}
+                      >
                         <span>
                           Inbound Preferred Seat for{" "}
                           {idx < adults
@@ -729,7 +759,10 @@ const SelectFlight = () => {
                     )}
                   {inboundAddons[idx]?.some((addon) => addon.type === "meal") &&
                     inbound && (
-                      <div className="flex justify-between">
+                      <div
+                        className="flex justify-between"
+                        data-testid={`addon-inbound-meal-${idx}`}
+                      >
                         <span>
                           Inbound On Board Meal for{" "}
                           {idx < adults
@@ -746,7 +779,10 @@ const SelectFlight = () => {
               ))}
 
               {/* Total Price */}
-              <div className="flex justify-between border-t pt-2 mt-2 font-bold text-lg">
+              <div
+                className="flex justify-between border-t pt-2 mt-2 font-bold text-lg"
+                data-testid="price-total"
+              >
                 <span>You pay:</span>
                 <span>
                   {(
@@ -777,6 +813,7 @@ const SelectFlight = () => {
           <div className="text-center mt-10">
             <button
               onClick={handleSubmit}
+              data-testid="btn-confirm-booking"
               className={`bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow flex items-center gap-2 mx-auto ${
                 isBookingLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -791,11 +828,15 @@ const SelectFlight = () => {
             </button>
 
             {bookingError && (
-              <p className="text-red-500 mt-4">{bookingError}</p>
+              <p className="text-red-500 mt-4" data-testid="booking-error">
+                {bookingError}
+              </p>
             )}
 
             {bookingSuccess && (
-              <p className="text-green-500 mt-4">Booking successful!</p>
+              <p className="text-green-500 mt-4" data-testid="booking-success">
+                Booking successful!
+              </p>
               // Optionally add a link to a confirmation page
             )}
           </div>

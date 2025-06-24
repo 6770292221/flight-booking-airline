@@ -36,6 +36,7 @@ const UserDropdown = ({ user, onLogout }) => {
       {/* Trigger Button */}
       <button
         onClick={toggleMenu}
+        data-testid="user-dropdown-trigger"
         className="flex items-center space-x-2 px-3 py-1 bg-white text-blue-600 rounded-full border border-blue-400 hover:bg-blue-50 transition"
       >
         <User className="h-5 w-5" />
@@ -57,13 +58,19 @@ const UserDropdown = ({ user, onLogout }) => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg z-50 p-4 space-y-2">
-          <div className="font-bold text-gray-800">{user?.firstName}</div>
+        <div
+          data-testid="user-dropdown-menu"
+          className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg z-50 p-4 space-y-2"
+        >
+          <div data-testid="user-name" className="font-bold text-gray-800">
+            {user?.firstName}
+          </div>
           <div className="border-b border-gray-200 mb-2" />
 
           <MenuItem
             icon={<CreditCard />}
             label="Payment & Refunds"
+            data-testid="menu-payments"
             onClick={() => navigate("/payments")}
           />
           <MenuItem
@@ -71,6 +78,7 @@ const UserDropdown = ({ user, onLogout }) => {
             label="Log Out"
             onClick={onLogout}
             className="text-red-600 hover:bg-red-100"
+            data-testid="menu-logout"
           />
         </div>
       )}

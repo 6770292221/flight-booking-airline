@@ -58,6 +58,7 @@ const MenuBar = () => {
           <div
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => navigate("/")}
+            data-testid="logo-button"
           >
             <img src={logo} alt="ChulaLoka Logo" className="h-12 w-auto" />
             <div className="leading-tight">
@@ -75,6 +76,7 @@ const MenuBar = () => {
           <button
             className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
             onClick={() => navigate("/")}
+            data-testid="menu-flights"
           >
             <FaPlaneDeparture />
             <span>Flights</span>
@@ -85,6 +87,7 @@ const MenuBar = () => {
               <button
                 className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/booking")}
+                data-testid="menu-bookings"
               >
                 <FaSuitcase />
                 <span>Bookings</span>
@@ -92,6 +95,7 @@ const MenuBar = () => {
               <button
                 className="flex items-center space-x-2 hover:text-[#FF4EB5] transition"
                 onClick={() => navigate("/history")}
+                data-testid="menu-history"
               >
                 <FaHistory />
                 <span>History</span>
@@ -109,6 +113,7 @@ const MenuBar = () => {
               <button
                 onClick={handleLogin}
                 className="flex items-center space-x-2 bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
+                data-testid="btn-login"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
@@ -116,6 +121,7 @@ const MenuBar = () => {
               <button
                 onClick={handleRegister}
                 className="flex items-center space-x-2 bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition"
+                data-testid="btn-register"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Register</span>
@@ -124,7 +130,10 @@ const MenuBar = () => {
           )}
 
           {/* TH | THB */}
-          <div className="flex items-center bg-white/10 border border-white/30 rounded-md px-3 py-1 cursor-pointer ml-2">
+          <div
+            className="flex items-center bg-white/10 border border-white/30 rounded-md px-3 py-1 cursor-pointer ml-2"
+            data-testid="currency-selector"
+          >
             <img
               src="https://flagcdn.com/w40/th.png"
               alt="Thai Flag"

@@ -141,6 +141,7 @@ const Booking = () => {
 
         {(isLoading || isLoadingDelete) && (
           <LoadingModal
+            data-testid="booking-loading"
             message={
               isLoading
                 ? "Loading bookings..."
@@ -172,7 +173,9 @@ const Booking = () => {
             </table>
 
             <div className="flex flex-col items-center justify-center mt-8 text-gray-400">
-              <p className="text-base">No bookings found.</p>
+              <p className="text-base" data-testid="no-booking-message">
+                No bookings found.
+              </p>
             </div>
           </div>
         ) : (
@@ -195,7 +198,11 @@ const Booking = () => {
                 {bookings.map((booking, index) => {
                   const expires = getTimeRemaining(booking.expiresAt);
                   return (
-                    <tr key={index} className="border-b hover:bg-gray-50">
+                    <tr
+                      key={index}
+                      className="border-b hover:bg-gray-50"
+                      data-testid={`booking-row-${booking._id}`}
+                    >
                       <td className="px-3 py-2 text-gray-700">
                         <div>{booking.bookingNubmer}</div>
                         <div className={`text-xs mt-1 ${expires.color}`}>
@@ -233,18 +240,21 @@ const Booking = () => {
                       <td className="px-3 py-2 flex flex-col items-center space-y-1">
                         <button
                           onClick={() => handleViewDetails(booking._id)}
+                          data-testid={`view-button-${booking._id}`}
                           className="bg-blue-500 text-white px-3 py-1.5 rounded hover:bg-blue-600 w-full flex items-center justify-center gap-2"
                         >
                           <FaEye /> View
                         </button>
                         <button
                           onClick={() => handlePayment(booking._id)}
+                          data-testid={`pay-button-${booking._id}`}
                           className="bg-emerald-500 text-white px-3 py-1.5 rounded hover:bg-emerald-600 w-full flex items-center justify-center gap-2"
                         >
                           <FaMoneyCheckAlt /> Pay
                         </button>
                         <button
                           onClick={() => handleCancel(booking._id)}
+                          data-testid={`cancel-button-${booking._id}`}
                           className="bg-rose-500 text-white px-3 py-1.5 rounded hover:bg-rose-600 w-full flex items-center justify-center gap-2"
                         >
                           <FaTimesCircle /> Cancel

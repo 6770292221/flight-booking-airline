@@ -74,10 +74,14 @@ const SearchResult = ({
         </div>
 
         <div className="text-right mt-2 md:mt-0 flex flex-col items-end space-y-2">
-          <div className="text-green-600 font-bold text-lg">
+          <div
+            data-testid={`price-${index}`}
+            className="text-green-600 font-bold text-lg"
+          >
             {flight.price.amount} {flight.price.currency}
           </div>
           <button
+            data-testid={`select-${onSelectType}-${index}`}
             onClick={handleSelectClick}
             className={`py-2 px-8 rounded font-semibold flex items-center gap-2 ${
               isSelected
@@ -91,6 +95,7 @@ const SearchResult = ({
           </button>
 
           <button
+            data-testid={`toggle-details-${index}`}
             onClick={() => handleToggleDetails(index)}
             className="py-2 px-2 rounded font-semibold flex items-center gap-1 bg-gray-600 hover:bg-gray-700 text-white"
           >
@@ -108,7 +113,10 @@ const SearchResult = ({
       </div>
 
       {selectedDetailIndex === index && (
-        <div className="mt-2 text-sm text-gray-700 space-y-2 text-left bg-gray-50 p-4 rounded-lg shadow-inner w-full">
+        <div
+          data-testid={`details-${index}`}
+          className="mt-2 text-sm text-gray-700 space-y-2 text-left bg-gray-50 p-4 rounded-lg shadow-inner w-full"
+        >
           <p className="flex items-center gap-2">
             <FaClock className="text-blue-500" />
             <strong>Duration:</strong> {formatDuration(flight.duration)}

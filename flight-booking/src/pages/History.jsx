@@ -86,6 +86,7 @@ const History = () => {
           <input
             type="text"
             placeholder="Search Booking Number"
+            data-testid="search-booking-input"
             value={searchBookingNumber}
             onChange={(e) => setSearchBookingNumber(e.target.value)}
             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -95,6 +96,7 @@ const History = () => {
         <div className="mb-4">
           <select
             value={selectedStatus}
+            data-testid="status-filter-select"
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -112,7 +114,9 @@ const History = () => {
         {isLoading ? (
           <div className="text-center text-xl text-gray-600"></div>
         ) : error ? (
-          <div className="text-center text-red-600">{error}</div>
+          <div className="text-center text-red-600" data-testid="history-error">
+            {error}
+          </div>
         ) : filteredBookings.length === 0 ? (
           <div className="bg-white p-4 rounded-lg shadow-sm text-center">
             {/* Mock Table Header */}
@@ -122,12 +126,18 @@ const History = () => {
               <div>Flight</div>
             </div>
 
-            <p className="text-gray-500 py-6">No bookings found.</p>
+            <p className="text-gray-500 py-6" data-testid="no-bookings-message">
+              No bookings found.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {filteredBookings.map((booking, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+              <div
+                key={index}
+                className="bg-white p-4 rounded-lg shadow-sm"
+                data-testid={`booking-card-${booking.bookingNubmer}`}
+              >
                 <div className="flex justify-between">
                   <h3 className="text-lg font-semibold">
                     Booking Number: {booking.bookingNubmer}
@@ -169,6 +179,7 @@ const History = () => {
                   <button
                     onClick={() => handleViewDetails(booking)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+                    data-testid={`view-details-button-${booking.bookingNubmer}`}
                   >
                     View Details
                   </button>

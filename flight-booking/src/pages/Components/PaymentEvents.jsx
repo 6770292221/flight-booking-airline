@@ -18,6 +18,7 @@ const PaymentEvents = ({ events }) => {
     <div className="mt-3">
       <button
         onClick={toggleEvents}
+        data-testid="toggle-events-button"
         className="flex items-center text-blue-600 hover:underline font-medium text-sm"
       >
         {showEvents ? (
@@ -29,7 +30,10 @@ const PaymentEvents = ({ events }) => {
       </button>
 
       {showEvents && (
-        <div className="mt-2 space-y-2 text-sm">
+        <div
+          className="mt-2 space-y-2 text-sm"
+          data-testid="payment-events-container"
+        >
           {events.map((event, idx) => {
             const payload = event.payload;
             const date = new Date(payload.paidAt || payload.refundedAt);
@@ -37,6 +41,7 @@ const PaymentEvents = ({ events }) => {
             return (
               <div
                 key={idx}
+                data-testid={`payment-event-${idx}`}
                 className="bg-gray-50 border-l-4 border-blue-400 p-3 rounded"
               >
                 <p className="text-gray-800 font-medium">

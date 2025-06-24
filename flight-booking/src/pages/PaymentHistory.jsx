@@ -70,12 +70,14 @@ const PaymentHistory = () => {
           <input
             type="text"
             placeholder="Search by Payment Ref or Booking Number"
+            data-testid="payment-search-input"
             value={searchRef}
             onChange={(e) => setSearchRef(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg flex-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <select
             value={statusFilter}
+            data-testid="payment-status-filter"
             onChange={(e) => setStatusFilter(e.target.value)}
             className="p-3 border border-gray-300 rounded-lg w-52 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
@@ -92,9 +94,14 @@ const PaymentHistory = () => {
         {loading ? (
           <LoadingModal message="Loading payment history..." />
         ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
+          <div className="text-center text-red-500" data-testid="payment-error">
+            {error}
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center text-gray-500">
+          <div
+            className="text-center text-gray-500"
+            data-testid="no-payment-message"
+          >
             No payment transaction found.
           </div>
         ) : (
@@ -102,6 +109,7 @@ const PaymentHistory = () => {
             {filtered.map((payment) => (
               <div
                 key={payment._id}
+                data-testid={`payment-card-${payment.paymentRef}`}
                 className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-lg transition"
               >
                 <div className="flex justify-between items-center mb-3">
@@ -152,7 +160,10 @@ const PaymentHistory = () => {
                 </div>
 
                 {payment.refund && (
-                  <div className="mt-3 bg-green-100 p-3 rounded-lg text-sm text-green-800 border border-green-200 flex items-start gap-2">
+                  <div
+                    className="mt-3 bg-green-100 p-3 rounded-lg text-sm text-green-800 border border-green-200 flex items-start gap-2"
+                    data-testid={`refund-info-${payment.paymentRef}`}
+                  >
                     <FaMoneyCheckAlt className="text-green-600 mt-1" />
                     <div>
                       <span className="font-semibold">Refunded:</span>{" "}
@@ -166,7 +177,10 @@ const PaymentHistory = () => {
                 )}
 
                 <div className="mt-4">
-                  <PaymentEvents events={payment.events} />
+                  <PaymentEvents
+                    events={payment.events}
+                    data-testid={`payment-events-${payment.paymentRef}`}
+                  />
                 </div>
               </div>
             ))}

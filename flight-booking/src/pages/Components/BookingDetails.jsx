@@ -23,11 +23,11 @@ const BookingDetails = ({ booking, onClose }) => {
 
         <div className="space-y-4">
           <div>
-            <p>
+            <p data-testid="booking-number">
               <span className="font-semibold">Booking Number:</span>{" "}
               {booking.bookingNumber}
             </p>
-            <p>
+            <p data-testid="booking-status">
               <span className="font-semibold">Status:</span>{" "}
               <StatusBooking status={booking.status} />
             </p>
@@ -38,7 +38,11 @@ const BookingDetails = ({ booking, onClose }) => {
               <FaPlane className="text-blue-500" /> Flights
             </h4>
             {booking.flights.map((flight, idx) => (
-              <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
+              <div
+                key={idx}
+                className="mb-3 p-3 border rounded bg-gray-50"
+                data-testid={`flight-info-${idx}`}
+              >
                 <p>
                   <span className="font-semibold">Flight:</span>{" "}
                   {flight.flightNumber} - {flight.airlineName}
@@ -66,7 +70,11 @@ const BookingDetails = ({ booking, onClose }) => {
               <FaUser className="text-green-500" /> Passengers
             </h4>
             {booking.passengers.map((passenger, idx) => (
-              <div key={idx} className="mb-3 p-3 border rounded bg-gray-50">
+              <div
+                key={idx}
+                className="mb-3 p-3 border rounded bg-gray-50"
+                data-testid={`passenger-info-${idx}`}
+              >
                 <p className="font-semibold mb-1">
                   Passenger #{idx + 1}: {passenger.firstName}{" "}
                   {passenger.lastName} ({passenger.type})
@@ -97,7 +105,7 @@ const BookingDetails = ({ booking, onClose }) => {
                     <h5 className="font-semibold">Tickets:</h5>
                     <div className="space-y-1 pl-4 border-l-2 border-gray-300">
                       {passenger.tickets.map((ticket, i) => (
-                        <p key={i}>
+                        <p key={i} data-testid={`ticket-info-${idx}-${i}`}>
                           <span className="font-semibold">Flight:</span>{" "}
                           {ticket.flightNumber} |{" "}
                           <span className="font-semibold">Ticket No.:</span>{" "}
@@ -116,6 +124,7 @@ const BookingDetails = ({ booking, onClose }) => {
                         <div
                           key={i}
                           className="pl-4 border-l-2 border-gray-300"
+                          data-testid={`addon-info-${idx}-${i}`}
                         >
                           <p>
                             <span className="font-semibold">Flight:</span>{" "}
@@ -149,6 +158,7 @@ const BookingDetails = ({ booking, onClose }) => {
           <button
             onClick={onClose}
             className="bg-gray-600 text-white px-4 py-1.5 rounded"
+            data-testid="close-booking-details"
           >
             Close
           </button>

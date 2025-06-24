@@ -34,12 +34,22 @@ function VerifyOTP({ user }) {
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
           placeholder="Enter 6-digit OTP"
+          data-testid="otp-input"
         />
-        <button type="submit" className="otp-button">
+        <button type="submit" className="otp-button" data-testid="otp-submit">
           Verify
         </button>
       </form>
-      {message && <p className="otp-message">{message}</p>}
+      {message && (
+        <p
+          className="otp-message"
+          data-testid={
+            message.includes("successfully") ? "otp-success" : "otp-error"
+          }
+        >
+          {message}
+        </p>
+      )}
     </div>
   );
 }

@@ -45,6 +45,7 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
   return (
     <div data-testid={`flight-info-${label.toLowerCase()}`}>
       <span
+        data-testid={`label-${label.toLowerCase()}`}
         className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-3`}
       >
         {label}
@@ -52,6 +53,7 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
       <div className="flex items-center gap-3 text-sm mb-3">
         {flight.logoUrl && ( // Using flight.logoUrl directly
           <img
+            data-testid={`flight-logo-${label.toLowerCase()}`}
             src={flight.logoUrl}
             alt={`${flight.airlineName || ""} logo`}
             className="h-24 w-32 p-2 round-full object-contain flex-shrink-0"

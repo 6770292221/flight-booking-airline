@@ -139,7 +139,10 @@ const PaymentPage = () => {
         )}
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 mb-3 rounded text-sm">
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 mb-3 rounded text-sm"
+            data-testid="payment-error"
+          >
             {error}
           </div>
         )}
@@ -166,6 +169,7 @@ const PaymentPage = () => {
               </label>
               <select
                 className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
+                data-testid="select-payment-method"
                 value={paymentMethod}
                 onChange={handlePaymentMethodChange}
               >
@@ -200,6 +204,7 @@ const PaymentPage = () => {
                         checked={cardType === "Visa"}
                         onChange={handleCardTypeChange}
                         className="form-radio text-blue-600"
+                        data-testid="radio-card-visa"
                       />
                       <img
                         src="https://img.icons8.com/color/48/visa.png"
@@ -217,6 +222,7 @@ const PaymentPage = () => {
                         checked={cardType === "MasterCard"}
                         onChange={handleCardTypeChange}
                         className="form-radio text-blue-600"
+                        data-testid="radio-card-mastercard"
                       />
                       <img
                         src="https://img.icons8.com/color/48/mastercard.png"
@@ -234,6 +240,7 @@ const PaymentPage = () => {
                         checked={cardType === "JCB"}
                         onChange={handleCardTypeChange}
                         className="form-radio text-blue-600"
+                        data-testid="radio-card-jcb"
                       />
                       <img
                         src="https://img.icons8.com/color/48/jcb.png"
@@ -254,6 +261,7 @@ const PaymentPage = () => {
                     setCardNumber(value);
                   }}
                   placeholder="0000-0000-0000-0000"
+                  testId="input-card-number"
                 />
 
                 <Input
@@ -266,6 +274,7 @@ const PaymentPage = () => {
                     }
                   }}
                   placeholder="John Doe"
+                  testId="input-name-on-card"
                 />
                 <div className="flex gap-3">
                   <div className="w-1/2">
@@ -282,6 +291,7 @@ const PaymentPage = () => {
                         setExpiryDate(value);
                       }}
                       placeholder="MM/YY"
+                      testId="input-expiry"
                     />
                   </div>
                   <div className="w-1/2">
@@ -295,6 +305,7 @@ const PaymentPage = () => {
                         setCvv(value);
                       }}
                       placeholder="123"
+                      testId="input-cvv"
                     />
                   </div>
                 </div>
@@ -305,6 +316,7 @@ const PaymentPage = () => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
+                data-testid="btn-confirm-payment"
                 className={`w-full bg-blue-600 text-white py-1.5 rounded text-sm hover:bg-blue-700 transition ${
                   isProcessing ? "opacity-50 cursor-not-allowed" : ""
                 }`}
@@ -334,6 +346,7 @@ const Input = ({
       onChange={onChange}
       readOnly={readOnly}
       placeholder={placeholder}
+      data-testid={testId}
       className="w-full p-2 border rounded focus:ring-1 focus:ring-blue-500 text-sm"
     />
   </div>
