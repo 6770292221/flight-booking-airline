@@ -322,6 +322,7 @@ const SearchFlight = () => {
                 <input
                   type="radio"
                   name="direction"
+                  data-testid="radio-oneway"
                   value="ONEWAY"
                   checked={form.direction === "ONEWAY"}
                   onChange={handleChange}
@@ -333,6 +334,7 @@ const SearchFlight = () => {
                 <input
                   type="radio"
                   name="direction"
+                  data-testid="radio-roundtrip"
                   value="ROUNDTRIP"
                   checked={form.direction === "ROUNDTRIP"}
                   onChange={handleChange}
@@ -351,6 +353,7 @@ const SearchFlight = () => {
                 name="originLocationCode"
                 value={form.originLocationCode}
                 onChange={handleChange}
+                data-testid="select-origin"
                 className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Select Origin --</option>
@@ -374,6 +377,7 @@ const SearchFlight = () => {
                 name="destinationLocationCode"
                 value={form.destinationLocationCode}
                 onChange={handleChange}
+                data-testid="select-destination"
                 className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">-- Select Destination --</option>
@@ -400,6 +404,7 @@ const SearchFlight = () => {
               <input
                 type="date"
                 name="departureDate"
+                data-testid="input-departure-date"
                 value={form.departureDate}
                 onChange={handleChange}
                 min={today}
@@ -419,6 +424,7 @@ const SearchFlight = () => {
                 <input
                   type="date"
                   name="arrivalDate"
+                  data-testid="input-return-date"
                   value={form.arrivalDate}
                   onChange={handleChange}
                   min={form.departureDate}
@@ -446,6 +452,7 @@ const SearchFlight = () => {
                 <input
                   type="number"
                   name="adults"
+                  data-testid="input-adults"
                   value={form.adults}
                   onChange={handleChange}
                   min="1"
@@ -475,6 +482,7 @@ const SearchFlight = () => {
                 <input
                   type="number"
                   name="children"
+                  data-testid="input-children"
                   value={form.children}
                   onChange={handleChange}
                   min="0"
@@ -504,6 +512,7 @@ const SearchFlight = () => {
                 <input
                   type="number"
                   name="infants"
+                  data-testid="input-infants"
                   value={form.infants}
                   onChange={handleChange}
                   min="0"
@@ -525,6 +534,7 @@ const SearchFlight = () => {
               </label>
               <select
                 name="cabinClass"
+                data-testid="select-cabin-class"
                 value={form.cabinClass}
                 onChange={handleChange}
                 className="w-[476px] border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -543,6 +553,7 @@ const SearchFlight = () => {
           <div className="mt-6 text-right">
             <button
               onClick={handleSearch}
+              data-testid="btn-search"
               className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg shadow"
             >
               Search Flights

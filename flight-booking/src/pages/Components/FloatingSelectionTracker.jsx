@@ -43,7 +43,7 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
   const arrivalTimeBKK = formatDateTimeInBKK(flight.arrival?.time);
 
   return (
-    <div>
+    <div data-testid={`flight-info-${label.toLowerCase()}`}>
       <span
         className={`text-sm font-semibold uppercase tracking-wider ${labelColor} block mb-3`}
       >
@@ -77,7 +77,10 @@ const FlightInfoDisplay = ({ flight, label, labelColor }) => {
           {flight.departure?.iataCode} &rarr; {flight.arrival?.iataCode}
         </span>
       </div>
-      <div className="mt-2 text-right">
+      <div
+        className="mt-2 text-right"
+        data-testid={`flight-price-${label.toLowerCase()}`}
+      >
         <span className="text-lg font-bold">{formatPrice(flight.price)}</span>
       </div>
     </div>
@@ -117,6 +120,7 @@ const FloatingSelectionTracker = ({
       `}
       role="status"
       aria-live="polite"
+      data-testid="floating-tracker"
     >
       <div className="flex flex-col gap-6 md:flex-row md:justify-around mb-1 p-5">
         {" "}
@@ -140,7 +144,7 @@ const FloatingSelectionTracker = ({
                 labelColor="text-indigo-200"
               />
             ) : (
-              <div>
+              <div data-testid="flight-info-return-placeholder">
                 <span className="text-sm font-semibold uppercase tracking-wider text-indigo-200 block mb-2">
                   Return
                 </span>
@@ -159,6 +163,7 @@ const FloatingSelectionTracker = ({
           <button
             onClick={onContinue}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-1 rounded-lg font-semibold shadow alinge-left"
+            data-testid="btn-proceed-booking"
           >
             Proceed to Booking
           </button>

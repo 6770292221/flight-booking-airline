@@ -102,6 +102,7 @@ const Login = () => {
                 type="email"
                 id="email"
                 name="email"
+                data-testid="input-email"
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
@@ -120,6 +121,7 @@ const Login = () => {
                 type="password"
                 id="password"
                 name="password"
+                data-testid="input-password"
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
@@ -128,12 +130,18 @@ const Login = () => {
             </div>
 
             {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
+              <div
+                className="text-red-500 text-sm text-center"
+                data-testid="login-error"
+              >
+                {error}
+              </div>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
+              data-testid="btn-login"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
             >
               {isLoading ? "Logging In..." : "Sign In"}
@@ -162,7 +170,10 @@ const Login = () => {
 
       {/* OTP Modal */}
       {showOtpModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+          data-testid="otp-modal"
+        >
           <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full animate-fade-in">
             <h3 className="text-2xl font-bold text-center mb-6">Verify OTP</h3>
             <form onSubmit={handleVerifyOtp} className="space-y-4">
@@ -172,11 +183,13 @@ const Login = () => {
                 value={otp}
                 onChange={handleOtpChange}
                 placeholder="Enter 6-digit code"
+                data-testid="input-otp"
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
                 required
               />
               <button
                 type="submit"
+                data-testid="btn-verify-otp"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
               >
                 Verify
@@ -184,12 +197,18 @@ const Login = () => {
             </form>
 
             {otpError && (
-              <p className="text-red-500 text-center text-sm mt-4">
+              <p
+                className="text-red-500 text-center text-sm mt-4"
+                data-testid="otp-error"
+              >
                 {otpError}
               </p>
             )}
             {message && (
-              <p className="text-green-500 text-center text-sm mt-4">
+              <p
+                className="text-green-500 text-center text-sm mt-4"
+                data-testid="otp-success"
+              >
                 {message}
               </p>
             )}
@@ -197,6 +216,7 @@ const Login = () => {
             <button
               className="block w-full text-center mt-6 text-blue-500 hover:underline"
               onClick={() => setShowOtpModal(false)}
+              data-testid="btn-cancel-otp"
             >
               Cancel
             </button>

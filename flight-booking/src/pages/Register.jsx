@@ -76,6 +76,7 @@ const Register = () => {
               type="text"
               id="firstName"
               name="firstName"
+              data-testid="input-first-name"
               value={formData.firstName}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -94,6 +95,7 @@ const Register = () => {
               type="text"
               id="lastName"
               name="lastName"
+              data-testid="input-last-name"
               value={formData.lastName}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -112,6 +114,7 @@ const Register = () => {
               type="email"
               id="email"
               name="email"
+              data-testid="input-email"
               value={formData.email}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -130,6 +133,7 @@ const Register = () => {
               type="tel"
               id="phoneNumber"
               name="phoneNumber"
+              data-testid="input-phone-number"
               value={formData.phoneNumber}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -148,6 +152,7 @@ const Register = () => {
               type="password"
               id="password"
               name="password"
+              data-testid="input-password"
               value={formData.password}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -163,6 +168,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
+            data-testid="btn-submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg mt-4 transition duration-300"
           >
             {isLoading ? "Registering..." : "Register"}
