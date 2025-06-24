@@ -1,20 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'static.json',
+          dest: '.' // copy ไป root ของ dist/
+        }
+      ]
+    })
+  ],
   assetsInclude: ['**/*.png'],
-
-  // 👇 Fallback for SPA routing (ใช้ตอน dev เท่านั้น)
-  server: {
-    fs: {
-      allow: ['..']
-    }
-  },
-
   resolve: {
     alias: {
-      '@': '/src'
-    }
-  }
+      '@': resolve(__dirname, 'src'),
+    },
+  },
+  server: {
+    fs: {
+      allow: ['..'],
+    },
+  },
 })
