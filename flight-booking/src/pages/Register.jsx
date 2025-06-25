@@ -113,7 +113,6 @@ const Register = () => {
               id="email"
               name="email"
               data-testid="input-email"
-              value={formData.email}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
