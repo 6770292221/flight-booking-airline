@@ -169,47 +169,6 @@ export async function verifyEmailOtp(req, res) {
 }
 
 
-await redisClient.del(`emailOtp:${userId}`);
-
-const token = jwt.sign(
-  {
-    userId: user._id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    name: user.name,
-    isAdmin: user.isAdmin,
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
-);
-
-const redisKey = `token:${token}`;
-await redisClient.set(redisKey, JSON.stringify({ verified: true }), {
-  EX: 3600,
-});
-
-return res.status(StatusCodes.OK).json({
-  status: StatusMessages.SUCCESS,
-  code: Codes.OTP_3004,
-  message: Messages.OTP_3004,
-  data: {
-    token,
-    userId: user._id,
-    email: user.email,
-    name: user.name,
-    isAdmin: user.isAdmin,
-    verified: true,
-  },
-});
-  } catch (error) {
-  res.status(StatusCodes.SERVER_ERROR).json({
-    status: StatusMessages.FAILED,
-    message: Messages.SERVER_ERROR,
-  });
-}
-}
-
 export async function googleLoginController(req, res) {
   try {
     const user = req.user;
