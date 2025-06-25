@@ -80,7 +80,6 @@ const Register = () => {
               value={formData.firstName}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
 
@@ -99,7 +98,6 @@ const Register = () => {
               value={formData.lastName}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
 
@@ -118,7 +116,6 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
 
@@ -137,7 +134,6 @@ const Register = () => {
               value={formData.phoneNumber}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
 
@@ -156,7 +152,6 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
             />
           </div>
 

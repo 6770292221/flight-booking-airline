@@ -106,7 +106,6 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-                required
               />
             </div>
 
@@ -125,7 +124,6 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-                required
               />
             </div>
 
@@ -186,7 +184,6 @@ const Login = () => {
                 placeholder="Enter 6-digit code"
                 data-testid="input-otp"
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
-                required
               />
               <button
                 type="submit"
