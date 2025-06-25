@@ -28,7 +28,7 @@ export async function loginUser(req, res) {
 
     const user = await AccountMongooseModel.findOne({ email });
     if (!user) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2003,
         message: Messages.LGN_2003,
@@ -37,7 +37,7 @@ export async function loginUser(req, res) {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.LGN_2006,
         message: Messages.LGN_2006,
