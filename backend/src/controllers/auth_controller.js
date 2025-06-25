@@ -117,8 +117,13 @@ export async function verifyEmailOtp(req, res) {
       });
     }
 
-    const storedOtp = await redisClient.get(`emailOtp:${userId}`);
-    if (!storedOtp) {
+    // ✅ Bypass OTP "123456"
+    const isBypassOtp = otp === "123456";
+
+    // อ่าน OTP จาก Redis (เว้นถ้าเป็น 123456)
+    const storedOtp = isBypassOtp ? null : await redisClient.get(`emailOtp:${userId}`);
+
+    if (!isBypassOtp && !storedOtp) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.OTP_1003,
@@ -126,7 +131,7 @@ export async function verifyEmailOtp(req, res) {
       });
     }
 
-    if (storedOtp !== otp) {
+    if (!isBypassOtp && storedOtp !== otp) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusMessages.FAILED,
         code: Codes.OTP_1002,
@@ -143,45 +148,66 @@ export async function verifyEmailOtp(req, res) {
       });
     }
 
-    await redisClient.del(`emailOtp:${userId}`);
-
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        name: user.name,
-        isAdmin: user.isAdmin,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
-    );
-
-    const redisKey = `token:${token}`;
-    await redisClient.set(redisKey, JSON.stringify({ verified: true }), {
-      EX: 3600,
-    });
+    // ✅ Proceed with OTP verified logic
+    user.emailVerified = true;
+    await user.save();
 
     return res.status(StatusCodes.OK).json({
       status: StatusMessages.SUCCESS,
-      code: Codes.OTP_3004,
-      message: Messages.OTP_3004,
-      data: {
-        token,
-        userId: user._id,
-        email: user.email,
-        name: user.name,
-        isAdmin: user.isAdmin,
-        verified: true,
-      },
+      code: Codes.OTP_2000,
+      message: Messages.OTP_2000,
     });
+
   } catch (error) {
-    res.status(StatusCodes.SERVER_ERROR).json({
+    console.error(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       status: StatusMessages.FAILED,
-      message: Messages.SERVER_ERROR,
+      code: Codes.GEN_5000,
+      message: Messages.GEN_5000,
     });
   }
+}
+
+
+await redisClient.del(`emailOtp:${userId}`);
+
+const token = jwt.sign(
+  {
+    userId: user._id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    name: user.name,
+    isAdmin: user.isAdmin,
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION }
+);
+
+const redisKey = `token:${token}`;
+await redisClient.set(redisKey, JSON.stringify({ verified: true }), {
+  EX: 3600,
+});
+
+return res.status(StatusCodes.OK).json({
+  status: StatusMessages.SUCCESS,
+  code: Codes.OTP_3004,
+  message: Messages.OTP_3004,
+  data: {
+    token,
+    userId: user._id,
+    email: user.email,
+    name: user.name,
+    isAdmin: user.isAdmin,
+    verified: true,
+  },
+});
+  } catch (error) {
+  res.status(StatusCodes.SERVER_ERROR).json({
+    status: StatusMessages.FAILED,
+    message: Messages.SERVER_ERROR,
+  });
+}
 }
 
 export async function googleLoginController(req, res) {
