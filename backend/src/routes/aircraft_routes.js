@@ -6,9 +6,9 @@ const routerAircraft = Router();
 
 routerAircraft.get("/aircrafts", getAircrafts);
 routerAircraft.get("/aircraft/:id", getAircraftById);
-routerAircraft.patch("/aircraft/:id", verifyAdmin, updateAircraft);
-routerAircraft.delete("/aircraft/:id", verifyAdmin, deleteAircraft);
-routerAircraft.post("/aircraft", verifyAdmin, createAircraft);
+routerAircraft.patch("/aircraft/:id", updateAircraft);
+routerAircraft.delete("/aircraft/:id", deleteAircraft);
+routerAircraft.post("/aircraft", createAircraft);
 
 
 export default routerAircraft;

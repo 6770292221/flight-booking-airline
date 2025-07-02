@@ -14,9 +14,9 @@ const routerAirports = Router();
 // CRUD Routes
 routerAirports.get("/airports", getAirports);
 routerAirports.get("/airports/:id", getAirportById);
-routerAirports.post("/airports", verifyAdmin, createAirport);
-routerAirports.put("/airports/:id", verifyAdmin, updateAirport);
-routerAirports.delete("/airports/:id", verifyAdmin, deleteAirport);
+routerAirports.post("/airports", createAirport);
+routerAirports.put("/airports/:id", updateAirport);
+routerAirports.delete("/airports/:id", deleteAirport);
 routerAirports.get('/locations', getLocations);
 
 
